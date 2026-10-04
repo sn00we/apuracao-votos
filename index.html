@@ -177,19 +177,25 @@
     <!-- NAVIGATION TABS -->
     <nav class="nav-tabs">
         <button class="nav-tab active" data-target="view-split">
-            <span class="tab-icon">⚡</span> VISÃO INTEGRADA (BRASIL + ALAGOAS)
+            <span class="tab-icon">⚡</span> VISÃO INTEGRADA (BR + AL)
         </button>
         <button class="nav-tab" data-target="view-presidente">
-            <span class="tab-icon">🇧🇷</span> PRESIDÊNCIA DA REPÚBLICA (NACIONAL)
+            <span class="tab-icon">🇧🇷</span> PRESIDENTE (BR)
         </button>
         <button class="nav-tab" data-target="view-alagoas">
-            <span class="tab-icon">🌴</span> GOVERNO DE ALAGOAS (AL)
+            <span class="tab-icon">🌴</span> GOVERNADOR (AL)
         </button>
         <button class="nav-tab" data-target="view-senado-al">
-            <span class="tab-icon">🏛️</span> SENADO & CÂMARA POR ALAGOAS
+            <span class="tab-icon">🏛️</span> SENADOR (AL)
+        </button>
+        <button class="nav-tab" data-target="view-deputado-federal">
+            <span class="tab-icon">📋</span> DEPUTADO FEDERAL (AL)
+        </button>
+        <button class="nav-tab" data-target="view-deputado-estadual">
+            <span class="tab-icon">🏛️</span> DEPUTADO ESTADUAL (AL)
         </button>
         <button class="nav-tab" data-target="view-telemetry">
-            <span class="tab-icon">📡</span> FLUXO DE URNAS & LOGS 1ms
+            <span class="tab-icon">📡</span> TELEMETRIA 1ms
         </button>
     </nav>
 
@@ -460,6 +466,120 @@
                         <!-- Injected via JS -->
                     </div>
                 </article>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: DEPUTADO FEDERAL (ALAGOAS - 9 VAGAS) ================= -->
+        <section id="view-deputado-federal" class="view-panel">
+            <div class="single-race-hero glass-panel glow-purple">
+                <div class="race-hero-header">
+                    <div class="hero-titles">
+                        <span class="kicker text-purple">CONGRESSO NACIONAL // CÂMARA DOS DEPUTADOS</span>
+                        <h1>📋 DEPUTADO FEDERAL POR ALAGOAS (2026)</h1>
+                        <span class="hero-desc">BANCADA FEDERAL DE ALAGOAS &bull; 9 VAGAS EM DISPUTA &bull; QUOCIENTE ELEITORAL E SOBRAS</span>
+                    </div>
+                    <div class="hero-mega-stats">
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">SEÇÕES APURADAS</span>
+                            <span class="stat-number text-purple numeric" id="fed-sec-percent">0.00%</span>
+                            <span class="stat-sub" id="fed-sec-count">0 / 7.101 urnas</span>
+                        </div>
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">VOTOS VÁLIDOS</span>
+                            <span class="stat-number text-cyan numeric" id="fed-votos-validos">0</span>
+                            <span class="stat-sub" id="fed-total-votos">TOTAL: 0 votos</span>
+                        </div>
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">VAGAS EM DISPUTA</span>
+                            <span class="stat-number text-gold">9 VAGAS</span>
+                            <span class="stat-sub">TOP 9 ELEITOS PROJETADOS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROGRESS BAR -->
+                <div class="progress-section">
+                    <div class="progress-labels">
+                        <span>TOTALIZAÇÃO GERAL (AL): <strong id="fed-progress-label" class="numeric text-purple">0.0000%</strong></span>
+                        <span class="text-dim">ATUALIZAÇÃO DIRETA DA CDN DO TSE (1ms)</span>
+                    </div>
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar-fill bg-purple" id="fed-progress-bar" style="width: 0%;">
+                            <span class="glow-edge"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILTRO DE BUSCA -->
+                <div class="filter-bar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="filter-fed" class="custom-input filter-search-input" placeholder="Buscar deputado federal por nome, número ou partido (ex: Alvinho Lira, Luciano Amaral, 1111, PP)...">
+                    </div>
+                    <div class="filter-count text-muted" id="fed-count-pill">Exibindo candidatos</div>
+                </div>
+
+                <!-- GRID DETALHADO DOS CANDIDATOS FEDERAIS -->
+                <div class="detailed-candidates-grid" id="fed-detailed-grid">
+                    <!-- Injetado via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: DEPUTADO ESTADUAL (ALAGOAS - 27 VAGAS) ================= -->
+        <section id="view-deputado-estadual" class="view-panel">
+            <div class="single-race-hero glass-panel glow-teal">
+                <div class="race-hero-header">
+                    <div class="hero-titles">
+                        <span class="kicker text-teal">ASSEMBLEIA LEGISLATIVA DE ALAGOAS // ALEAL</span>
+                        <h1>🏛️ DEPUTADO ESTADUAL POR ALAGOAS (2026)</h1>
+                        <span class="hero-desc">PALÁCIO TAVARES BASTOS &bull; 27 VAGAS EM DISPUTA &bull; QUOCIENTE ELEITORAL E PARTIDÁRIO</span>
+                    </div>
+                    <div class="hero-mega-stats">
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">SEÇÕES APURADAS</span>
+                            <span class="stat-number text-teal numeric" id="est-sec-percent">0.00%</span>
+                            <span class="stat-sub" id="est-sec-count">0 / 7.101 urnas</span>
+                        </div>
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">VOTOS VÁLIDOS</span>
+                            <span class="stat-number text-cyan numeric" id="est-votos-validos">0</span>
+                            <span class="stat-sub" id="est-total-votos">TOTAL: 0 votos</span>
+                        </div>
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">VAGAS EM DISPUTA</span>
+                            <span class="stat-number text-gold">27 VAGAS</span>
+                            <span class="stat-sub">TOP 27 ELEITOS PROJETADOS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROGRESS BAR -->
+                <div class="progress-section">
+                    <div class="progress-labels">
+                        <span>TOTALIZAÇÃO GERAL (AL): <strong id="est-progress-label" class="numeric text-teal">0.0000%</strong></span>
+                        <span class="text-dim">ATUALIZAÇÃO DIRETA DA CDN DO TSE (1ms)</span>
+                    </div>
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar-fill bg-teal" id="est-progress-bar" style="width: 0%;">
+                            <span class="glow-edge"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILTRO DE BUSCA -->
+                <div class="filter-bar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="filter-est" class="custom-input filter-search-input" placeholder="Buscar deputado estadual por nome, número ou partido (ex: Marcelo Victor, Cabo Bebeto, 15789, MDB)...">
+                    </div>
+                    <div class="filter-count text-muted" id="est-count-pill">Exibindo candidatos</div>
+                </div>
+
+                <!-- GRID DETALHADO DOS CANDIDATOS ESTADUAIS -->
+                <div class="detailed-candidates-grid" id="est-detailed-grid">
+                    <!-- Injetado via JS -->
+                </div>
             </div>
         </section>
 

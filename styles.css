@@ -1303,7 +1303,75 @@ canvas#telemetryCanvas {
 .text-gold { color: var(--neon-gold); }
 .text-green { color: var(--neon-green); }
 .text-red { color: var(--neon-red); }
+.text-purple { color: #c084fc; }
 .text-white { color: #ffffff; }
+
+.glow-purple {
+    border-color: rgba(168, 85, 247, 0.5) !important;
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
+}
+
+/* Filter & Search Toolbar */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 8px 0 16px 0;
+    flex-wrap: wrap;
+}
+
+.search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(10, 16, 28, 0.85);
+    border: 1px solid rgba(60, 90, 140, 0.45);
+    border-radius: 8px;
+    padding: 6px 14px;
+    flex: 1;
+    min-width: 260px;
+    max-width: 600px;
+    transition: all 0.2s ease;
+}
+
+.search-input-wrap:focus-within {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+.search-icon {
+    font-size: 14px;
+    color: var(--text-dim);
+}
+
+.filter-search-input {
+    border: none !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    width: 100%;
+    font-size: 12px;
+    padding: 0 !important;
+}
+
+.filter-count {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+.cand-badge.eleito {
+    background: rgba(16, 185, 129, 0.2) !important;
+    border-color: var(--neon-green) !important;
+    color: var(--neon-green) !important;
+}
+
+.cand-badge.eleito-qp {
+    background: rgba(168, 85, 247, 0.2) !important;
+    border-color: #c084fc !important;
+    color: #c084fc !important;
+}
+
 
 /* ==========================================================================
    REFRESH BUTTON GLOW & ANIMATION

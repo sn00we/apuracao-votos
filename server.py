@@ -28,6 +28,7 @@ URL_PRES_BR = "https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-c0
 URL_GOV_AL  = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0003-e006259-u.json"
 URL_SEN_AL  = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0005-e006259-u.json"
 URL_DEP_AL  = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0006-e006259-u.json"
+URL_EST_AL  = "https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0007-e006259-u.json"
 
 # Lock para atualização thread-safe
 data_lock = threading.Lock()
@@ -65,6 +66,24 @@ tse_state = {
         "votos_validos": 269375,
         "candidatos": []
     },
+    "dep_al": {
+        "secoes_total": 7101,
+        "secoes_apuradas": 2763,
+        "pct_secoes": "38,91%",
+        "total_votos": 645000,
+        "votos_validos": 589400,
+        "vagas": 9,
+        "candidatos": []
+    },
+    "est_al": {
+        "secoes_total": 7101,
+        "secoes_apuradas": 2763,
+        "pct_secoes": "38,91%",
+        "total_votos": 645000,
+        "votos_validos": 589400,
+        "vagas": 27,
+        "candidatos": []
+    },
     "data": {},
     "raw": {}
 }
@@ -91,6 +110,8 @@ def process_and_normalize_tse():
     d_pres = fetch_json(URL_PRES_BR)
     d_gov  = fetch_json(URL_GOV_AL)
     d_sen  = fetch_json(URL_SEN_AL)
+    d_dep  = fetch_json(URL_DEP_AL)
+    d_est  = fetch_json(URL_EST_AL)
 
     with data_lock:
         # Armazena cópia bruta
@@ -103,6 +124,12 @@ def process_and_normalize_tse():
         if d_sen:
             tse_state["raw"]["sen_al"] = d_sen
             tse_state["data"]["sen_al"] = d_sen
+        if d_dep:
+            tse_state["raw"]["dep_al"] = d_dep
+            tse_state["data"]["dep_al"] = d_dep
+        if d_est:
+            tse_state["raw"]["est_al"] = d_est
+            tse_state["data"]["est_al"] = d_est
 
         # 1. PRESIDENTE DA REPÚBLICA (6257)
         if d_pres and 's' in d_pres:
@@ -205,7 +232,8 @@ def process_and_normalize_tse():
                                 "pct": pct_num,
                                 "pct_str": f"{c.get('pvap')}%",
                                 "foto": f"fotos/sen_{c.get('n')}.jpeg",
-                                "foto_tse": f"https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/{sqcand}.jpeg" if sqcand else ""
+                                "foto_tse": f"https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/{sqcand}.jpeg" if sqcand else "",
+                                "eleito": c.get('e') == 's'
                             })
             cands_sen.sort(key=lambda x: x["votos"], reverse=True)
 
@@ -215,6 +243,80 @@ def process_and_normalize_tse():
                 "pct_secoes": f"{d_sen['s'].get('pst', '9,48')}%",
                 "votos_validos": int(d_sen['v'].get('vv', 0)),
                 "candidatos": cands_sen
+            }
+
+        # 4. DEPUTADO FEDERAL DE ALAGOAS (6259 / c0006)
+        if d_dep and 's' in d_dep:
+            cands_dep = []
+            for cg in d_dep.get('carg', []):
+                for agr in cg.get('agr', []):
+                    for p in agr.get('par', []):
+                        for c in p.get('cand', []):
+                            votos = int(c.get('vap') or 0)
+                            pvap_raw = str(c.get('pvap') or '0').replace(',', '.')
+                            pct_num = float(pvap_raw) / 100.0 if pvap_raw else 0.0
+                            sqcand = str(c.get('sqcand') or '')
+                            cands_dep.append({
+                                "id": str(c.get('n')),
+                                "numero": str(c.get('n')),
+                                "sqcand": sqcand,
+                                "nome": c.get('nmu') or c.get('nm'),
+                                "nome_completo": c.get('nm'),
+                                "partido": p.get('sg') or '',
+                                "votos": votos,
+                                "pct": pct_num,
+                                "pct_str": f"{c.get('pvap')}%",
+                                "foto": f"fotos/dep_{c.get('n')}.jpeg",
+                                "foto_tse": f"https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/{sqcand}.jpeg" if sqcand else "",
+                                "eleito": c.get('e') == 's'
+                            })
+            cands_dep.sort(key=lambda x: x["votos"], reverse=True)
+
+            tse_state["dep_al"] = {
+                "secoes_total": int(d_dep['s'].get('ts', 7101)),
+                "secoes_apuradas": int(d_dep['s'].get('st', 0)),
+                "pct_secoes": f"{d_dep['s'].get('pst', '0,00')}%",
+                "total_votos": int(d_dep['v'].get('tv', 0)),
+                "votos_validos": int(d_dep['v'].get('vv', 0)),
+                "vagas": 9,
+                "candidatos": cands_dep
+            }
+
+        # 5. DEPUTADO ESTADUAL DE ALAGOAS (6259 / c0007)
+        if d_est and 's' in d_est:
+            cands_est = []
+            for cg in d_est.get('carg', []):
+                for agr in cg.get('agr', []):
+                    for p in agr.get('par', []):
+                        for c in p.get('cand', []):
+                            votos = int(c.get('vap') or 0)
+                            pvap_raw = str(c.get('pvap') or '0').replace(',', '.')
+                            pct_num = float(pvap_raw) / 100.0 if pvap_raw else 0.0
+                            sqcand = str(c.get('sqcand') or '')
+                            cands_est.append({
+                                "id": str(c.get('n')),
+                                "numero": str(c.get('n')),
+                                "sqcand": sqcand,
+                                "nome": c.get('nmu') or c.get('nm'),
+                                "nome_completo": c.get('nm'),
+                                "partido": p.get('sg') or '',
+                                "votos": votos,
+                                "pct": pct_num,
+                                "pct_str": f"{c.get('pvap')}%",
+                                "foto": f"fotos/est_{c.get('n')}.jpeg",
+                                "foto_tse": f"https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/{sqcand}.jpeg" if sqcand else "",
+                                "eleito": c.get('e') == 's'
+                            })
+            cands_est.sort(key=lambda x: x["votos"], reverse=True)
+
+            tse_state["est_al"] = {
+                "secoes_total": int(d_est['s'].get('ts', 7101)),
+                "secoes_apuradas": int(d_est['s'].get('st', 0)),
+                "pct_secoes": f"{d_est['s'].get('pst', '0,00')}%",
+                "total_votos": int(d_est['v'].get('tv', 0)),
+                "votos_validos": int(d_est['v'].get('vv', 0)),
+                "vagas": 27,
+                "candidatos": cands_est
             }
 
         tse_state["last_sync"] = time.strftime("%H:%M:%S")

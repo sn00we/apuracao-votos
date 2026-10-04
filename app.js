@@ -128,17 +128,36 @@
             ]
         },
 
-        // 4. DEPUTADOS FEDERAIS POR ALAGOAS
-        deputies: [
-            { name: 'DANIEL BARBOSA', party: 'PP', number: '1155', targetVotes: 4890, currentVotes: 4890, targetShare: 0.0784 },
-            { name: 'MARX BELTRÃO', party: 'PP', number: '4444', targetVotes: 3120, currentVotes: 3120, targetShare: 0.0498 },
-            { name: 'NIVALDO ALBUQUERQUE', party: 'UNIÃO', number: '4400', targetVotes: 2780, currentVotes: 2780, targetShare: 0.0442 },
-            { name: 'ARTHUR LIRA (LEGENDA)', party: 'PP', number: '1111', targetVotes: 2570, currentVotes: 2570, targetShare: 0.0410 },
-            { name: 'ALFREDO GASPAR', party: 'UNIÃO', number: '4455', targetVotes: 2390, currentVotes: 2390, targetShare: 0.0382 },
-            { name: 'LUCIANO AMARAL', party: 'PV', number: '4333', targetVotes: 2140, currentVotes: 2140, targetShare: 0.0341 },
-            { name: 'ISNALDO BULHÕES JR', party: 'MDB', number: '1515', targetVotes: 1960, currentVotes: 1960, targetShare: 0.0313 },
-            { name: 'RAFAEL BRITO', party: 'MDB', number: '1580', targetVotes: 1790, currentVotes: 1790, targetShare: 0.0286 }
-        ],
+        // 4. DEPUTADOS FEDERAIS POR ALAGOAS (9 VAGAS NA CÂMARA)
+        depFed: {
+            secoesTotal: 7101,
+            secoesApuradasTarget: 2763,
+            secoesApuradasCurrent: 2763,
+            totalVotosTarget: 645000,
+            totalVotosCurrent: 645000,
+            validosTarget: 589400,
+            validosCurrent: 589400,
+            vagas: 9,
+            candidates: []
+        },
+
+        // 5. DEPUTADOS ESTADUAIS POR ALAGOAS (27 VAGAS NA ALEAL)
+        depEst: {
+            secoesTotal: 7101,
+            secoesApuradasTarget: 2763,
+            secoesApuradasCurrent: 2763,
+            totalVotosTarget: 645000,
+            totalVotosCurrent: 645000,
+            validosTarget: 589400,
+            validosCurrent: 589400,
+            vagas: 27,
+            candidates: []
+        },
+
+        // Deputados legado para compatibilidade com outros módulos
+        get deputies() {
+            return this.depFed.candidates.slice(0, 9);
+        },
 
         // 5. REGIONAL UF (ESTADOS)
         ufs: [
@@ -223,7 +242,7 @@
         govDetailedGrid: document.getElementById('gov-detailed-grid'),
         alagoasCitiesGrid: document.getElementById('alagoas-cities-grid'),
 
-        // Senado & Deputados
+        // Senado & Deputados Legado
         senSecPercent: document.getElementById('sen-sec-percent'),
         senSecCount: document.getElementById('sen-sec-count'),
         senProgressBar: document.getElementById('sen-progress-bar'),
@@ -232,6 +251,28 @@
         depTotalVotos: document.getElementById('dep-total-votos'),
         depProgressBar: document.getElementById('dep-progress-bar'),
         depCandidatesContainer: document.getElementById('dep-candidates-container'),
+
+        // Deputado Federal AL (Dedicado)
+        fedSecPercent: document.getElementById('fed-sec-percent'),
+        fedSecCount: document.getElementById('fed-sec-count'),
+        fedTotalVotos: document.getElementById('fed-total-votos'),
+        fedVotosValidos: document.getElementById('fed-votos-validos'),
+        fedProgressBar: document.getElementById('fed-progress-bar'),
+        fedProgressLabel: document.getElementById('fed-progress-label'),
+        fedCandidatesContainer: document.getElementById('fed-detailed-grid'),
+        filterFed: document.getElementById('filter-fed'),
+        fedCountPill: document.getElementById('fed-count-pill'),
+
+        // Deputado Estadual AL (Dedicado)
+        estSecPercent: document.getElementById('est-sec-percent'),
+        estSecCount: document.getElementById('est-sec-count'),
+        estTotalVotos: document.getElementById('est-total-votos'),
+        estVotosValidos: document.getElementById('est-votos-validos'),
+        estProgressBar: document.getElementById('est-progress-bar'),
+        estProgressLabel: document.getElementById('est-progress-label'),
+        estCandidatesContainer: document.getElementById('est-detailed-grid'),
+        filterEst: document.getElementById('filter-est'),
+        estCountPill: document.getElementById('est-count-pill'),
 
         // Ticker & Logs
         liveStreamTicker: document.getElementById('live-stream-ticker'),
@@ -548,6 +589,100 @@
                 });
             }
 
+            // 4. DEPUTADOS FEDERAIS POR ALAGOAS (NORMALIZADO)
+            if (payload.dep_al && payload.dep_al.candidatos) {
+                const df = payload.dep_al;
+                state.depFed.secoesTotal = df.secoes_total || 7101;
+                state.depFed.secoesApuradasTarget = df.secoes_apuradas !== undefined ? df.secoes_apuradas : state.depFed.secoesApuradasTarget;
+                state.depFed.totalVotosTarget = df.total_votos || state.depFed.totalVotosTarget;
+                state.depFed.validosTarget = df.votos_validos || state.depFed.validosTarget;
+                state.depFed.vagas = df.vagas || 9;
+
+                df.candidatos.forEach(c => {
+                    const idStr = String(c.id || c.numero);
+                    let candObj = state.depFed.candidates.find(item => item.id === idStr);
+                    const photoPath = c.foto || resolveCandidatePhoto('dep', idStr, c.sqcand, candObj ? candObj.photo : null);
+                    if (candObj) {
+                        candObj.targetVotes = c.votos;
+                        candObj.targetShare = c.pct;
+                        candObj.name = c.nome;
+                        candObj.fullName = c.nome_completo || candObj.fullName;
+                        candObj.party = c.partido;
+                        candObj.pct_str = c.pct_str || candObj.pct_str;
+                        candObj.eleito = !!c.eleito;
+                        if (photoPath) candObj.photo = photoPath;
+                        if (instantSnap) {
+                            candObj.currentVotes = c.votos;
+                            candObj.currentShare = c.pct;
+                        }
+                    } else {
+                        state.depFed.candidates.push({
+                            id: idStr,
+                            number: idStr,
+                            sqcand: c.sqcand || '',
+                            name: c.nome,
+                            fullName: c.nome_completo || c.nome,
+                            party: c.partido,
+                            targetVotes: c.votos,
+                            currentVotes: c.votos,
+                            targetShare: c.pct,
+                            currentShare: c.pct,
+                            pct_str: c.pct_str || `${(c.pct * 100).toFixed(2)}%`,
+                            eleito: !!c.eleito,
+                            photo: photoPath || 'fotos/dep_' + idStr + '.jpeg'
+                        });
+                        dataChanged = true;
+                    }
+                });
+            }
+
+            // 5. DEPUTADOS ESTADUAIS POR ALAGOAS (NORMALIZADO)
+            if (payload.est_al && payload.est_al.candidatos) {
+                const de = payload.est_al;
+                state.depEst.secoesTotal = de.secoes_total || 7101;
+                state.depEst.secoesApuradasTarget = de.secoes_apuradas !== undefined ? de.secoes_apuradas : state.depEst.secoesApuradasTarget;
+                state.depEst.totalVotosTarget = de.total_votos || state.depEst.totalVotosTarget;
+                state.depEst.validosTarget = de.votos_validos || state.depEst.validosTarget;
+                state.depEst.vagas = de.vagas || 27;
+
+                de.candidatos.forEach(c => {
+                    const idStr = String(c.id || c.numero);
+                    let candObj = state.depEst.candidates.find(item => item.id === idStr);
+                    const photoPath = c.foto || resolveCandidatePhoto('est', idStr, c.sqcand, candObj ? candObj.photo : null);
+                    if (candObj) {
+                        candObj.targetVotes = c.votos;
+                        candObj.targetShare = c.pct;
+                        candObj.name = c.nome;
+                        candObj.fullName = c.nome_completo || candObj.fullName;
+                        candObj.party = c.partido;
+                        candObj.pct_str = c.pct_str || candObj.pct_str;
+                        candObj.eleito = !!c.eleito;
+                        if (photoPath) candObj.photo = photoPath;
+                        if (instantSnap) {
+                            candObj.currentVotes = c.votos;
+                            candObj.currentShare = c.pct;
+                        }
+                    } else {
+                        state.depEst.candidates.push({
+                            id: idStr,
+                            number: idStr,
+                            sqcand: c.sqcand || '',
+                            name: c.nome,
+                            fullName: c.nome_completo || c.nome,
+                            party: c.partido,
+                            targetVotes: c.votos,
+                            currentVotes: c.votos,
+                            targetShare: c.pct,
+                            currentShare: c.pct,
+                            pct_str: c.pct_str || `${(c.pct * 100).toFixed(2)}%`,
+                            eleito: !!c.eleito,
+                            photo: photoPath || 'fotos/est_' + idStr + '.jpeg'
+                        });
+                        dataChanged = true;
+                    }
+                });
+            }
+
             if (payload.tse_horario) {
                 state.tseLastTime = payload.tse_horario;
                 if (dom.tseTimePill) dom.tseTimePill.textContent = payload.tse_horario;
@@ -697,6 +832,116 @@
             }
         }
 
+        // FALLBACK: Deputados Federais AL (dados diretos da CDN do TSE)
+        const rawDep = payload.dep_al || (payload.data && payload.data.dep_al) || (payload.raw && payload.raw.dep_al);
+        if (rawDep && rawDep.s && (!payload.dep_al || !payload.dep_al.candidatos)) {
+            state.depFed.secoesTotal = parseInt(rawDep.s.ts, 10) || state.depFed.secoesTotal;
+            state.depFed.secoesApuradasTarget = parseInt(rawDep.s.st, 10) || state.depFed.secoesApuradasTarget;
+            state.depFed.totalVotosTarget = parseInt(rawDep.v.tv, 10) || state.depFed.totalVotosTarget;
+            state.depFed.validosTarget = parseInt(rawDep.v.vv, 10) || state.depFed.validosTarget;
+
+            for (const cg of (rawDep.carg || [])) {
+                for (const agr of (cg.agr || [])) {
+                    for (const p of (agr.par || [])) {
+                        for (const c of (p.cand || [])) {
+                            const cId = String(c.n);
+                            let candObj = state.depFed.candidates.find(item => item.id === cId);
+                            const votes = parseInt(c.vap, 10) || 0;
+                            const share = parseFloat(String(c.pvap || '0').replace(',', '.')) / 100;
+                            const photoPath = resolveCandidatePhoto('dep', cId, c.sqcand, candObj ? candObj.photo : null);
+                            const elected = c.e === 's' || c.dstit === 'Eleito' || c.dstit === 'Eleito por QP' || c.dstit === 'Eleito por média';
+                            if (candObj) {
+                                candObj.targetVotes = votes;
+                                candObj.targetShare = share;
+                                candObj.name = c.nmu || c.nm;
+                                candObj.fullName = c.nm;
+                                candObj.party = p.sg || candObj.party;
+                                candObj.pct_str = (share * 100).toFixed(2) + '%';
+                                candObj.eleito = elected;
+                                if (photoPath) candObj.photo = photoPath;
+                                if (instantSnap) {
+                                    candObj.currentVotes = votes;
+                                    candObj.currentShare = share;
+                                }
+                            } else {
+                                state.depFed.candidates.push({
+                                    id: cId,
+                                    number: cId,
+                                    sqcand: c.sqcand || '',
+                                    name: c.nmu || c.nm,
+                                    fullName: c.nm,
+                                    party: p.sg || '',
+                                    targetVotes: votes,
+                                    currentVotes: votes,
+                                    targetShare: share,
+                                    currentShare: share,
+                                    pct_str: (share * 100).toFixed(2) + '%',
+                                    eleito: elected,
+                                    photo: photoPath || 'fotos/dep_' + cId + '.jpeg'
+                                });
+                                dataChanged = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // FALLBACK: Deputados Estaduais AL (dados diretos da CDN do TSE)
+        const rawEst = payload.est_al || (payload.data && payload.data.est_al) || (payload.raw && payload.raw.est_al);
+        if (rawEst && rawEst.s && (!payload.est_al || !payload.est_al.candidatos)) {
+            state.depEst.secoesTotal = parseInt(rawEst.s.ts, 10) || state.depEst.secoesTotal;
+            state.depEst.secoesApuradasTarget = parseInt(rawEst.s.st, 10) || state.depEst.secoesApuradasTarget;
+            state.depEst.totalVotosTarget = parseInt(rawEst.v.tv, 10) || state.depEst.totalVotosTarget;
+            state.depEst.validosTarget = parseInt(rawEst.v.vv, 10) || state.depEst.validosTarget;
+
+            for (const cg of (rawEst.carg || [])) {
+                for (const agr of (cg.agr || [])) {
+                    for (const p of (agr.par || [])) {
+                        for (const c of (p.cand || [])) {
+                            const cId = String(c.n);
+                            let candObj = state.depEst.candidates.find(item => item.id === cId);
+                            const votes = parseInt(c.vap, 10) || 0;
+                            const share = parseFloat(String(c.pvap || '0').replace(',', '.')) / 100;
+                            const photoPath = resolveCandidatePhoto('est', cId, c.sqcand, candObj ? candObj.photo : null);
+                            const elected = c.e === 's' || c.dstit === 'Eleito' || c.dstit === 'Eleito por QP' || c.dstit === 'Eleito por média';
+                            if (candObj) {
+                                candObj.targetVotes = votes;
+                                candObj.targetShare = share;
+                                candObj.name = c.nmu || c.nm;
+                                candObj.fullName = c.nm;
+                                candObj.party = p.sg || candObj.party;
+                                candObj.pct_str = (share * 100).toFixed(2) + '%';
+                                candObj.eleito = elected;
+                                if (photoPath) candObj.photo = photoPath;
+                                if (instantSnap) {
+                                    candObj.currentVotes = votes;
+                                    candObj.currentShare = share;
+                                }
+                            } else {
+                                state.depEst.candidates.push({
+                                    id: cId,
+                                    number: cId,
+                                    sqcand: c.sqcand || '',
+                                    name: c.nmu || c.nm,
+                                    fullName: c.nm,
+                                    party: p.sg || '',
+                                    targetVotes: votes,
+                                    currentVotes: votes,
+                                    targetShare: share,
+                                    currentShare: share,
+                                    pct_str: (share * 100).toFixed(2) + '%',
+                                    eleito: elected,
+                                    photo: photoPath || 'fotos/est_' + cId + '.jpeg'
+                                });
+                                dataChanged = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         state.tseConnected = true;
 
         // Se instantSnap estiver ativo, converge imediatamente os números para o valor exato
@@ -722,6 +967,22 @@
                 c.currentShare = c.targetShare;
             });
             state.sen.candidates.forEach(c => {
+                c.currentVotes = c.targetVotes;
+                c.currentShare = c.targetShare;
+            });
+
+            state.depFed.secoesApuradasCurrent = state.depFed.secoesApuradasTarget;
+            state.depFed.totalVotosCurrent = state.depFed.totalVotosTarget;
+            state.depFed.validosCurrent = state.depFed.validosTarget;
+            state.depFed.candidates.forEach(c => {
+                c.currentVotes = c.targetVotes;
+                c.currentShare = c.targetShare;
+            });
+
+            state.depEst.secoesApuradasCurrent = state.depEst.secoesApuradasTarget;
+            state.depEst.totalVotosCurrent = state.depEst.totalVotosTarget;
+            state.depEst.validosCurrent = state.depEst.validosTarget;
+            state.depEst.candidates.forEach(c => {
                 c.currentVotes = c.targetVotes;
                 c.currentShare = c.targetShare;
             });
@@ -768,17 +1029,21 @@
         // consulta diretamente a CDN oficial do TSE via requisições paralelas ultra-rápidas:
         if (!loaded) {
             try {
-                const [resBr, resAl, resSen] = await Promise.all([
+                const [resBr, resAl, resSen, resDep, resEst] = await Promise.all([
                     fetch(`https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-c0001-e006257-u.json?t=${Date.now()}`, { cache: 'no-store' }),
                     fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0003-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' }),
-                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0005-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' })
+                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0005-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' }),
+                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0006-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' }),
+                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0007-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' })
                 ]);
 
                 if (resBr.ok && resAl.ok) {
                     const dBr = await resBr.json();
                     const dAl = await resAl.json();
                     const dSen = resSen.ok ? await resSen.json() : null;
-                    parseTsePayload({ pres_br: dBr, gov_al: dAl, sen_al: dSen }, instantSnap);
+                    const dDep = resDep.ok ? await resDep.json() : null;
+                    const dEst = resEst.ok ? await resEst.json() : null;
+                    parseTsePayload({ pres_br: dBr, gov_al: dAl, sen_al: dSen, dep_al: dDep, est_al: dEst }, instantSnap);
                     loaded = true;
                 }
             } catch (err) {}
@@ -952,7 +1217,13 @@
             });
         }
 
-        // 7. UF Row
+        // 7. DEPUTADOS FEDERAIS POR ALAGOAS (9 VAGAS NA CÂMARA)
+        renderFedCandidates();
+
+        // 8. DEPUTADOS ESTADUAIS POR ALAGOAS (27 VAGAS NA ALEAL)
+        renderEstCandidates();
+
+        // 9. UF Row
         if (dom.ufTelemetryRow) {
             dom.ufTelemetryRow.innerHTML = '';
             state.ufs.forEach(uf => {
@@ -1042,10 +1313,19 @@
                 c.currentShare = lerp(c.currentShare, c.targetShare, factor);
             });
 
-            // Suaviza deputados AL
+            // Suaviza deputados AL (legado)
             state.deputies.forEach(dep => {
                 dep.currentVotes = lerp(dep.currentVotes, dep.targetVotes, factor);
             });
+
+            // Suaviza deputados federais e estaduais AL
+            state.depFed.secoesApuradasCurrent = lerp(state.depFed.secoesApuradasCurrent, state.depFed.secoesApuradasTarget, factor);
+            state.depFed.totalVotosCurrent = lerp(state.depFed.totalVotosCurrent, state.depFed.totalVotosTarget, factor);
+            state.depFed.validosCurrent = lerp(state.depFed.validosCurrent, state.depFed.validosTarget, factor);
+
+            state.depEst.secoesApuradasCurrent = lerp(state.depEst.secoesApuradasCurrent, state.depEst.secoesApuradasTarget, factor);
+            state.depEst.totalVotosCurrent = lerp(state.depEst.totalVotosCurrent, state.depEst.totalVotosTarget, factor);
+            state.depEst.validosCurrent = lerp(state.depEst.validosCurrent, state.depEst.validosTarget, factor);
 
             // Ticker & Feed de Boletins de Urna
             tickerAccumulator += deltaMs * state.speedMultiplier;
@@ -1114,6 +1394,108 @@
                 // Garante que o elemento fique na posição exata da hierarquia do ranking
                 container.appendChild(row);
             }
+        });
+    }
+
+    // --- RENDERIZAÇÃO DEPUTADOS FEDERAIS (AL - 9 VAGAS) ---
+    function renderFedCandidates(filterQuery = '') {
+        if (!dom.fedCandidatesContainer) return;
+        const query = (filterQuery !== '' ? filterQuery : (dom.filterFed ? dom.filterFed.value : '')).trim().toLowerCase();
+        const sorted = [...state.depFed.candidates].sort((a, b) => b.targetVotes - a.targetVotes);
+        
+        const filtered = query ? sorted.filter(c => 
+            (c.name && c.name.toLowerCase().includes(query)) ||
+            (c.party && c.party.toLowerCase().includes(query)) ||
+            (c.number && c.number.includes(query))
+        ) : sorted;
+
+        if (dom.fedCountPill) {
+            dom.fedCountPill.textContent = `Exibindo ${filtered.length} de ${sorted.length} candidatos`;
+        }
+
+        dom.fedCandidatesContainer.innerHTML = '';
+        if (filtered.length === 0) {
+            dom.fedCandidatesContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 40px;">Nenhum candidato a deputado federal encontrado com esse termo.</div>';
+            return;
+        }
+
+        filtered.forEach(cand => {
+            const originalRank = sorted.indexOf(cand) + 1;
+            const isElected = originalRank <= 9;
+            const card = document.createElement('div');
+            card.className = `detailed-card ${isElected ? 'leader' : ''}`;
+            const photoSrc = resolveCandidatePhoto('dep', cand.number, cand.sqcand, cand.photo);
+            card.innerHTML = `
+                <div class="detailed-top">
+                    <div class="detailed-avatar-box">${renderAvatar(photoSrc, cand.name, '📋')}</div>
+                    <div class="detailed-name-meta">
+                        <div class="detailed-candidate-name">${originalRank}º ${cand.name}</div>
+                        <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
+                        <div style="margin-top: 5px;">
+                            ${isElected ? '<span class="cand-badge eleito">⭐ ELEITO (TOP 9)</span>' : '<span class="cand-badge">SUPLENTE</span>'}
+                        </div>
+                    </div>
+                </div>
+                <div class="detailed-numbers-row">
+                    <span class="detailed-pct-giant numeric text-purple" id="detail-pct-fed-${cand.id}">${cand.pct_str || formatPercent(cand.targetShare, 2)}</span>
+                    <span class="detailed-votes-total numeric" id="detail-votes-fed-${cand.id}">${formatInt(cand.targetVotes)} VOTOS</span>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill bg-purple" id="detail-bar-fed-${cand.id}" style="width: ${Math.min(100, (cand.targetShare || 0) * 100 * 2.5)}%;"></div>
+                </div>
+            `;
+            dom.fedCandidatesContainer.appendChild(card);
+        });
+    }
+
+    // --- RENDERIZAÇÃO DEPUTADOS ESTADUAIS (AL - 27 VAGAS) ---
+    function renderEstCandidates(filterQuery = '') {
+        if (!dom.estCandidatesContainer) return;
+        const query = (filterQuery !== '' ? filterQuery : (dom.filterEst ? dom.filterEst.value : '')).trim().toLowerCase();
+        const sorted = [...state.depEst.candidates].sort((a, b) => b.targetVotes - a.targetVotes);
+
+        const filtered = query ? sorted.filter(c => 
+            (c.name && c.name.toLowerCase().includes(query)) ||
+            (c.party && c.party.toLowerCase().includes(query)) ||
+            (c.number && c.number.includes(query))
+        ) : sorted;
+
+        if (dom.estCountPill) {
+            dom.estCountPill.textContent = `Exibindo ${filtered.length} de ${sorted.length} candidatos`;
+        }
+
+        dom.estCandidatesContainer.innerHTML = '';
+        if (filtered.length === 0) {
+            dom.estCandidatesContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 40px;">Nenhum candidato a deputado estadual encontrado com esse termo.</div>';
+            return;
+        }
+
+        filtered.forEach(cand => {
+            const originalRank = sorted.indexOf(cand) + 1;
+            const isElected = originalRank <= 27;
+            const card = document.createElement('div');
+            card.className = `detailed-card ${isElected ? 'leader' : ''}`;
+            const photoSrc = resolveCandidatePhoto('est', cand.number, cand.sqcand, cand.photo);
+            card.innerHTML = `
+                <div class="detailed-top">
+                    <div class="detailed-avatar-box">${renderAvatar(photoSrc, cand.name, '🏛️')}</div>
+                    <div class="detailed-name-meta">
+                        <div class="detailed-candidate-name">${originalRank}º ${cand.name}</div>
+                        <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
+                        <div style="margin-top: 5px;">
+                            ${isElected ? '<span class="cand-badge eleito">⭐ ELEITO (TOP 27)</span>' : '<span class="cand-badge">SUPLENTE</span>'}
+                        </div>
+                    </div>
+                </div>
+                <div class="detailed-numbers-row">
+                    <span class="detailed-pct-giant numeric text-teal" id="detail-pct-est-${cand.id}">${cand.pct_str || formatPercent(cand.targetShare, 2)}</span>
+                    <span class="detailed-votes-total numeric" id="detail-votes-est-${cand.id}">${formatInt(cand.targetVotes)} VOTOS</span>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill bg-teal" id="detail-bar-est-${cand.id}" style="width: ${Math.min(100, (cand.targetShare || 0) * 100 * 3.5)}%;"></div>
+                </div>
+            `;
+            dom.estCandidatesContainer.appendChild(card);
         });
     }
 
@@ -1238,7 +1620,47 @@
             });
         }
 
-        // 5. REGIONAL
+        // 5. DEPUTADO FEDERAL POR ALAGOAS (DEDICADO)
+        const fedRatio = state.depFed.secoesTotal > 0 ? (state.depFed.secoesApuradasCurrent / state.depFed.secoesTotal) : 0;
+        if (dom.fedSecPercent) {
+            dom.fedSecPercent.textContent = formatPercent(fedRatio, 2);
+            if (dom.fedSecCount) dom.fedSecCount.textContent = `${formatInt(state.depFed.secoesApuradasCurrent)} / ${formatInt(state.depFed.secoesTotal)} urnas`;
+            if (dom.fedVotosValidos) dom.fedVotosValidos.textContent = formatInt(state.depFed.validosCurrent);
+            if (dom.fedTotalVotos) dom.fedTotalVotos.textContent = `TOTAL: ${formatInt(state.depFed.totalVotosCurrent)} votos`;
+            if (dom.fedProgressLabel) dom.fedProgressLabel.textContent = formatPercent(fedRatio, 4);
+            if (dom.fedProgressBar) dom.fedProgressBar.style.width = `${Math.min(100, fedRatio * 100)}%`;
+
+            state.depFed.candidates.forEach(cand => {
+                const pEl = document.getElementById(`detail-pct-fed-${cand.id}`);
+                const vEl = document.getElementById(`detail-votes-fed-${cand.id}`);
+                const bEl = document.getElementById(`detail-bar-fed-${cand.id}`);
+                if (pEl) pEl.textContent = cand.pct_str || formatPercent(cand.targetShare, 2);
+                if (vEl) vEl.textContent = `${formatInt(cand.targetVotes)} VOTOS`;
+                if (bEl) bEl.style.width = `${Math.min(100, (cand.targetShare || 0) * 100 * 2.5)}%`;
+            });
+        }
+
+        // 6. DEPUTADO ESTADUAL POR ALAGOAS (DEDICADO)
+        const estRatio = state.depEst.secoesTotal > 0 ? (state.depEst.secoesApuradasCurrent / state.depEst.secoesTotal) : 0;
+        if (dom.estSecPercent) {
+            dom.estSecPercent.textContent = formatPercent(estRatio, 2);
+            if (dom.estSecCount) dom.estSecCount.textContent = `${formatInt(state.depEst.secoesApuradasCurrent)} / ${formatInt(state.depEst.secoesTotal)} urnas`;
+            if (dom.estVotosValidos) dom.estVotosValidos.textContent = formatInt(state.depEst.validosCurrent);
+            if (dom.estTotalVotos) dom.estTotalVotos.textContent = `TOTAL: ${formatInt(state.depEst.totalVotosCurrent)} votos`;
+            if (dom.estProgressLabel) dom.estProgressLabel.textContent = formatPercent(estRatio, 4);
+            if (dom.estProgressBar) dom.estProgressBar.style.width = `${Math.min(100, estRatio * 100)}%`;
+
+            state.depEst.candidates.forEach(cand => {
+                const pEl = document.getElementById(`detail-pct-est-${cand.id}`);
+                const vEl = document.getElementById(`detail-votes-est-${cand.id}`);
+                const bEl = document.getElementById(`detail-bar-est-${cand.id}`);
+                if (pEl) pEl.textContent = cand.pct_str || formatPercent(cand.targetShare, 2);
+                if (vEl) vEl.textContent = `${formatInt(cand.targetVotes)} VOTOS`;
+                if (bEl) bEl.style.width = `${Math.min(100, (cand.targetShare || 0) * 100 * 3.5)}%`;
+            });
+        }
+
+        // 7. REGIONAL
         state.ufs.forEach(uf => {
             const pEl = document.getElementById(`uf-pct-${uf.uf}`);
             const bEl = document.getElementById(`uf-bar-${uf.uf}`);
@@ -1280,6 +1702,18 @@
                 if (target) target.classList.add('active');
             });
         });
+
+        // Filtros de busca instantânea para Deputados Federais e Estaduais de Alagoas
+        if (dom.filterFed) {
+            dom.filterFed.addEventListener('input', (e) => {
+                renderFedCandidates(e.target.value);
+            });
+        }
+        if (dom.filterEst) {
+            dom.filterEst.addEventListener('input', (e) => {
+                renderEstCandidates(e.target.value);
+            });
+        }
 
         if (dom.btnAudio) {
             dom.btnAudio.addEventListener('click', () => {
