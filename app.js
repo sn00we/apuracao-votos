@@ -182,6 +182,7 @@
         btnForceRefresh: document.getElementById('btn-force-refresh'),
         spinRefreshIcon: document.getElementById('spin-refresh-icon'),
         lblRefresh: document.getElementById('lbl-refresh'),
+        btnLula13: document.getElementById('btn-lula-13'),
         tseTimePill: document.getElementById('telemetry-tse-time'),
 
         // Split Screen
@@ -1346,6 +1347,66 @@
                     showToast(`✅ DADOS OFICIAIS TSE SINCRONIZADOS: ${formatInt(state.pres.secoesApuradasCurrent)} URNAS BR (${pctApurado.toFixed(2)}%) &bull; BOLETIM ${state.tseLastTime}`);
                 } else {
                     showToast(`⚠️ ERRO AO CONECTAR COM TSE. VERIFIQUE SE O SERVIDOR ESTÁ ATIVO.`);
+                }
+            });
+        }
+
+        // FUNÇÃO MEME: LULA 13 ("AI BOLSONARO COLOCA VAI")
+        function triggerLula13Meme() {
+            sound.init();
+            sound.beep(650, 0.08, 'sawtooth', 0.08);
+
+            if (dom.btnLula13) {
+                dom.btnLula13.classList.add('playing');
+                setTimeout(() => dom.btnLula13.classList.remove('playing'), 2000);
+            }
+
+            const frase = 'Ai Bolsonaro, coloca vai!';
+
+            if ('speechSynthesis' in window) {
+                try {
+                    window.speechSynthesis.resume();
+                    window.speechSynthesis.cancel();
+                    const utter = new SpeechSynthesisUtterance(frase);
+                    utter.lang = 'pt-BR';
+                    utter.rate = 1.05;
+                    utter.pitch = 1.35;
+                    utter.volume = 1.0;
+
+                    const voices = window.speechSynthesis.getVoices();
+                    if (voices && voices.length > 0) {
+                        const ptVoice = voices.find(v => v.lang && (v.lang.toLowerCase().includes('pt') || v.lang.toLowerCase().includes('br')));
+                        if (ptVoice) utter.voice = ptVoice;
+                    }
+
+                    window.speechSynthesis.speak(utter);
+                } catch (e) {
+                    console.warn('Speech synthesis error:', e);
+                }
+            }
+
+            showToast('🗣️ "AI BOLSONARO COLOCA VAI!" — LULA 13');
+        }
+
+        // Listener do botão no cabeçalho
+        if (dom.btnLula13) {
+            dom.btnLula13.addEventListener('click', triggerLula13Meme);
+        }
+
+        // Delegação de clique: clicar no card do Lula (13) também ativa a fala
+        if (dom.presCandidatesContainer) {
+            dom.presCandidatesContainer.addEventListener('click', (e) => {
+                const item = e.target.closest('.cand-item');
+                if (item && item.dataset && item.dataset.candId === '13') {
+                    triggerLula13Meme();
+                }
+            });
+        }
+        if (dom.presDetailedGrid) {
+            dom.presDetailedGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.detailed-card');
+                if (card && card.innerHTML.includes('Nº 13')) {
+                    triggerLula13Meme();
                 }
             });
         }

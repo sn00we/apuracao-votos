@@ -1333,3 +1333,38 @@ canvas#telemetryCanvas {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* ==========================================================================
+   LULA 13 MEME BUTTON STYLING
+   ========================================================================== */
+.btn-lula-glow {
+    background: linear-gradient(135deg, rgba(220, 20, 60, 0.5), rgba(255, 0, 50, 0.7)) !important;
+    border: 1px solid #ff2255 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 15px rgba(255, 0, 60, 0.45);
+    letter-spacing: 0.8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+.btn-lula-glow:hover {
+    background: linear-gradient(135deg, rgba(255, 0, 60, 0.85), rgba(255, 50, 90, 0.95)) !important;
+    border-color: #ffbe0b !important;
+    box-shadow: 0 0 25px rgba(255, 0, 80, 0.85), 0 0 10px rgba(255, 190, 11, 0.6) !important;
+    transform: translateY(-1px) scale(1.05);
+}
+
+.btn-lula-glow:active {
+    transform: scale(0.94);
+    box-shadow: 0 0 30px rgba(255, 20, 80, 1) !important;
+}
+
+.btn-lula-glow.playing {
+    animation: lulaShake 0.4s infinite alternate;
+}
+
+@keyframes lulaShake {
+    0% { transform: scale(1.05) rotate(-2deg); }
+    100% { transform: scale(1.05) rotate(2deg); }
+}
