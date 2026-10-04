@@ -179,7 +179,20 @@
             { name: 'União dos Palmares', secoes: 160, apuradas: 18, leader: 'RENAN FILHO (MDB)', leadShare: '58.2%' },
             { name: 'Delmiro Gouveia', secoes: 128, apuradas: 15, leader: 'RENAN FILHO (MDB)', leadShare: '62.4%' },
             { name: 'Santana do Ipanema', secoes: 110, apuradas: 13, leader: 'RENAN FILHO (MDB)', leadShare: '61.1%' }
-        ]
+        ],
+
+        // 7. DUELO / CONFRONTO DIRETO (HEAD-TO-HEAD)
+        duel: {
+            cargo: 'pres', // 'pres', 'gov', 'sen', 'dep', 'est', 'all'
+            candAId: '13',
+            candBId: '22'
+        },
+
+        // 8. OMNI-SEARCH
+        omni: {
+            filterRace: 'all',
+            query: ''
+        }
     };
 
     // --- DOM REFERENCES ---
@@ -299,7 +312,63 @@
         editAl1Name: document.getElementById('edit-al1-name'),
         editAl1Party: document.getElementById('edit-al1-party'),
         editAl2Name: document.getElementById('edit-al2-name'),
-        editAl2Party: document.getElementById('edit-al2-party')
+        editAl2Party: document.getElementById('edit-al2-party'),
+
+        // Executive Navigation & Omni-Search Hub
+        mobileNavSelect: document.getElementById('mobile-nav-select'),
+        omniSearchInput: document.getElementById('omni-search-input'),
+        omniSearchClear: document.getElementById('omni-search-clear'),
+        omniFilterChips: document.querySelectorAll('.omni-filter-chips .chip'),
+        omniDropdownResults: document.getElementById('omni-dropdown-results'),
+        omniResultsCount: document.getElementById('omni-results-count'),
+        omniResultsList: document.getElementById('omni-results-list'),
+
+        // Confronto Direto (Head-to-Head / X1)
+        duelSelectCargo: document.getElementById('duel-select-cargo'),
+        duelSelectCandA: document.getElementById('duel-select-cand-a'),
+        duelSelectCandB: document.getElementById('duel-select-cand-b'),
+        duelBtnSwap: document.getElementById('duel-btn-swap'),
+        duelPresetButtons: document.querySelectorAll('.preset-btn'),
+
+        duelCardA: document.getElementById('duel-card-a'),
+        fighterBadgeA: document.getElementById('fighter-badge-a'),
+        fighterAvatarA: document.getElementById('fighter-avatar-a'),
+        fighterNameA: document.getElementById('fighter-name-a'),
+        fighterMetaA: document.getElementById('fighter-meta-a'),
+        fighterCargoA: document.getElementById('fighter-cargo-a'),
+        fighterPctA: document.getElementById('fighter-pct-a'),
+        fighterVotesA: document.getElementById('fighter-votes-a'),
+        fighterBarA: document.getElementById('fighter-bar-a'),
+
+        duelCardB: document.getElementById('duel-card-b'),
+        fighterBadgeB: document.getElementById('fighter-badge-b'),
+        fighterAvatarB: document.getElementById('fighter-avatar-b'),
+        fighterNameB: document.getElementById('fighter-name-b'),
+        fighterMetaB: document.getElementById('fighter-meta-b'),
+        fighterCargoB: document.getElementById('fighter-cargo-b'),
+        fighterPctB: document.getElementById('fighter-pct-b'),
+        fighterVotesB: document.getElementById('fighter-votes-b'),
+        fighterBarB: document.getElementById('fighter-bar-b'),
+
+        duelDiffVotes: document.getElementById('duel-diff-votes'),
+        duelDiffPct: document.getElementById('duel-diff-pct'),
+        domLabelA: document.getElementById('dom-label-a'),
+        domLabelB: document.getElementById('dom-label-b'),
+        domBarA: document.getElementById('dom-bar-a'),
+        domBarB: document.getElementById('dom-bar-b'),
+        duelTurnaroundText: document.getElementById('duel-turnaround-text'),
+
+        matShareA: document.getElementById('mat-share-a'),
+        matShareB: document.getElementById('mat-share-b'),
+        matShareSub: document.getElementById('mat-share-sub'),
+        matVotesA: document.getElementById('mat-votes-a'),
+        matVotesB: document.getElementById('mat-votes-b'),
+        matVotesSub: document.getElementById('mat-votes-sub'),
+        matDomA: document.getElementById('mat-dom-a'),
+        matDomB: document.getElementById('mat-dom-b'),
+        matStatusA: document.getElementById('mat-status-a'),
+        matStatusB: document.getElementById('mat-status-b'),
+        matStatusSub: document.getElementById('mat-status-sub')
     };
 
     // --- OSCILLOSCOPE CANVAS ---
@@ -457,6 +526,424 @@
         }
         return `<span style="font-size: 26px;">${fallbackEmoji}</span>`;
     }
+
+    function escapeHtml(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // --- AGREGADOR UNIVERSAL DE CANDIDATOS (TODOS OS 5 CARGOS) ---
+    function getAllCandidates() {
+        const list = [];
+        if (state.pres && state.pres.candidates) {
+            state.pres.candidates.forEach((c, idx) => {
+                list.push({
+                    ...c,
+                    race: 'pres',
+                    raceLabel: 'PRESIDENTE (BR)',
+                    raceColor: 'blue',
+                    rank: idx + 1,
+                    cargoNome: 'Presidente da República'
+                });
+            });
+        }
+        if (state.gov && state.gov.candidates) {
+            state.gov.candidates.forEach((c, idx) => {
+                list.push({
+                    ...c,
+                    race: 'gov',
+                    raceLabel: 'GOVERNADOR (AL)',
+                    raceColor: 'teal',
+                    rank: idx + 1,
+                    cargoNome: 'Governador de Alagoas'
+                });
+            });
+        }
+        if (state.sen && state.sen.candidates) {
+            state.sen.candidates.forEach((c, idx) => {
+                list.push({
+                    ...c,
+                    race: 'sen',
+                    raceLabel: 'SENADOR (AL)',
+                    raceColor: 'gold',
+                    rank: idx + 1,
+                    cargoNome: 'Senador por Alagoas'
+                });
+            });
+        }
+        if (state.depFed && state.depFed.candidates) {
+            state.depFed.candidates.forEach((c, idx) => {
+                list.push({
+                    ...c,
+                    race: 'dep',
+                    raceLabel: 'DEP. FEDERAL (AL)',
+                    raceColor: 'purple',
+                    rank: idx + 1,
+                    cargoNome: 'Deputado Federal por Alagoas'
+                });
+            });
+        }
+        if (state.depEst && state.depEst.candidates) {
+            state.depEst.candidates.forEach((c, idx) => {
+                list.push({
+                    ...c,
+                    race: 'est',
+                    raceLabel: 'DEP. ESTADUAL (AL)',
+                    raceColor: 'teal',
+                    rank: idx + 1,
+                    cargoNome: 'Deputado Estadual por Alagoas'
+                });
+            });
+        }
+        return list;
+    }
+
+    function getCandidatesByRace(race) {
+        if (!race || race === 'all') return getAllCandidates();
+        return getAllCandidates().filter(c => c.race === race);
+    }
+
+    function findCandidate(id, race) {
+        const all = getAllCandidates();
+        if (race && race !== 'all') {
+            const found = all.find(c => String(c.id) === String(id) && c.race === race);
+            if (found) return found;
+        }
+        return all.find(c => String(c.id) === String(id));
+    }
+
+    // --- CONTROLE DE NAVEGAÇÃO UNIFICADO (DESKTOP + MOBILE) ---
+    function switchTab(targetId) {
+        sound.init();
+        sound.click();
+        dom.tabs.forEach(t => {
+            t.classList.toggle('active', t.dataset.target === targetId);
+        });
+        dom.panels.forEach(p => {
+            p.classList.toggle('active', p.id === targetId);
+        });
+        if (dom.mobileNavSelect && dom.mobileNavSelect.value !== targetId) {
+            dom.mobileNavSelect.value = targetId;
+        }
+        if (targetId === 'view-comparador') {
+            populateDuelCandidateSelects();
+            updateDuelDisplay();
+        }
+    }
+
+    // --- OMNI-SEARCH ENGINE (BUSCA CENTRAL EXECUTIVA) ---
+    function renderOmniSearchResults(query, raceFilter = 'all') {
+        if (!dom.omniDropdownResults || !dom.omniResultsList) return;
+        const q = (query || '').trim().toLowerCase();
+
+        if (!q) {
+            dom.omniDropdownResults.classList.add('hidden');
+            if (dom.omniSearchClear) dom.omniSearchClear.classList.add('hidden');
+            return;
+        }
+
+        if (dom.omniSearchClear) dom.omniSearchClear.classList.remove('hidden');
+
+        const all = getAllCandidates();
+        const filtered = all.filter(c => {
+            if (raceFilter !== 'all' && c.race !== raceFilter) return false;
+            const nameMatch = c.name && c.name.toLowerCase().includes(q);
+            const fullMatch = c.fullName && c.fullName.toLowerCase().includes(q);
+            const partyMatch = c.party && c.party.toLowerCase().includes(q);
+            const numMatch = c.number && String(c.number).includes(q);
+            const cargoMatch = c.cargoNome && c.cargoNome.toLowerCase().includes(q);
+            return nameMatch || fullMatch || partyMatch || numMatch || cargoMatch;
+        });
+
+        filtered.sort((a, b) => (b.targetVotes || b.currentVotes || 0) - (a.targetVotes || a.currentVotes || 0));
+
+        if (dom.omniResultsCount) {
+            dom.omniResultsCount.textContent = `${filtered.length} candidato(s) encontrado(s)`;
+        }
+
+        dom.omniResultsList.innerHTML = '';
+        if (filtered.length === 0) {
+            dom.omniResultsList.innerHTML = `
+                <div style="padding: 24px; text-align: center; color: var(--text-dim); font-size: 12px;">
+                    Nenhum candidato encontrado para "<strong>${escapeHtml(q)}</strong>". Tente buscar por número (ex: 13, 22, 1111) ou partido (PT, PL, MDB).
+                </div>
+            `;
+            dom.omniDropdownResults.classList.remove('hidden');
+            return;
+        }
+
+        filtered.slice(0, 16).forEach(cand => {
+            const item = document.createElement('div');
+            item.className = 'omni-result-item';
+            const votes = cand.currentVotes !== undefined ? cand.currentVotes : (cand.targetVotes || 0);
+            const share = cand.currentShare !== undefined ? cand.currentShare : (cand.targetShare || 0);
+            const photoSrc = resolveCandidatePhoto(cand.race, cand.number, cand.sqcand, cand.photo);
+
+            item.innerHTML = `
+                <div class="omni-cand-left">
+                    <div class="omni-cand-avatar">${renderAvatar(photoSrc, cand.name, '👤')}</div>
+                    <div class="omni-cand-meta">
+                        <div class="omni-cand-name">${cand.rank ? cand.rank + 'º ' : ''}${cand.name}</div>
+                        <div class="omni-cand-sub">
+                            <span class="cargo-tag ${cand.race}">${cand.raceLabel}</span>
+                            <span>${cand.party} • Nº ${cand.number}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="omni-cand-right">
+                    <div class="omni-votes-box">
+                        <div class="omni-votes-pct">${cand.pct_str || formatPercent(share, 2)}</div>
+                        <div class="omni-votes-total">${formatInt(votes)} votos</div>
+                    </div>
+                    <div class="omni-actions">
+                        <button class="btn-omni-act" data-action="goto" title="Ver Apuração Oficial">👁️ Ver</button>
+                        <button class="btn-omni-act btn-omni-duel" data-action="duel" title="Comparar no Confronto Direto (X1)">⚔️ X1</button>
+                    </div>
+                </div>
+            `;
+
+            item.querySelector('[data-action="goto"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                dom.omniDropdownResults.classList.add('hidden');
+                let targetTab = 'view-presidente';
+                if (cand.race === 'gov') targetTab = 'view-alagoas';
+                else if (cand.race === 'sen') targetTab = 'view-senado-al';
+                else if (cand.race === 'dep') targetTab = 'view-deputado-federal';
+                else if (cand.race === 'est') targetTab = 'view-deputado-estadual';
+                switchTab(targetTab);
+                showToast(`📍 Visualizando apuração de ${cand.cargoNome || cand.raceLabel}`);
+            });
+
+            item.querySelector('[data-action="duel"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                dom.omniDropdownResults.classList.add('hidden');
+                window.startDuelWith(cand.id, cand.race);
+            });
+
+            item.addEventListener('click', () => {
+                dom.omniDropdownResults.classList.add('hidden');
+                window.startDuelWith(cand.id, cand.race);
+            });
+
+            dom.omniResultsList.appendChild(item);
+        });
+
+        dom.omniDropdownResults.classList.remove('hidden');
+    }
+
+    // --- CONFRONTO DIRETO // HEAD-TO-HEAD DUEL ENGINE (X1) ---
+    const DUEL_PRESETS = {
+        'lula-bolsonaro': { cargo: 'pres', candA: { race: 'pres', id: '13' }, candB: { race: 'pres', id: '22' } },
+        'renan-jhc': { cargo: 'gov', candA: { race: 'gov', id: '15' }, candB: { race: 'gov', id: '45' } },
+        'lira-marina': { cargo: 'sen', candA: { race: 'sen', id: '111' }, candB: { race: 'sen', id: '456' } },
+        'alvinho-luciano': { cargo: 'dep', candA: { race: 'dep', id: '1111' }, candB: { race: 'dep', id: '5555' } },
+        'marcelo-bebeto': { cargo: 'est', candA: { race: 'est', id: '15789' }, candB: { race: 'est', id: '22222' } }
+    };
+
+    function setDuelPreset(presetKey) {
+        const p = DUEL_PRESETS[presetKey];
+        if (!p) return;
+        state.duel.cargo = p.cargo;
+        state.duel.candAId = p.candA.id;
+        state.duel.candACargo = p.candA.race;
+        state.duel.candBId = p.candB.id;
+        state.duel.candBCargo = p.candB.race;
+
+        if (dom.duelSelectCargo) dom.duelSelectCargo.value = p.cargo;
+        populateDuelCandidateSelects();
+        updateDuelDisplay();
+
+        if (dom.duelPresetButtons) {
+            dom.duelPresetButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.preset === presetKey);
+            });
+        }
+        showToast(`⚔️ DUELO CARREGADO: ${presetKey.toUpperCase().replace('-', ' VS ')}`);
+    }
+
+    function populateDuelCandidateSelects() {
+        if (!dom.duelSelectCandA || !dom.duelSelectCandB) return;
+        const cargo = state.duel.cargo || 'pres';
+        const candidates = getCandidatesByRace(cargo);
+
+        dom.duelSelectCandA.innerHTML = '';
+        dom.duelSelectCandB.innerHTML = '';
+
+        candidates.forEach(cand => {
+            const optA = document.createElement('option');
+            optA.value = `${cand.race}:${cand.id}`;
+            optA.textContent = `${cand.name} (${cand.party} ${cand.number}) — ${cand.raceLabel}`;
+
+            const optB = document.createElement('option');
+            optB.value = `${cand.race}:${cand.id}`;
+            optB.textContent = `${cand.name} (${cand.party} ${cand.number}) — ${cand.raceLabel}`;
+
+            dom.duelSelectCandA.appendChild(optA);
+            dom.duelSelectCandB.appendChild(optB);
+        });
+
+        const keyA = `${state.duel.candACargo || (cargo === 'all' ? 'pres' : cargo)}:${state.duel.candAId}`;
+        const keyB = `${state.duel.candBCargo || (cargo === 'all' ? 'pres' : cargo)}:${state.duel.candBId}`;
+
+        if (Array.from(dom.duelSelectCandA.options).some(o => o.value === keyA)) {
+            dom.duelSelectCandA.value = keyA;
+        } else if (dom.duelSelectCandA.options.length > 0) {
+            dom.duelSelectCandA.selectedIndex = 0;
+            const parts = dom.duelSelectCandA.value.split(':');
+            state.duel.candACargo = parts[0];
+            state.duel.candAId = parts[1];
+        }
+
+        if (Array.from(dom.duelSelectCandB.options).some(o => o.value === keyB)) {
+            dom.duelSelectCandB.value = keyB;
+        } else if (dom.duelSelectCandB.options.length > 1) {
+            dom.duelSelectCandB.selectedIndex = 1;
+            const parts = dom.duelSelectCandB.value.split(':');
+            state.duel.candBCargo = parts[0];
+            state.duel.candBId = parts[1];
+        } else if (dom.duelSelectCandB.options.length > 0) {
+            dom.duelSelectCandB.selectedIndex = 0;
+            const parts = dom.duelSelectCandB.value.split(':');
+            state.duel.candBCargo = parts[0];
+            state.duel.candBId = parts[1];
+        }
+    }
+
+    function updateDuelDisplay() {
+        if (!dom.duelCardA || !dom.duelCardB) return;
+
+        const candA = findCandidate(state.duel.candAId, state.duel.candACargo);
+        const candB = findCandidate(state.duel.candBId, state.duel.candBCargo);
+
+        if (!candA || !candB) return;
+
+        const votesA = candA.currentVotes !== undefined ? candA.currentVotes : (candA.targetVotes || 0);
+        const votesB = candB.currentVotes !== undefined ? candB.currentVotes : (candB.targetVotes || 0);
+        const shareA = candA.currentShare !== undefined ? candA.currentShare : (candA.targetShare || 0);
+        const shareB = candB.currentShare !== undefined ? candB.currentShare : (candB.targetShare || 0);
+
+        const diffVotes = Math.abs(votesA - votesB);
+        const diffShare = Math.abs(shareA - shareB);
+        const isLeaderA = votesA >= votesB;
+        const leaderName = isLeaderA ? candA.name : candB.name;
+
+        // Fighter A
+        if (dom.fighterBadgeA) {
+            dom.fighterBadgeA.textContent = isLeaderA ? `👑 LÍDER (+${formatInt(diffVotes)})` : 'SEGUNDO COLOCADO';
+        }
+        if (dom.fighterAvatarA) dom.fighterAvatarA.innerHTML = renderAvatar(candA.photo, candA.name, '👤');
+        if (dom.fighterNameA) dom.fighterNameA.textContent = candA.name;
+        if (dom.fighterMetaA) dom.fighterMetaA.textContent = `${candA.party} • Nº ${candA.number} • ${candA.fullName || candA.name}`;
+        if (dom.fighterCargoA) dom.fighterCargoA.textContent = candA.cargoNome || candA.raceLabel;
+        if (dom.fighterPctA) dom.fighterPctA.textContent = candA.pct_str || formatPercent(shareA, 4);
+        if (dom.fighterVotesA) dom.fighterVotesA.textContent = `${formatInt(votesA)} VOTOS`;
+        if (dom.fighterBarA) dom.fighterBarA.style.width = `${Math.min(100, shareA * 100)}%`;
+        if (dom.duelCardA) {
+            dom.duelCardA.classList.toggle('leader-a', isLeaderA);
+        }
+
+        // Fighter B
+        if (dom.fighterBadgeB) {
+            dom.fighterBadgeB.textContent = !isLeaderA ? `👑 LÍDER (+${formatInt(diffVotes)})` : 'SEGUNDO COLOCADO';
+        }
+        if (dom.fighterAvatarB) dom.fighterAvatarB.innerHTML = renderAvatar(candB.photo, candB.name, '👤');
+        if (dom.fighterNameB) dom.fighterNameB.textContent = candB.name;
+        if (dom.fighterMetaB) dom.fighterMetaB.textContent = `${candB.party} • Nº ${candB.number} • ${candB.fullName || candB.name}`;
+        if (dom.fighterCargoB) dom.fighterCargoB.textContent = candB.cargoNome || candB.raceLabel;
+        if (dom.fighterPctB) dom.fighterPctB.textContent = candB.pct_str || formatPercent(shareB, 4);
+        if (dom.fighterVotesB) dom.fighterVotesB.textContent = `${formatInt(votesB)} VOTOS`;
+        if (dom.fighterBarB) dom.fighterBarB.style.width = `${Math.min(100, shareB * 100)}%`;
+        if (dom.duelCardB) {
+            dom.duelCardB.classList.toggle('leader-b', !isLeaderA);
+        }
+
+        // Center VS HUD
+        if (dom.duelDiffVotes) dom.duelDiffVotes.textContent = `+${formatInt(diffVotes)} VOTOS`;
+        if (dom.duelDiffPct) dom.duelDiffPct.textContent = `+${(diffShare * 100).toFixed(2)}% (${(diffShare * 100).toFixed(4)} pts)`;
+
+        const sumTwo = votesA + votesB;
+        const domA = sumTwo > 0 ? (votesA / sumTwo) * 100 : 50;
+        const domB = sumTwo > 0 ? (votesB / sumTwo) * 100 : 50;
+
+        if (dom.domLabelA) dom.domLabelA.textContent = `${domA.toFixed(1)}%`;
+        if (dom.domLabelB) dom.domLabelB.textContent = `${domB.toFixed(1)}%`;
+        if (dom.domBarA) dom.domBarA.style.width = `${domA}%`;
+        if (dom.domBarB) dom.domBarB.style.width = `${domB}%`;
+
+        // Projeção Matemática
+        if (dom.duelTurnaroundText) {
+            const trailingName = isLeaderA ? candB.name : candA.name;
+            const leadingName = isLeaderA ? candA.name : candB.name;
+            const raceKey = candA.race === 'dep' ? 'depFed' : (candA.race === 'est' ? 'depEst' : candA.race);
+            const raceObj = state[raceKey] || state.pres;
+            const secoesTotal = raceObj.secoesTotal || 1000;
+            const secoesDone = raceObj.secoesApuradasCurrent || 0;
+            const secoesRestantes = Math.max(0, secoesTotal - secoesDone);
+            const pctDone = secoesTotal > 0 ? (secoesDone / secoesTotal) * 100 : 0;
+
+            if (diffVotes === 0) {
+                dom.duelTurnaroundText.textContent = `Empate técnico exato entre ${candA.name} e ${candB.name} com ${formatInt(votesA)} votos cada!`;
+            } else if (secoesRestantes === 0 || pctDone >= 99.9) {
+                dom.duelTurnaroundText.textContent = `Apuração praticamente concluída (${pctDone.toFixed(2)}%). Vantagem matemática consolidada para ${leadingName} com ${formatInt(diffVotes)} votos à frente.`;
+            } else {
+                const totalTarget = raceObj.validosTarget || (raceObj.totalVotosTarget || 100000);
+                const validosRestantes = Math.max(0, totalTarget - (raceObj.validosCurrent || 0));
+                if (validosRestantes > 0 && diffVotes <= validosRestantes) {
+                    const pctNeeded = Math.min(100, Math.max(0, (((validosRestantes + diffVotes) / 2) / validosRestantes) * 100));
+                    dom.duelTurnaroundText.textContent = `Para igualar o confronto nas ${formatInt(secoesRestantes)} urnas restantes (${(100 - pctDone).toFixed(2)}% por apurar), ${trailingName} precisa conquistar aproximadamente ${pctNeeded.toFixed(1)}% dos votos remanescentes.`;
+                } else {
+                    dom.duelTurnaroundText.textContent = `${leadingName} mantém vantagem consolidada de ${formatInt(diffVotes)} votos sobre ${trailingName} com ${pctDone.toFixed(2)}% das urnas apuradas.`;
+                }
+            }
+        }
+
+        // Metrics Matrix
+        if (dom.matShareA) dom.matShareA.textContent = candA.pct_str || formatPercent(shareA, 4);
+        if (dom.matShareB) dom.matShareB.textContent = candB.pct_str || formatPercent(shareB, 4);
+        if (dom.matShareSub) dom.matShareSub.textContent = `Diferença de ${(diffShare * 100).toFixed(4)} pontos percentuais`;
+
+        if (dom.matVotesA) dom.matVotesA.textContent = formatInt(votesA);
+        if (dom.matVotesB) dom.matVotesB.textContent = formatInt(votesB);
+        if (dom.matVotesSub) dom.matVotesSub.textContent = `Diferença absoluta: ${formatInt(diffVotes)} votos apurados`;
+
+        if (dom.matDomA) dom.matDomA.textContent = `${domA.toFixed(2)}%`;
+        if (dom.matDomB) dom.matDomB.textContent = `${domB.toFixed(2)}%`;
+
+        if (dom.matStatusA) {
+            dom.matStatusA.textContent = isLeaderA ? '👑 LÍDER' : 'SEGUNDO';
+            dom.matStatusA.className = `cand-badge ${isLeaderA ? 'eleito' : ''}`;
+        }
+        if (dom.matStatusB) {
+            dom.matStatusB.textContent = !isLeaderA ? '👑 LÍDER' : 'SEGUNDO';
+            dom.matStatusB.className = `cand-badge ${!isLeaderA ? 'eleito' : ''}`;
+        }
+        if (dom.matStatusSub) {
+            dom.matStatusSub.textContent = `Liderança isolada de ${leaderName}`;
+        }
+    }
+
+    // Inicia confronto com um candidato a partir de qualquer ponto da interface
+    window.startDuelWith = function(candId, race) {
+        sound.init();
+        sound.beep(950, 0.06, 'sine', 0.04);
+        const cand = findCandidate(candId, race);
+        if (!cand) return;
+
+        state.duel.cargo = race || cand.race || 'pres';
+        state.duel.candAId = String(cand.id);
+        state.duel.candACargo = cand.race;
+
+        const peers = getCandidatesByRace(cand.race).filter(c => String(c.id) !== String(cand.id));
+        if (peers.length > 0) {
+            state.duel.candBId = String(peers[0].id);
+            state.duel.candBCargo = peers[0].race;
+        }
+
+        if (dom.duelSelectCargo) dom.duelSelectCargo.value = state.duel.cargo;
+        populateDuelCandidateSelects();
+        updateDuelDisplay();
+        switchTab('view-comparador');
+        showToast(`⚔️ CONFRONTO CARREGADO: ${cand.name} vs ${peers.length > 0 ? peers[0].name : 'OPONENTE'}`);
+    };
 
     // --- PARSER DAS ESTRUTURAS DO TSE (NORMALIZADO OU RAW CDN) ---
     function parseTsePayload(payload, instantSnap = false) {
@@ -1078,6 +1565,7 @@
                         <div class="cand-meta">
                             <span class="cand-party">${cand.party}</span> &bull; 
                             <span class="cand-num">Nº ${cand.number}</span>
+                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'pres')" title="Comparar no Confronto Direto (X1)">⚔️ X1</button>
                         </div>
                     </div>
                     <div class="cand-stats">
@@ -1109,6 +1597,7 @@
                         <div class="cand-meta">
                             <span class="cand-party">${cand.party}</span> &bull; 
                             <span class="cand-num">Nº ${cand.number}</span>
+                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'gov')" title="Comparar no Confronto Direto (X1)">⚔️ X1</button>
                         </div>
                     </div>
                     <div class="cand-stats">
@@ -1133,6 +1622,9 @@
                         <div class="detailed-name-meta">
                             <div class="detailed-candidate-name">${cand.name}</div>
                             <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
+                            <div style="margin-top: 5px;">
+                                <button class="btn-card-duel-pill" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'pres')">⚔️ Comparar no X1</button>
+                            </div>
                         </div>
                     </div>
                     <div class="detailed-numbers-row">
@@ -1159,6 +1651,9 @@
                         <div class="detailed-name-meta">
                             <div class="detailed-candidate-name">${cand.name}</div>
                             <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
+                            <div style="margin-top: 5px;">
+                                <button class="btn-card-duel-pill" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'gov')">⚔️ Comparar no X1</button>
+                            </div>
                         </div>
                     </div>
                     <div class="detailed-numbers-row">
@@ -1184,7 +1679,10 @@
                     <div class="cand-avatar">${renderAvatar(cand.photo, cand.name, '🏛️')}</div>
                     <div class="cand-info">
                         <span class="cand-name">${cand.name}</span>
-                        <span class="cand-meta">${cand.party} &bull; Nº ${cand.number} ${idx < 2 ? '<strong class="text-gold">(ZONA ELEITO)</strong>' : ''}</span>
+                        <span class="cand-meta">
+                            ${cand.party} &bull; Nº ${cand.number} ${idx < 2 ? '<strong class="text-gold">(ZONA ELEITO)</strong>' : ''}
+                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'sen')" title="Comparar no Confronto Direto (X1)">⚔️ X1</button>
+                        </span>
                     </div>
                     <div class="cand-stats">
                         <span class="cand-pct numeric" id="pct-sen-${cand.id}">0.0000%</span>
@@ -1431,8 +1929,9 @@
                     <div class="detailed-name-meta">
                         <div class="detailed-candidate-name">${originalRank}º ${cand.name}</div>
                         <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
-                        <div style="margin-top: 5px;">
+                        <div style="margin-top: 5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                             ${isElected ? '<span class="cand-badge eleito">⭐ ELEITO (TOP 9)</span>' : '<span class="cand-badge">SUPLENTE</span>'}
+                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'dep')" title="Comparar este candidato no X1">⚔️ X1</button>
                         </div>
                     </div>
                 </div>
@@ -1482,8 +1981,9 @@
                     <div class="detailed-name-meta">
                         <div class="detailed-candidate-name">${originalRank}º ${cand.name}</div>
                         <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
-                        <div style="margin-top: 5px;">
+                        <div style="margin-top: 5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                             ${isElected ? '<span class="cand-badge eleito">⭐ ELEITO (TOP 27)</span>' : '<span class="cand-badge">SUPLENTE</span>'}
+                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'est')" title="Comparar este candidato no X1">⚔️ X1</button>
                         </div>
                     </div>
                 </div>
@@ -1686,22 +2186,134 @@
             const zonasDone = Math.floor(gRatio * 42);
             if (dom.specAlZonas) dom.specAlZonas.textContent = `${zonasDone} de 42 Zonas`;
         }
+
+        // 8. CONFRONTO DIRETO // HEAD-TO-HEAD (X1)
+        updateDuelDisplay();
     }
 
     // --- EVENT LISTENERS ---
     function setupInteractions() {
+        // 1. Navegação de Abas Unificada (Desktop Pills & Mobile Dropdown)
         dom.tabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                sound.init();
-                sound.click();
-                dom.tabs.forEach(t => t.classList.remove('active'));
-                dom.panels.forEach(p => p.classList.remove('active'));
-
-                tab.classList.add('active');
-                const target = document.getElementById(tab.dataset.target);
-                if (target) target.classList.add('active');
+                switchTab(tab.dataset.target);
             });
         });
+
+        if (dom.mobileNavSelect) {
+            dom.mobileNavSelect.addEventListener('change', (e) => {
+                switchTab(e.target.value);
+            });
+        }
+
+        // 2. Omni-Search Engine Listeners
+        if (dom.omniSearchInput) {
+            dom.omniSearchInput.addEventListener('input', (e) => {
+                state.omni.query = e.target.value;
+                renderOmniSearchResults(state.omni.query, state.omni.filterRace);
+            });
+
+            dom.omniSearchInput.addEventListener('focus', () => {
+                if (dom.omniSearchInput.value.trim()) {
+                    renderOmniSearchResults(dom.omniSearchInput.value, state.omni.filterRace);
+                }
+            });
+        }
+
+        if (dom.omniSearchClear) {
+            dom.omniSearchClear.addEventListener('click', () => {
+                if (dom.omniSearchInput) dom.omniSearchInput.value = '';
+                state.omni.query = '';
+                renderOmniSearchResults('', state.omni.filterRace);
+            });
+        }
+
+        if (dom.omniFilterChips) {
+            dom.omniFilterChips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    sound.click();
+                    dom.omniFilterChips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    state.omni.filterRace = chip.dataset.race || 'all';
+                    renderOmniSearchResults(dom.omniSearchInput ? dom.omniSearchInput.value : '', state.omni.filterRace);
+                });
+            });
+        }
+
+        // Fechar dropdown de busca ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.omni-search-bar-wrap')) {
+                if (dom.omniDropdownResults) dom.omniDropdownResults.classList.add('hidden');
+            }
+        });
+
+        // Atalhos de teclado (Ctrl+K ou '/' foca a busca; ESC fecha)
+        document.addEventListener('keydown', (e) => {
+            if (((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') || (e.key === '/' && document.activeElement.tagName !== 'INPUT')) {
+                e.preventDefault();
+                if (dom.omniSearchInput) {
+                    dom.omniSearchInput.focus();
+                    dom.omniSearchInput.select();
+                }
+            } else if (e.key === 'Escape') {
+                if (dom.omniDropdownResults) dom.omniDropdownResults.classList.add('hidden');
+            }
+        });
+
+        // 3. Confronto Direto // Duelo Listeners
+        if (dom.duelSelectCargo) {
+            dom.duelSelectCargo.addEventListener('change', (e) => {
+                sound.click();
+                state.duel.cargo = e.target.value;
+                populateDuelCandidateSelects();
+                updateDuelDisplay();
+            });
+        }
+
+        if (dom.duelSelectCandA) {
+            dom.duelSelectCandA.addEventListener('change', (e) => {
+                sound.click();
+                const [race, id] = e.target.value.split(':');
+                state.duel.candACargo = race;
+                state.duel.candAId = id;
+                updateDuelDisplay();
+            });
+        }
+
+        if (dom.duelSelectCandB) {
+            dom.duelSelectCandB.addEventListener('change', (e) => {
+                sound.click();
+                const [race, id] = e.target.value.split(':');
+                state.duel.candBCargo = race;
+                state.duel.candBId = id;
+                updateDuelDisplay();
+            });
+        }
+
+        if (dom.duelBtnSwap) {
+            dom.duelBtnSwap.addEventListener('click', () => {
+                sound.click();
+                const tmpId = state.duel.candAId;
+                const tmpCargo = state.duel.candACargo;
+                state.duel.candAId = state.duel.candBId;
+                state.duel.candACargo = state.duel.candBCargo;
+                state.duel.candBId = tmpId;
+                state.duel.candBCargo = tmpCargo;
+
+                populateDuelCandidateSelects();
+                updateDuelDisplay();
+                showToast('⇄ CANDIDATOS INVERTIDOS NO CONFRONTO');
+            });
+        }
+
+        if (dom.duelPresetButtons) {
+            dom.duelPresetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    sound.click();
+                    setDuelPreset(btn.dataset.preset);
+                });
+            });
+        }
 
         // Filtros de busca instantânea para Deputados Federais e Estaduais de Alagoas
         if (dom.filterFed) {
@@ -1923,10 +2535,14 @@
     // --- BOOTSTRAP ---
     async function init() {
         renderCandidateItems();
+        populateDuelCandidateSelects();
+        updateDuelDisplay();
         setupInteractions();
 
         // Carga inicial forçada sincronizando imediatamente
         await fetchLiveTse(true, true);
+        populateDuelCandidateSelects();
+        updateDuelDisplay();
 
         // Polling contínuo automático a cada 1.5s
         setInterval(() => fetchLiveTse(false, true), 1500);

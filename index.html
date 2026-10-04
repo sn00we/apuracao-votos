@@ -174,30 +174,100 @@
         </div>
     </aside>
 
-    <!-- NAVIGATION TABS -->
-    <nav class="nav-tabs">
-        <button class="nav-tab active" data-target="view-split">
-            <span class="tab-icon">⚡</span> VISÃO INTEGRADA (BR + AL)
-        </button>
-        <button class="nav-tab" data-target="view-presidente">
-            <span class="tab-icon">🇧🇷</span> PRESIDENTE (BR)
-        </button>
-        <button class="nav-tab" data-target="view-alagoas">
-            <span class="tab-icon">🌴</span> GOVERNADOR (AL)
-        </button>
-        <button class="nav-tab" data-target="view-senado-al">
-            <span class="tab-icon">🏛️</span> SENADOR (AL)
-        </button>
-        <button class="nav-tab" data-target="view-deputado-federal">
-            <span class="tab-icon">📋</span> DEPUTADO FEDERAL (AL)
-        </button>
-        <button class="nav-tab" data-target="view-deputado-estadual">
-            <span class="tab-icon">🏛️</span> DEPUTADO ESTADUAL (AL)
-        </button>
-        <button class="nav-tab" data-target="view-telemetry">
-            <span class="tab-icon">📡</span> TELEMETRIA 1ms
-        </button>
-    </nav>
+    <!-- ==========================================================================
+         EXECUTIVE NAVIGATION HUB & OMNI-SEARCH SUITE
+         ========================================================================== -->
+    <div class="command-hub">
+        <!-- TOP ROW: SEGMENTED NAVIGATION & MOBILE SELECTOR -->
+        <div class="nav-bar-container">
+            <!-- MOBILE QUICK SELECTOR DROPDOWN -->
+            <div class="mobile-nav-wrapper">
+                <span class="mobile-nav-label">CARGO:</span>
+                <select id="mobile-nav-select" class="mobile-nav-select" aria-label="Seletor de Cargo">
+                    <option value="view-split">⚡ Visão Integrada (BR + AL)</option>
+                    <option value="view-presidente">🇧🇷 Presidente da República</option>
+                    <option value="view-alagoas">🌴 Governador de Alagoas</option>
+                    <option value="view-senado-al">🏛️ Senador por Alagoas</option>
+                    <option value="view-deputado-federal">📋 Deputado Federal (AL) — 9 Vagas</option>
+                    <option value="view-deputado-estadual">🏛️ Deputado Estadual (AL) — 27 Vagas</option>
+                    <option value="view-comparador">⚔️ Confronto Direto (X1) — Comparador</option>
+                    <option value="view-telemetry">📡 Telemetria & Logs 1ms</option>
+                </select>
+            </div>
+
+            <!-- DESKTOP SCROLLABLE SEGMENTED PILLS -->
+            <nav class="nav-tabs" id="main-nav-tabs">
+                <button class="nav-tab active" data-target="view-split">
+                    <span class="tab-icon">⚡</span>
+                    <span class="tab-title">VISÃO INTEGRADA</span>
+                </button>
+                <button class="nav-tab" data-target="view-presidente">
+                    <span class="tab-icon">🇧🇷</span>
+                    <span class="tab-title">PRESIDENTE</span>
+                </button>
+                <button class="nav-tab" data-target="view-alagoas">
+                    <span class="tab-icon">🌴</span>
+                    <span class="tab-title">GOV. ALAGOAS</span>
+                </button>
+                <button class="nav-tab" data-target="view-senado-al">
+                    <span class="tab-icon">🏛️</span>
+                    <span class="tab-title">SENADO (AL)</span>
+                </button>
+                <button class="nav-tab" data-target="view-deputado-federal">
+                    <span class="tab-icon">📋</span>
+                    <span class="tab-title">DEP. FEDERAL</span>
+                    <span class="nav-pill-badge badge-purple">9 Vagas</span>
+                </button>
+                <button class="nav-tab" data-target="view-deputado-estadual">
+                    <span class="tab-icon">🏛️</span>
+                    <span class="tab-title">DEP. ESTADUAL</span>
+                    <span class="nav-pill-badge badge-teal">27 Vagas</span>
+                </button>
+                <button class="nav-tab nav-tab-highlight" data-target="view-comparador">
+                    <span class="tab-icon">⚔️</span>
+                    <span class="tab-title">CONFRONTO DIRETO (X1)</span>
+                    <span class="nav-pill-badge badge-gold">COMPARADOR</span>
+                </button>
+                <button class="nav-tab" data-target="view-telemetry">
+                    <span class="tab-icon">📡</span>
+                    <span class="tab-title">TELEMETRIA 1ms</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- BOTTOM ROW: PROFESSIONAL OMNI-SEARCH BAR WITH FILTERS & DROPDOWN -->
+        <div class="omni-search-bar-wrap">
+            <div class="omni-search-inner">
+                <div class="omni-search-input-box">
+                    <span class="omni-search-icon">🔍</span>
+                    <input type="text" id="omni-search-input" class="omni-search-input" placeholder="Buscar qualquer candidato por nome, cargo, partido ou número em tempo real... (ex: Lula, Bolsonaro, Renan, Arthur Lira, 1111)" autocomplete="off">
+                    <button id="omni-search-clear" class="omni-search-clear hidden" title="Limpar busca">&times;</button>
+                    <span class="omni-kbd-hint hide-on-mobile">Ctrl + K</span>
+                </div>
+                
+                <!-- FILTER PILLS BY RACE -->
+                <div class="omni-filter-chips">
+                    <button class="chip active" data-race="all">TODOS OS CARGOS</button>
+                    <button class="chip" data-race="pres">🇧🇷 PRESIDENTE</button>
+                    <button class="chip" data-race="gov">🌴 GOVERNADOR</button>
+                    <button class="chip" data-race="sen">🏛️ SENADO</button>
+                    <button class="chip" data-race="dep">📋 DEP. FEDERAL</button>
+                    <button class="chip" data-race="est">🏛️ DEP. ESTADUAL</button>
+                </div>
+            </div>
+
+            <!-- FLOATING AUTOCOMPLETE DROPDOWN RESULTS -->
+            <div id="omni-dropdown-results" class="omni-dropdown-results hidden">
+                <div class="dropdown-header">
+                    <span id="omni-results-count">0 candidatos encontrados</span>
+                    <span class="dropdown-tip">Clique no candidato para navegar ou no botão ⚔️ para comparar</span>
+                </div>
+                <div class="dropdown-list" id="omni-results-list">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MAIN DISPLAY CANVAS -->
     <main class="main-content">
@@ -580,6 +650,201 @@
                 <div class="detailed-candidates-grid" id="est-detailed-grid">
                     <!-- Injetado via JS -->
                 </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: COMPARADOR DIRETO // HEAD-TO-HEAD (X1) ================= -->
+        <section id="view-comparador" class="view-panel">
+            <div class="comparador-hero glass-panel glow-gold">
+                <!-- HERO TITLE & STATUS -->
+                <div class="comparador-header">
+                    <div class="comp-title-group">
+                        <span class="kicker text-gold">RADAR BI-NOMINAL // HEAD-TO-HEAD</span>
+                        <h1>⚔️ CONFRONTO DIRETO DE CANDIDATOS (X1)</h1>
+                        <span class="comp-desc">ANÁLISE COMPARATIVA MATEMÁTICA EM TEMPO REAL &bull; VANTAGEM NOMINAL, RELAÇÃO DIRETA E PROJEÇÃO DE VIRADA</span>
+                    </div>
+                    <div class="comp-badge-live">
+                        <span class="pulse-icon pulse-gold"></span>
+                        <span>SISTEMA DE DUELO 1.000 Hz</span>
+                    </div>
+                </div>
+
+                <!-- PRESET DUEL SHORTCUTS -->
+                <div class="duel-presets-bar">
+                    <span class="presets-label">⚡ CONFRONTOS HISTÓRICOS RÁPIDOS:</span>
+                    <div class="preset-buttons">
+                        <button class="preset-btn active" data-preset="lula-bolsonaro">
+                            🇧🇷 LULA vs BOLSONARO
+                        </button>
+                        <button class="preset-btn" data-preset="renan-jhc">
+                            🌴 RENAN FILHO vs JHC
+                        </button>
+                        <button class="preset-btn" data-preset="lira-marina">
+                            🏛️ ARTHUR LIRA vs MARINA JHC
+                        </button>
+                        <button class="preset-btn" data-preset="alvinho-luciano">
+                            📋 ALVINHO LIRA vs LUCIANO AMARAL
+                        </button>
+                        <button class="preset-btn" data-preset="marcelo-bebeto">
+                            🏛️ MARCELO VICTOR vs CABO BEBETO
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CANDIDATE SELECTION BAR -->
+                <div class="duel-selector-bar">
+                    <div class="selector-field">
+                        <label for="duel-select-cargo">CARGO EM DISPUTA:</label>
+                        <select id="duel-select-cargo" class="custom-select">
+                            <option value="pres">🇧🇷 Presidente da República (BR)</option>
+                            <option value="gov">🌴 Governador de Alagoas (AL)</option>
+                            <option value="sen">🏛️ Senador por Alagoas (AL)</option>
+                            <option value="dep">📋 Deputado Federal por Alagoas (AL)</option>
+                            <option value="est">🏛️ Deputado Estadual por Alagoas (AL)</option>
+                            <option value="all">🌐 Duelo Cruzado / Qualquer Cargo</option>
+                        </select>
+                    </div>
+
+                    <div class="selector-field cand-select-field">
+                        <label for="duel-select-cand-a">CANDIDATO "A":</label>
+                        <select id="duel-select-cand-a" class="custom-select select-cand">
+                            <!-- Populated dynamically via JS -->
+                        </select>
+                    </div>
+
+                    <button id="duel-btn-swap" class="btn-swap-cands" title="Inverter Candidatos (A ⇄ B)">
+                        <span class="swap-icon">⇄</span>
+                        <small>INVERTER</small>
+                    </button>
+
+                    <div class="selector-field cand-select-field">
+                        <label for="duel-select-cand-b">CANDIDATO "B":</label>
+                        <select id="duel-select-cand-b" class="custom-select select-cand">
+                            <!-- Populated dynamically via JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- HEAD-TO-HEAD DUEL ARENA -->
+                <div class="duel-arena">
+                    <!-- CARD CANDIDATE A -->
+                    <div class="duel-fighter-card fighter-a" id="duel-card-a">
+                        <div class="fighter-badge" id="fighter-badge-a">LÍDER DO CONFRONTO</div>
+                        <div class="fighter-avatar-wrap">
+                            <div class="fighter-avatar-box" id="fighter-avatar-a">
+                                <!-- Photo or icon injected via JS -->
+                            </div>
+                        </div>
+                        <div class="fighter-info">
+                            <h2 class="fighter-name" id="fighter-name-a">LULA</h2>
+                            <span class="fighter-meta" id="fighter-meta-a">PT &bull; Nº 13 &bull; LUIZ INÁCIO LULA DA SILVA</span>
+                            <span class="fighter-cargo-pill" id="fighter-cargo-a">PRESIDENTE DA REPÚBLICA</span>
+                        </div>
+                        <div class="fighter-stats">
+                            <div class="fighter-pct numeric text-cyan" id="fighter-pct-a">0.0000%</div>
+                            <div class="fighter-votes numeric" id="fighter-votes-a">0 VOTOS</div>
+                            <div class="progress-bar-wrap" style="height: 10px; margin-top: 10px;">
+                                <div class="progress-bar-fill bg-cyan" id="fighter-bar-a" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VS CENTER HUD & DIFFERENTIAL -->
+                    <div class="vs-center-hud">
+                        <div class="vs-circle">VS</div>
+                        <div class="lead-diff-box">
+                            <span class="diff-title">VANTAGEM NOMINAL</span>
+                            <span class="diff-value numeric text-gold" id="duel-diff-votes">+0 VOTOS</span>
+                            <span class="diff-pct numeric text-white" id="duel-diff-pct">+0.00%</span>
+                        </div>
+
+                        <!-- BARRA RELATIVA DIRETA DE DOMÍNIO (100% ENTRE OS DOIS) -->
+                        <div class="relative-dominance-box">
+                            <div class="dominance-labels">
+                                <span id="dom-label-a" class="text-cyan numeric">50.0%</span>
+                                <span class="dom-mid">PROPORÇÃO DIRETA</span>
+                                <span id="dom-label-b" class="text-teal numeric">50.0%</span>
+                            </div>
+                            <div class="split-bar-track">
+                                <div class="split-fill-a bg-cyan" id="dom-bar-a" style="width: 50%;"></div>
+                                <div class="split-divider"></div>
+                                <div class="split-fill-b bg-teal" id="dom-bar-b" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- PROJEÇÃO DE VIRADA / NECESSIDADE MATEMÁTICA -->
+                        <div class="projection-callout" id="duel-turnaround-box">
+                            <span class="proj-badge">PROJEÇÃO MATEMÁTICA</span>
+                            <p id="duel-turnaround-text">Calculando margem de apuração e quórum para virada...</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD CANDIDATE B -->
+                    <div class="duel-fighter-card fighter-b" id="duel-card-b">
+                        <div class="fighter-badge" id="fighter-badge-b">SEGUNDO COLOCADO</div>
+                        <div class="fighter-avatar-wrap">
+                            <div class="fighter-avatar-box" id="fighter-avatar-b">
+                                <!-- Photo or icon injected via JS -->
+                            </div>
+                        </div>
+                        <div class="fighter-info">
+                            <h2 class="fighter-name" id="fighter-name-b">FLÁVIO BOLSONARO</h2>
+                            <span class="fighter-meta" id="fighter-meta-b">PL &bull; Nº 22 &bull; FLAVIO NANTES BOLSONARO</span>
+                            <span class="fighter-cargo-pill" id="fighter-cargo-b">PRESIDENTE DA REPÚBLICA</span>
+                        </div>
+                        <div class="fighter-stats">
+                            <div class="fighter-pct numeric text-teal" id="fighter-pct-b">0.0000%</div>
+                            <div class="fighter-votes numeric" id="fighter-votes-b">0 VOTOS</div>
+                            <div class="progress-bar-wrap" style="height: 10px; margin-top: 10px;">
+                                <div class="progress-bar-fill bg-teal" id="fighter-bar-b" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DETAILED METRIC BREAKDOWN MATRIX -->
+                <div class="duel-metrics-matrix">
+                    <div class="matrix-card">
+                        <span class="matrix-title">VOTOS VÁLIDOS (SHARE OFICIAL)</span>
+                        <div class="matrix-compare-row">
+                            <strong class="text-cyan numeric" id="mat-share-a">0.00%</strong>
+                            <span class="matrix-vs">vs</span>
+                            <strong class="text-teal numeric" id="mat-share-b">0.00%</strong>
+                        </div>
+                        <div class="matrix-sub" id="mat-share-sub">Diferença de 0 pontos percentuais</div>
+                    </div>
+
+                    <div class="matrix-card">
+                        <span class="matrix-title">TOTAL DE VOTOS NOMINAIS</span>
+                        <div class="matrix-compare-row">
+                            <strong class="text-cyan numeric" id="mat-votes-a">0</strong>
+                            <span class="matrix-vs">vs</span>
+                            <strong class="text-teal numeric" id="mat-votes-b">0</strong>
+                        </div>
+                        <div class="matrix-sub" id="mat-votes-sub">Total acumulado apurado nas urnas</div>
+                    </div>
+
+                    <div class="matrix-card">
+                        <span class="matrix-title">DOMÍNIO RELATIVO ENTRE OS DOIS</span>
+                        <div class="matrix-compare-row">
+                            <strong class="text-cyan numeric" id="mat-dom-a">50.0%</strong>
+                            <span class="matrix-vs">vs</span>
+                            <strong class="text-teal numeric" id="mat-dom-b">50.0%</strong>
+                        </div>
+                        <div class="matrix-sub">Considerando apenas a soma dos 2 concorrentes</div>
+                    </div>
+
+                    <div class="matrix-card">
+                        <span class="matrix-title">STATUS ELEITORAL NO CARGO</span>
+                        <div class="matrix-compare-row">
+                            <span class="cand-badge" id="mat-status-a">EM DISPUTA</span>
+                            <span class="matrix-vs">vs</span>
+                            <span class="cand-badge" id="mat-status-b">EM DISPUTA</span>
+                        </div>
+                        <div class="matrix-sub" id="mat-status-sub">Situação perante totalização oficial</div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
