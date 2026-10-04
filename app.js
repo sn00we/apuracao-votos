@@ -1290,6 +1290,18 @@
             });
         }
 
+        const btnAudioMobile = document.getElementById('btn-audio-mobile');
+        if (btnAudioMobile) {
+            btnAudioMobile.addEventListener('click', () => {
+                sound.init();
+                sound.enabled = !sound.enabled;
+                if (dom.audioStatus) dom.audioStatus.textContent = sound.enabled ? 'SOM: ON' : 'SOM: OFF';
+                if (dom.btnAudio) dom.btnAudio.style.borderColor = sound.enabled ? 'var(--neon-cyan)' : 'var(--text-dim)';
+                btnAudioMobile.textContent = sound.enabled ? '🔊 Áudio: Ativado' : '🔇 Áudio: Desativado';
+                showToast(sound.enabled ? '🔊 EFEITOS SONOROS ATIVADOS' : '🔇 EFEITOS SONOROS MUTADOS');
+            });
+        }
+
         if (dom.btnFullscreen) {
             dom.btnFullscreen.addEventListener('click', () => {
                 sound.init();

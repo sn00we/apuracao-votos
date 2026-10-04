@@ -10,7 +10,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="styles.css?v=20261004_lula13">
+    <link rel="stylesheet" href="styles.css?v=20261004_mobile_pc">
 </head>
 <body class="theme-oled">
     <!-- SCANLINE & BACKGROUND FX -->
@@ -51,22 +51,25 @@
 
         <div class="header-right">
             <button id="btn-force-refresh" class="ctrl-btn btn-refresh-glow" title="Consultar novos dados do TSE agora">
-                <span class="icon" id="spin-refresh-icon">🔄</span> <strong id="lbl-refresh">ATUALIZAR TSE</strong>
+                <span class="icon" id="spin-refresh-icon">🔄</span> <strong id="lbl-refresh" class="btn-text-desktop">ATUALIZAR TSE</strong><strong class="btn-text-mobile">ATUALIZAR</strong>
             </button>
             <button id="btn-lula-13" class="ctrl-btn btn-lula-glow" title="Lula 13">
-                <span class="icon">⭐</span> <strong>LULA 13</strong>
+                <span class="icon">⭐</span> <strong class="btn-text-desktop">LULA 13</strong><strong class="btn-text-mobile">13</strong>
             </button>
-            <a href="https://resultados.tse.jus.br/oficial/app/index.html#/eleicao/6257/uf/br/cargo/1/vis/nominal/resultados" target="_blank" class="ctrl-btn" style="text-decoration: none; border-color: var(--neon-cyan); color: var(--neon-cyan);" title="Abrir aplicativo oficial de apuração do TSE">
-                <span class="icon">🔗</span> TSE OFICIAL (6257)
+            <a href="https://github.com/sn00we" target="_blank" rel="noopener noreferrer" class="ctrl-btn btn-github-glow" title="Perfil GitHub @sn00we">
+                <span class="icon">🐙</span> <strong class="btn-text-desktop">@sn00we</strong><strong class="btn-text-mobile">GH</strong>
             </a>
-            <button id="btn-audio" class="ctrl-btn" title="Ativar/Desativar Efeitos Sonoros">
+            <a href="https://resultados.tse.jus.br/oficial/app/index.html#/eleicao/6257/uf/br/cargo/1/vis/nominal/resultados" target="_blank" rel="noopener noreferrer" class="ctrl-btn hide-on-mobile" style="text-decoration: none; border-color: var(--neon-cyan); color: var(--neon-cyan);" title="Abrir aplicativo oficial de apuração do TSE">
+                <span class="icon">🔗</span> TSE OFICIAL
+            </a>
+            <button id="btn-audio" class="ctrl-btn hide-on-mobile" title="Ativar/Desativar Efeitos Sonoros">
                 <span class="icon">🔊</span> <span id="audio-status">SOM: ON</span>
             </button>
-            <button id="btn-fullscreen" class="ctrl-btn" title="Tela Cheia">
+            <button id="btn-fullscreen" class="ctrl-btn hide-on-mobile" title="Tela Cheia">
                 <span class="icon">⛶</span> FULLSCREEN
             </button>
             <button id="btn-controls" class="ctrl-btn highlight" title="Central de Operações">
-                <span class="icon">⚙️</span> PAINEL DE CONTROLE
+                <span class="icon">⚙️</span> <span class="btn-text-desktop">PAINEL</span>
             </button>
         </div>
     </header>
@@ -78,6 +81,33 @@
             <button id="btn-close-drawer" class="btn-close">&times;</button>
         </div>
         <div class="drawer-content">
+
+            <!-- BLOCO DO DESENVOLVEDOR GITHUB -->
+            <div class="ctrl-group author-group">
+                <label>DESENVOLVEDOR & CÓDIGO-FONTE</label>
+                <div class="author-drawer-card">
+                    <div class="author-drawer-top">
+                        <span class="author-avatar-gh">🐙</span>
+                        <div class="author-meta-gh">
+                            <strong>JORGE // @sn00we</strong>
+                            <span>github.com/sn00we</span>
+                        </div>
+                    </div>
+                    <a href="https://github.com/sn00we" target="_blank" rel="noopener noreferrer" class="act-btn primary author-link-btn">
+                        🔗 Acessar GitHub @sn00we
+                    </a>
+                </div>
+            </div>
+
+            <!-- CONTROLES MOBILE RÁPIDOS -->
+            <div class="ctrl-group show-on-mobile-only">
+                <label>UTILITÁRIOS RÁPIDOS</label>
+                <div class="btn-group-scenario">
+                    <button id="btn-audio-mobile" class="act-btn">🔊 Alternar Áudio</button>
+                    <a href="https://resultados.tse.jus.br/oficial/app/index.html#/eleicao/6257/uf/br/cargo/1/vis/nominal/resultados" target="_blank" rel="noopener noreferrer" class="act-btn primary" style="text-decoration:none; text-align:center;">🔗 App Oficial TSE</a>
+                </div>
+            </div>
+
             <div class="ctrl-group">
                 <label>VELOCIDADE DA APURAÇÃO (FPS/TICK)</label>
                 <div class="btn-group-speed">
@@ -486,6 +516,26 @@
             </div>
         </section>
 
+        <!-- FOOTER RESPONSIVO MOBILE & PC -->
+        <footer class="app-footer">
+            <div class="footer-inner">
+                <div class="footer-left">
+                    <div class="footer-brand">⚡ TSE TOTALIZADOR PRO // ELEIÇÕES 2026</div>
+                    <div class="footer-sub">APURAÇÃO NACIONAL (BR) & ESTADO DE ALAGOAS (AL) &bull; 04/10/2026</div>
+                </div>
+                <div class="footer-center">
+                    <a href="https://github.com/sn00we" target="_blank" rel="noopener noreferrer" class="footer-github-badge">
+                        <span class="icon">🐙</span> <span>DESENVOLVIDO POR <strong>@sn00we</strong></span>
+                    </a>
+                </div>
+                <div class="footer-right">
+                    <span class="footer-status-pill">
+                        <span class="live-dot-mini"></span> CDN OFICIAL TSE &bull; 1.000 Hz
+                    </span>
+                </div>
+            </div>
+        </footer>
+
     </main>
 
     <!-- FLOATING TOAST ALERT FOR MAJOR EVENTS -->
@@ -494,6 +544,6 @@
         <div class="toast-text" id="toast-message">VIRADA HISTÓRICA DETECTADA!</div>
     </div>
 
-    <script src="app.js?v=20261004_lula13"></script>
+    <script src="app.js?v=20261004_mobile_pc"></script>
 </body>
 </html>
