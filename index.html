@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSE TOTALIZADOR PRO // BRASIL & ALAGOAS 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="styles.css?v=20261004_fotos">
+</head>
+<body class="theme-oled">
+    <!-- SCANLINE & BACKGROUND FX -->
+    <div class="matrix-bg"></div>
+    <div class="scanlines"></div>
+
+    <!-- TOP BROADCAST HEADER -->
+    <header class="broadcast-header">
+        <div class="header-left">
+            <div class="badge-live">
+                <span class="live-dot"></span>
+                <span>AO VIVO &bull; 04/10/2026</span>
+            </div>
+            <div class="tse-branding">
+                <span class="brand-title">TSE &bull; APURAÇÃO OFICIAL ELEIÇÕES 2026</span>
+                <span class="brand-sub">1º TURNO &bull; 04 DE OUTUBRO DE 2026 // TRANSMISSÃO 1.000 Hz (1ms)</span>
+            </div>
+        </div>
+
+        <div class="header-center">
+            <div class="telemetry-pill">
+                <span class="pill-label">DATA:</span>
+                <span class="pill-value text-gold" id="telemetry-date">04/10/2026</span>
+            </div>
+            <div class="telemetry-pill">
+                <span class="pill-label">ÚLTIMO BU TSE:</span>
+                <span class="pill-value text-green" id="telemetry-tse-time">18:13:47</span>
+            </div>
+            <div class="telemetry-pill">
+                <span class="pill-label">VAZÃO:</span>
+                <span class="pill-value text-cyan" id="telemetry-rate">1.482 votos/ms</span>
+            </div>
+            <div class="telemetry-pill">
+                <span class="pill-label">BRASÍLIA (MS):</span>
+                <span class="pill-value text-gold" id="telemetry-clock">18:14:00.000</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <button id="btn-force-refresh" class="ctrl-btn btn-refresh-glow" title="Consultar novos dados do TSE agora">
+                <span class="icon" id="spin-refresh-icon">🔄</span> <strong id="lbl-refresh">ATUALIZAR TSE</strong>
+            </button>
+            <a href="https://resultados.tse.jus.br/oficial/app/index.html#/eleicao/6257/uf/br/cargo/1/vis/nominal/resultados" target="_blank" class="ctrl-btn" style="text-decoration: none; border-color: var(--neon-cyan); color: var(--neon-cyan);" title="Abrir aplicativo oficial de apuração do TSE">
+                <span class="icon">🔗</span> TSE OFICIAL (6257)
+            </a>
+            <button id="btn-audio" class="ctrl-btn" title="Ativar/Desativar Efeitos Sonoros">
+                <span class="icon">🔊</span> <span id="audio-status">SOM: ON</span>
+            </button>
+            <button id="btn-fullscreen" class="ctrl-btn" title="Tela Cheia">
+                <span class="icon">⛶</span> FULLSCREEN
+            </button>
+            <button id="btn-controls" class="ctrl-btn highlight" title="Central de Operações">
+                <span class="icon">⚙️</span> PAINEL DE CONTROLE
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTROL DRAWER / MODAL -->
+    <aside id="control-drawer" class="control-drawer hidden">
+        <div class="drawer-header">
+            <h3>⚙️ CENTRAL DE CONTROLE & SIMULAÇÃO 1ms</h3>
+            <button id="btn-close-drawer" class="btn-close">&times;</button>
+        </div>
+        <div class="drawer-content">
+            <div class="ctrl-group">
+                <label>VELOCIDADE DA APURAÇÃO (FPS/TICK)</label>
+                <div class="btn-group-speed">
+                    <button class="speed-btn" data-speed="0.2">0.2x Lento</button>
+                    <button class="speed-btn active" data-speed="1">1x Normal</button>
+                    <button class="speed-btn" data-speed="3">3x Rápido</button>
+                    <button class="speed-btn" data-speed="10">10x Turbo</button>
+                    <button class="speed-btn" data-speed="50">50x Ultra (1ms)</button>
+                </div>
+            </div>
+
+            <div class="ctrl-group">
+                <label>AÇÕES RÁPIDAS DE CENÁRIO (04/10/2026)</label>
+                <div class="btn-group-scenario">
+                    <button id="btn-sync-now" class="act-btn primary">🕒 Sincronizar com 17:54 (Atual)</button>
+                    <button id="btn-pause" class="act-btn">⏸️ Pausar / Retomar</button>
+                    <button id="btn-virada" class="act-btn warning">⚡ Simular Virada Histórica</button>
+                    <button id="btn-reset" class="act-btn danger">🔄 Reiniciar Apuração (0%)</button>
+                    <button id="btn-finish" class="act-btn success">🏁 Finalizar 100% das Urnas</button>
+                </div>
+            </div>
+
+            <div class="ctrl-group">
+                <label>MODO DE ALIMENTAÇÃO DE DADOS</label>
+                <div class="feed-mode-select">
+                    <label class="radio-label">
+                        <input type="radio" name="feed-mode" value="simulated" checked>
+                        <span>Motor Autônomo Milissegundo (Física Eleitoral 1000Hz)</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="feed-mode" value="tse-custom">
+                        <span>Entrada de Dados Customizada / API Externa</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="ctrl-group">
+                <label>CANDIDATOS OFICIAIS TSE (04/10/2026)</label>
+                <p class="ctrl-hint">Personalize ou consulte os concorrentes oficiais:</p>
+                <div class="edit-inputs">
+                    <div class="input-row">
+                        <span>Pres. 1:</span>
+                        <input type="text" id="edit-p1-name" value="FLÁVIO BOLSONARO" class="custom-input">
+                        <input type="text" id="edit-p1-party" value="PL" class="custom-input input-short">
+                    </div>
+                    <div class="input-row">
+                        <span>Pres. 2:</span>
+                        <input type="text" id="edit-p2-name" value="LULA" class="custom-input">
+                        <input type="text" id="edit-p2-party" value="PT" class="custom-input input-short">
+                    </div>
+                    <div class="input-row">
+                        <span>Gov. AL 1:</span>
+                        <input type="text" id="edit-al1-name" value="RENAN FILHO" class="custom-input">
+                        <input type="text" id="edit-al1-party" value="MDB" class="custom-input input-short">
+                    </div>
+                    <div class="input-row">
+                        <span>Gov. AL 2:</span>
+                        <input type="text" id="edit-al2-name" value="JHC" class="custom-input">
+                        <input type="text" id="edit-al2-party" value="PSDB" class="custom-input input-short">
+                    </div>
+                    <button id="btn-apply-names" class="act-btn primary">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" data-target="view-split">
+            <span class="tab-icon">⚡</span> VISÃO INTEGRADA (BRASIL + ALAGOAS)
+        </button>
+        <button class="nav-tab" data-target="view-presidente">
+            <span class="tab-icon">🇧🇷</span> PRESIDÊNCIA DA REPÚBLICA (NACIONAL)
+        </button>
+        <button class="nav-tab" data-target="view-alagoas">
+            <span class="tab-icon">🌴</span> GOVERNO DE ALAGOAS (AL)
+        </button>
+        <button class="nav-tab" data-target="view-senado-al">
+            <span class="tab-icon">🏛️</span> SENADO & CÂMARA POR ALAGOAS
+        </button>
+        <button class="nav-tab" data-target="view-telemetry">
+            <span class="tab-icon">📡</span> FLUXO DE URNAS & LOGS 1ms
+        </button>
+    </nav>
+
+    <!-- MAIN DISPLAY CANVAS -->
+    <main class="main-content">
+
+        <!-- ================= VIEW: SPLIT SCREEN (PRESIDENTE + ALAGOAS) ================= -->
+        <section id="view-split" class="view-panel active">
+            <div class="split-grid">
+                
+                <!-- CARD 1: PRESIDENTE NACIONAL -->
+                <article class="contest-card glass-panel glow-blue" id="contest-pres-split">
+                    <div class="card-header">
+                        <div class="race-identity">
+                            <span class="flag-icon">🇧🇷</span>
+                            <div>
+                                <h2 class="race-title">PRESIDENTE DA REPÚBLICA</h2>
+                                <span class="race-scope">TOTALIZAÇÃO NACIONAL &bull; 1º TURNO 2026</span>
+                            </div>
+                        </div>
+                        <div class="status-box">
+                            <span class="status-indicator live"></span>
+                            <span class="status-text" id="pres-status-badge">APURANDO</span>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL PROGRESS BAR -->
+                    <div class="progress-section">
+                        <div class="progress-labels">
+                            <span>SEÇÕES APURADAS: <strong id="pres-sec-percent" class="numeric">0.0000%</strong></span>
+                            <span>URNAS: <strong id="pres-sec-count" class="numeric">0 / 472.075</strong></span>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill bg-cyan" id="pres-progress-bar" style="width: 0%;">
+                                <span class="glow-edge"></span>
+                            </div>
+                            <div class="marker-50" title="Linha de 50% dos votos">50%</div>
+                        </div>
+                        <div class="sub-progress-stats">
+                            <span>TOTAL VOTOS: <strong id="pres-total-votos" class="numeric">0</strong></span>
+                            <span>VOTOS VÁLIDOS: <strong id="pres-votos-validos" class="numeric">0 (0.00%)</strong></span>
+                            <span>BRANCOS/NULOS: <strong id="pres-brancos-nulos" class="numeric">0 (0.00%)</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- LEADING CANDIDATES RANKING -->
+                    <div class="candidates-list" id="pres-candidates-container">
+                        <!-- Injected via JS -->
+                    </div>
+
+                    <!-- LEAD MARGIN HUD -->
+                    <div class="margin-hud">
+                        <div class="hud-item">
+                            <span class="hud-label">DIFERENÇA ENTRE 1º E 2º:</span>
+                            <span class="hud-val text-gold numeric" id="pres-margin-diff">0 votos</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">VARIAÇÃO / SEGUNDO:</span>
+                            <span class="hud-val text-green numeric" id="pres-margin-rate">+0 votos/s</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">PROJEÇÃO MATEMÁTICA:</span>
+                            <span class="hud-val text-white" id="pres-projection">AGUARDANDO QUÓRUM</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- CARD 2: GOVERNO DE ALAGOAS -->
+                <article class="contest-card glass-panel glow-teal" id="contest-gov-split">
+                    <div class="card-header">
+                        <div class="race-identity">
+                            <span class="flag-icon">🌴</span>
+                            <div>
+                                <h2 class="race-title">GOVERNADOR DE ALAGOAS</h2>
+                                <span class="race-scope">ESTADO DE ALAGOAS &bull; PALÁCIO REPÚBLICA DOS PALMARES</span>
+                            </div>
+                        </div>
+                        <div class="status-box">
+                            <span class="status-indicator live"></span>
+                            <span class="status-text" id="gov-status-badge">APURANDO</span>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL PROGRESS BAR -->
+                    <div class="progress-section">
+                        <div class="progress-labels">
+                            <span>SEÇÕES APURADAS: <strong id="gov-sec-percent" class="numeric">0.0000%</strong></span>
+                            <span>URNAS: <strong id="gov-sec-count" class="numeric">0 / 7.218</strong></span>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill bg-teal" id="gov-progress-bar" style="width: 0%;">
+                                <span class="glow-edge"></span>
+                            </div>
+                            <div class="marker-50" title="Linha de 50% dos votos">50%</div>
+                        </div>
+                        <div class="sub-progress-stats">
+                            <span>TOTAL ALAGOAS: <strong id="gov-total-votos" class="numeric">0</strong></span>
+                            <span>VOTOS VÁLIDOS: <strong id="gov-votos-validos" class="numeric">0 (0.00%)</strong></span>
+                            <span>MACEIÓ APURADA: <strong id="gov-maceio-percent" class="numeric">0.00%</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- LEADING CANDIDATES RANKING -->
+                    <div class="candidates-list" id="gov-candidates-container">
+                        <!-- Injected via JS -->
+                    </div>
+
+                    <!-- ALAGOAS REGIONAL RADAR -->
+                    <div class="margin-hud">
+                        <div class="hud-item">
+                            <span class="hud-label">VANTAGEM LÍDER AL:</span>
+                            <span class="hud-val text-gold numeric" id="gov-margin-diff">0 votos</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">MUNICÍPIO DESTAQUE:</span>
+                            <span class="hud-val text-cyan" id="gov-active-city">Maceió - 1ª Zona Eleitoral</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">PROJEÇÃO ALAGOAS:</span>
+                            <span class="hud-val text-white" id="gov-projection">EM APURAÇÃO</span>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+
+            <!-- BOTTON LIVE TICKER STRIP -->
+            <div class="bottom-ticker">
+                <div class="ticker-title">
+                    <span class="pulse-icon"></span>
+                    <span>FEED DE URNAS MILISSEGUNDO:</span>
+                </div>
+                <div class="ticker-wrapper">
+                    <div class="ticker-content" id="live-stream-ticker">
+                        <!-- Urna stream injected by ticker -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: PRESIDENTE FULL SCREEN ================= -->
+        <section id="view-presidente" class="view-panel">
+            <div class="single-race-hero glass-panel">
+                <div class="race-hero-header">
+                    <div class="hero-titles">
+                        <span class="kicker">BRASIL &bull; ELEIÇÃO PRESIDENCIAL 2026</span>
+                        <h1>TOTALIZAÇÃO NACIONAL DOS VOTOS PARA PRESIDENTE</h1>
+                        <p class="hero-desc">Dados consolidados de todas as 27 Unidades Federativas + Votação no Exterior</p>
+                    </div>
+                    <div class="hero-mega-stats">
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">SEÇÕES ELEITORAIS</span>
+                            <span class="stat-number numeric" id="hero-pres-secoes">0.0000%</span>
+                            <span class="stat-sub" id="hero-pres-urnas-ratio">0 de 472.075</span>
+                        </div>
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">ELEITORADO APURADO</span>
+                            <span class="stat-number numeric text-cyan" id="hero-pres-eleitores">0</span>
+                            <span class="stat-sub">VOTOS TOTAIS COMPUTADOS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DETAILED CANDIDATES EXPANDED -->
+                <div class="detailed-candidates-grid" id="pres-detailed-grid">
+                    <!-- Cards de detalhe ampliado com foto, partido, número, % e gráfico de barra -->
+                </div>
+
+                <!-- REGIONAL UF BREAKDOWN -->
+                <div class="uf-matrix-section">
+                    <h3>⚡ TRANSMISSÃO POR ESTADOS (DESTAQUE ALAGOAS & GRANDES COLÉGIOS)</h3>
+                    <div class="uf-cards-row" id="uf-telemetry-row">
+                        <!-- Cards de SP, MG, RJ, BA, RS, ALAGOAS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: ALAGOAS FULL SCREEN ================= -->
+        <section id="view-alagoas" class="view-panel">
+            <div class="single-race-hero glass-panel">
+                <div class="race-hero-header">
+                    <div class="hero-titles">
+                        <span class="kicker">ALAGOAS &bull; GOVERNO DO ESTADO 2026</span>
+                        <h1>TOTALIZAÇÃO OFICIAL PARA O GOVERNO DE ALAGOAS</h1>
+                        <p class="hero-desc">Monitoramento ao vivo dos 102 municípios alagoanos e 7.218 seções eleitorais</p>
+                    </div>
+                    <div class="hero-mega-stats">
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">SEÇÕES DE ALAGOAS</span>
+                            <span class="stat-number numeric" id="hero-gov-secoes">0.0000%</span>
+                            <span class="stat-sub" id="hero-gov-urnas-ratio">0 de 7.218</span>
+                        </div>
+                        <div class="mega-stat-box">
+                            <span class="stat-caption">VOTOS APURADOS EM AL</span>
+                            <span class="stat-number numeric text-teal" id="hero-gov-eleitores">0</span>
+                            <span class="stat-sub">ELEITORADO ESTIMADO: 2.325.656</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALAGOAS CANDIDATES DETAILED -->
+                <div class="detailed-candidates-grid" id="gov-detailed-grid">
+                    <!-- Cards governadores -->
+                </div>
+
+                <!-- MUNICIPALITIES OF ALAGOAS BREAKDOWN -->
+                <div class="alagoas-cities-section">
+                    <h3>🌴 APURAÇÃO NOS PRINCIPAIS MUNICÍPIOS DE ALAGOAS</h3>
+                    <div class="cities-grid" id="alagoas-cities-grid">
+                        <!-- Maceió, Arapiraca, Rio Largo, Palmeira dos Índios, etc. -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: SENADO & CÂMARA ALAGOAS ================= -->
+        <section id="view-senado-al" class="view-panel">
+            <div class="split-grid">
+                <!-- SENADO ALAGOAS -->
+                <article class="contest-card glass-panel">
+                    <div class="card-header">
+                        <div class="race-identity">
+                            <span class="flag-icon">🏛️</span>
+                            <div>
+                                <h2 class="race-title">SENADO POR ALAGOAS (2026)</h2>
+                                <span class="race-scope">DUAS VAGAS EM DISPUTA &bull; RENOVAÇÃO DE 2/3 &bull; MANDATO 8 ANOS</span>
+                            </div>
+                        </div>
+                        <span class="status-indicator live"></span>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-labels">
+                            <span>APURAÇÃO: <strong id="sen-sec-percent" class="numeric">0.0000%</strong></span>
+                            <span>URNAS: <strong id="sen-sec-count" class="numeric">0 / 7.218</strong></span>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill bg-gold" id="sen-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="candidates-list" id="sen-candidates-container">
+                        <!-- Injected via JS -->
+                    </div>
+                </article>
+
+                <!-- DEPUTADOS FEDERAIS MAIS VOTADOS AL -->
+                <article class="contest-card glass-panel">
+                    <div class="card-header">
+                        <div class="race-identity">
+                            <span class="flag-icon">📋</span>
+                            <div>
+                                <h2 class="race-title">DEPUTADO FEDERAL - ALAGOAS</h2>
+                                <span class="race-scope">TOP CANDIDATOS MAIS VOTADOS (9 VAGAS)</span>
+                            </div>
+                        </div>
+                        <span class="status-indicator live"></span>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-labels">
+                            <span>APURAÇÃO GERAL: <strong id="dep-sec-percent" class="numeric">0.0000%</strong></span>
+                            <span>VOTOS NOMINAIS/LEGENDA: <strong id="dep-total-votos" class="numeric">0</strong></span>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill bg-purple" id="dep-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="candidates-list deputies-list" id="dep-candidates-container">
+                        <!-- Injected via JS -->
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: TELEMETRIA E LOGS DE MILISSEGUNDOS ================= -->
+        <section id="view-telemetry" class="view-panel">
+            <div class="telemetry-dashboard glass-panel">
+                <div class="telemetry-header">
+                    <h2>📡 FLUXO DE TRANSMISSÃO DE URNAS EM TEMPO REAL</h2>
+                    <span class="terminal-status">SOCKET PROTOCOL: BUFFER STREAM 1ms &bull; PORTA: SECURE BROADCAST</span>
+                </div>
+                
+                <div class="telemetry-columns">
+                    <div class="telemetry-col">
+                        <h3>LOG DE PACOTES DE URNAS ELETRÔNICAS (BUs PROCESSADOS)</h3>
+                        <div class="terminal-window" id="terminal-bus-log">
+                            <!-- Stream lines -->
+                        </div>
+                    </div>
+                    <div class="telemetry-col">
+                        <h3>TELEMETRIA E ESTATÍSTICAS DA REDE ELEITORAL</h3>
+                        <div class="tech-specs-box">
+                            <div class="spec-row">
+                                <span>FREQUÊNCIA DE AMOSTRAGEM:</span>
+                                <strong class="text-green">1.000 Hz (1 atualiz./ms)</strong>
+                            </div>
+                            <div class="spec-row">
+                                <span>TAXA DE PROCESSAMENTO:</span>
+                                <strong class="text-cyan" id="spec-process-rate">~4.800 urnas/minuto</strong>
+                            </div>
+                            <div class="spec-row">
+                                <span>CHAVE DE AUTENTICAÇÃO TSE:</span>
+                                <strong class="text-gold">SHA-512 SECURE BROADCAST VERIFIED</strong>
+                            </div>
+                            <div class="spec-row">
+                                <span>URNAS DE ALAGOAS TRANSMITIDAS:</span>
+                                <strong class="text-white" id="spec-alagoas-count">0 / 7.218</strong>
+                            </div>
+                            <div class="spec-row">
+                                <span>ZONAS ELEITORAIS CONCLUÍDAS (AL):</span>
+                                <strong class="text-teal" id="spec-al-zonas">0 de 42 Zonas</strong>
+                            </div>
+                            <div class="spec-row">
+                                <span>STATUS DOS CIRCUITOS DE TRANSMISSÃO:</span>
+                                <strong class="text-green">100% OPERACIONAL / SATÉLITE + FIBRA</strong>
+                            </div>
+                        </div>
+
+                        <div class="chart-box">
+                            <h4>CURVA DE VELOCIDADE DE APURAÇÃO (VOTOS/MS)</h4>
+                            <canvas id="telemetryCanvas" width="500" height="180"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FLOATING TOAST ALERT FOR MAJOR EVENTS -->
+    <div id="breaking-toast" class="breaking-toast hidden">
+        <div class="toast-badge">URGENTE // TSE</div>
+        <div class="toast-text" id="toast-message">VIRADA HISTÓRICA DETECTADA!</div>
+    </div>
+
+    <script src="app.js?v=20261004_fotos"></script>
+</body>
+</html>

@@ -1,0 +1,3054 @@
+{
+  "status": "online",
+  "last_sync": "18:48:19",
+  "tse_horario": "18:43:29",
+  "tse_data": "04/10/2026",
+  "pres": {
+    "secoes_total": 499248,
+    "secoes_apuradas": 207533,
+    "pct_secoes": "41,57%",
+    "total_votos": 50227792,
+    "votos_validos": 48031741,
+    "brancos": 869509,
+    "nulos": 1326542,
+    "candidatos": [
+      {
+        "id": "22",
+        "numero": "22",
+        "sqcand": "280002551544",
+        "nome": "FLAVIO BOLSONARO",
+        "nome_completo": "FLAVIO NANTES BOLSONARO",
+        "partido": "PL",
+        "votos": 24212947,
+        "pct": 0.5041,
+        "pct_str": "50,41%",
+        "foto": "fotos/pres_22.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551544.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "13",
+        "numero": "13",
+        "sqcand": "280002542548",
+        "nome": "LULA",
+        "nome_completo": "LUIZ INÁCIO LULA DA SILVA",
+        "partido": "PT",
+        "votos": 19903245,
+        "pct": 0.4144,
+        "pct_str": "41,44%",
+        "foto": "fotos/pres_13.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002542548.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "70",
+        "numero": "70",
+        "sqcand": "280002551547",
+        "nome": "ESCRITOR AUGUSTO CURY",
+        "nome_completo": "AUGUSTO JORGE CURY",
+        "partido": "AVANTE",
+        "votos": 1416111,
+        "pct": 0.029500000000000002,
+        "pct_str": "2,95%",
+        "foto": "fotos/pres_70.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551547.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "55",
+        "numero": "55",
+        "sqcand": "280002551932",
+        "nome": "RONALDO CAIADO",
+        "nome_completo": "RONALDO RAMOS CAIADO",
+        "partido": "PSD",
+        "votos": 1147127,
+        "pct": 0.0239,
+        "pct_str": "2,39%",
+        "foto": "fotos/pres_55.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551932.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "14",
+        "numero": "14",
+        "sqcand": "280002540694",
+        "nome": "RENAN SANTOS",
+        "nome_completo": "RENAN ANTONIO FERREIRA DOS SANTOS",
+        "partido": "MISSÃO",
+        "votos": 1107591,
+        "pct": 0.0231,
+        "pct_str": "2,31%",
+        "foto": "fotos/pres_14.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002540694.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "30",
+        "numero": "30",
+        "sqcand": "280002539826",
+        "nome": "ZEMA",
+        "nome_completo": "ROMEU ZEMA NETO",
+        "partido": "NOVO",
+        "votos": 137066,
+        "pct": 0.0029,
+        "pct_str": "0,29%",
+        "foto": "fotos/pres_30.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002539826.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "80",
+        "numero": "80",
+        "sqcand": "280002538811",
+        "nome": "SAMARA",
+        "nome_completo": "SAMARA MARTINS DA SILVA FEITOSA",
+        "partido": "UP",
+        "votos": 49996,
+        "pct": 0.001,
+        "pct_str": "0,10%",
+        "foto": "fotos/pres_80.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002538811.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "16",
+        "numero": "16",
+        "sqcand": "280002541457",
+        "nome": "HERTZ DIAS",
+        "nome_completo": "HERTZ DA CONCEICAO DIAS",
+        "partido": "PSTU",
+        "votos": 17603,
+        "pct": 0.0004,
+        "pct_str": "0,04%",
+        "foto": "fotos/pres_16.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002541457.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "27",
+        "numero": "27",
+        "sqcand": "280002552484",
+        "nome": "CLARIANA BARAO",
+        "nome_completo": "CLARIANA ZACARKIM BARAO",
+        "partido": "DC",
+        "votos": 17336,
+        "pct": 0.0004,
+        "pct_str": "0,04%",
+        "foto": "fotos/pres_27.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002552484.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "21",
+        "numero": "21",
+        "sqcand": "280002551975",
+        "nome": "EDMILSON COSTA",
+        "nome_completo": "EDMILSON SILVA COSTA",
+        "partido": "PCB",
+        "votos": 8978,
+        "pct": 0.0002,
+        "pct_str": "0,02%",
+        "foto": "fotos/pres_21.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551975.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "35",
+        "numero": "35",
+        "sqcand": "280002548139",
+        "nome": "VETERINÁRIO WILSON GRASSI",
+        "nome_completo": "WILSON GRASSI JUNIOR",
+        "partido": "DEMOCRATA",
+        "votos": 7124,
+        "pct": 0.0001,
+        "pct_str": "0,01%",
+        "foto": "fotos/pres_35.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002548139.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "29",
+        "numero": "29",
+        "sqcand": "280002552487",
+        "nome": "RUI COSTA PIMENTA",
+        "nome_completo": "RUI COSTA PIMENTA",
+        "partido": "PCO",
+        "votos": 6617,
+        "pct": 0.0001,
+        "pct_str": "0,01%",
+        "foto": "fotos/pres_29.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002552487.jpeg",
+        "eleito": false
+      }
+    ]
+  },
+  "gov_al": {
+    "secoes_total": 7101,
+    "secoes_apuradas": 1497,
+    "pct_secoes": "21,08%",
+    "total_votos": 358847,
+    "votos_validos": 317699,
+    "brancos": 9579,
+    "nulos": 31569,
+    "candidatos": [
+      {
+        "id": "15",
+        "numero": "15",
+        "sqcand": "20002553745",
+        "nome": "RENAN FILHO",
+        "nome_completo": "JOSÉ RENAN VASCONCELOS CALHEIROS FILHO",
+        "partido": "MDB",
+        "votos": 165639,
+        "pct": 0.5214,
+        "pct_str": "52,14%",
+        "foto": "fotos/gov_15.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002553745.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "45",
+        "numero": "45",
+        "sqcand": "20002553350",
+        "nome": "JHC",
+        "nome_completo": "JOÃO HENRIQUE HOLANDA CALDAS",
+        "partido": "PSDB",
+        "votos": 150939,
+        "pct": 0.47509999999999997,
+        "pct_str": "47,51%",
+        "foto": "fotos/gov_45.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002553350.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "80",
+        "numero": "80",
+        "sqcand": "20002539642",
+        "nome": "LENILDA LUNA",
+        "nome_completo": "LENILDA LUNA DE ALMEIDA",
+        "partido": "UP",
+        "votos": 987,
+        "pct": 0.0031,
+        "pct_str": "0,31%",
+        "foto": "fotos/gov_80.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002539642.jpeg",
+        "eleito": false
+      },
+      {
+        "id": "35",
+        "numero": "35",
+        "sqcand": "20002552502",
+        "nome": "MÁRCIO JAMBO",
+        "nome_completo": "MARCIO FERREIRA JAMBO SOBRINHO",
+        "partido": "DEMOCRATA",
+        "votos": 134,
+        "pct": 0.0004,
+        "pct_str": "0,04%",
+        "foto": "fotos/gov_35.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002552502.jpeg",
+        "eleito": false
+      }
+    ]
+  },
+  "sen_al": {
+    "secoes_total": 7101,
+    "secoes_apuradas": 1497,
+    "pct_secoes": "21,08%",
+    "votos_validos": 613714,
+    "candidatos": [
+      {
+        "id": "111",
+        "numero": "111",
+        "sqcand": "20002553272",
+        "nome": "ARTHUR LIRA",
+        "partido": "PP",
+        "votos": 194454,
+        "pct": 0.31679999999999997,
+        "pct_str": "31,68%",
+        "foto": "fotos/sen_111.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002553272.jpeg"
+      },
+      {
+        "id": "456",
+        "numero": "456",
+        "sqcand": "20002553711",
+        "nome": "MARINA JHC",
+        "partido": "PSDB",
+        "votos": 157335,
+        "pct": 0.2564,
+        "pct_str": "25,64%",
+        "foto": "fotos/sen_456.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002553711.jpeg"
+      },
+      {
+        "id": "151",
+        "numero": "151",
+        "sqcand": "20002553727",
+        "nome": "RENAN",
+        "partido": "MDB",
+        "votos": 152041,
+        "pct": 0.2477,
+        "pct_str": "24,77%",
+        "foto": "fotos/sen_151.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002553727.jpeg"
+      },
+      {
+        "id": "156",
+        "numero": "156",
+        "sqcand": "20002553726",
+        "nome": "DR. WANDERLEY",
+        "partido": "MDB",
+        "votos": 64260,
+        "pct": 0.1047,
+        "pct_str": "10,47%",
+        "foto": "fotos/sen_156.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002553726.jpeg"
+      },
+      {
+        "id": "100",
+        "numero": "100",
+        "sqcand": "20002548147",
+        "nome": "DAVI DAVINO FILHO",
+        "partido": "REPUBLICANOS",
+        "votos": 41305,
+        "pct": 0.0673,
+        "pct_str": "6,73%",
+        "foto": "fotos/sen_100.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002548147.jpeg"
+      },
+      {
+        "id": "800",
+        "numero": "800",
+        "sqcand": "20002540197",
+        "nome": "ALEXANDRE FLEMING",
+        "partido": "UP",
+        "votos": 3975,
+        "pct": 0.006500000000000001,
+        "pct_str": "0,65%",
+        "foto": "fotos/sen_800.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002540197.jpeg"
+      },
+      {
+        "id": "355",
+        "numero": "355",
+        "sqcand": "20002552524",
+        "nome": "MARIEDSON",
+        "partido": "DEMOCRATA",
+        "votos": 344,
+        "pct": 0.0006,
+        "pct_str": "0,06%",
+        "foto": "fotos/sen_355.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/al/20002552524.jpeg"
+      }
+    ]
+  },
+  "data": {
+    "pres_br": {
+      "ele": "6257",
+      "t": "1",
+      "f": "o",
+      "sup": "n",
+      "tpabr": "br",
+      "cdabr": "br",
+      "dg": "04/10/2026",
+      "hg": "18:43:29",
+      "idg": "1469539",
+      "dt": "04/10/2026",
+      "ht": "18:38:05",
+      "dv": "s",
+      "tf": "n",
+      "and": "p",
+      "md": "n",
+      "carg": [
+        {
+          "cd": "1",
+          "nmn": "Presidente",
+          "nmm": "Presidente",
+          "nmf": "Presidente",
+          "nv": "1",
+          "fed": [
+            {
+              "n": "101",
+              "sg": "PT/PC do B/PV",
+              "nm": "FEDERAÇÃO BRASIL DA ESPERANÇA - FE BRASIL",
+              "com": "PT/PC do B/PV",
+              "npar": [
+                "13",
+                "43",
+                "65"
+              ]
+            }
+          ],
+          "agr": [
+            {
+              "n": "280001801177",
+              "nm": "PARTIDO LIBERAL",
+              "tp": "i",
+              "com": "PL",
+              "par": [
+                {
+                  "n": "22",
+                  "sg": "PL",
+                  "nm": "PARTIDO LIBERAL",
+                  "nfed": "",
+                  "tvtn": "24212947",
+                  "tvan": "24212947",
+                  "cand": [
+                    {
+                      "n": "22",
+                      "sqcand": "280002551544",
+                      "nm": "FLAVIO NANTES BOLSONARO",
+                      "nmu": "FLAVIO BOLSONARO",
+                      "dt": "30/04/1981",
+                      "dvt": "Válido",
+                      "seq": "1",
+                      "e": "n",
+                      "st": "",
+                      "vap": "24212947",
+                      "pvap": "50,41",
+                      "pvapn": "50,410304719",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002551543",
+                          "nm": "ALFREDO GASPAR DE MENDONÇA NETO",
+                          "nmu": "ALFREDO GASPAR",
+                          "sgp": "PL"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801222",
+              "nm": "PARTIDO SOCIAL DEMOCRÁTICO",
+              "tp": "i",
+              "com": "PSD",
+              "par": [
+                {
+                  "n": "55",
+                  "sg": "PSD",
+                  "nm": "PARTIDO SOCIAL DEMOCRÁTICO",
+                  "nfed": "",
+                  "tvtn": "1147127",
+                  "tvan": "1147127",
+                  "cand": [
+                    {
+                      "n": "55",
+                      "sqcand": "280002551932",
+                      "nm": "RONALDO RAMOS CAIADO",
+                      "nmu": "RONALDO CAIADO",
+                      "dt": "25/09/1949",
+                      "dvt": "Válido",
+                      "seq": "4",
+                      "e": "n",
+                      "st": "",
+                      "vap": "1147127",
+                      "pvap": "2,39",
+                      "pvapn": "2,388268624",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002551933",
+                          "nm": "GILBERTO KASSAB",
+                          "nmu": "GILBERTO KASSAB",
+                          "sgp": "PSD"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800617",
+              "nm": "BRASIL PRONTO PRA MAIS",
+              "tp": "c",
+              "com": "PSB / PDT / PCDOB / PT / PV / PSOL / REDE",
+              "tvtn": "19903245",
+              "tvan": "19903245",
+              "par": [
+                {
+                  "n": "13",
+                  "sg": "PT",
+                  "nm": "PARTIDO DOS TRABALHADORES",
+                  "nfed": "101",
+                  "tvtn": "19903245",
+                  "tvan": "19903245",
+                  "cand": [
+                    {
+                      "n": "13",
+                      "sqcand": "280002542548",
+                      "nm": "LUIZ INÁCIO LULA DA SILVA",
+                      "nmu": "LULA",
+                      "dt": "06/10/1945",
+                      "dvt": "Válido",
+                      "seq": "2",
+                      "e": "n",
+                      "st": "",
+                      "vap": "19903245",
+                      "pvap": "41,44",
+                      "pvapn": "41,437692213",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002542549",
+                          "nm": "GERALDO JOSE RODRIGUES ALCKMIN FILHO",
+                          "nmu": "GERALDO ALCKMIN",
+                          "sgp": "PSB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801307",
+              "nm": "DEMOCRACIA CRISTÃ",
+              "tp": "i",
+              "com": "DC",
+              "par": [
+                {
+                  "n": "27",
+                  "sg": "DC",
+                  "nm": "DEMOCRACIA CRISTÃ",
+                  "nfed": "",
+                  "tvtn": "17336",
+                  "tvan": "17336",
+                  "cand": [
+                    {
+                      "n": "27",
+                      "sqcand": "280002552484",
+                      "nm": "CLARIANA ZACARKIM BARAO",
+                      "nmu": "CLARIANA BARAO",
+                      "dt": "03/04/1987",
+                      "dvt": "Válido",
+                      "seq": "9",
+                      "e": "n",
+                      "st": "",
+                      "vap": "17336",
+                      "pvap": "0,04",
+                      "pvapn": "0,036092800",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002552485",
+                          "nm": "FABIANA CRISTINA TAVARES TORQUATO",
+                          "nmu": "FABIANA TORQUATO",
+                          "sgp": "DC"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801228",
+              "nm": "PARTIDO COMUNISTA BRASILEIRO",
+              "tp": "i",
+              "com": "PCB",
+              "par": [
+                {
+                  "n": "21",
+                  "sg": "PCB",
+                  "nm": "PARTIDO COMUNISTA BRASILEIRO",
+                  "nfed": "",
+                  "tvtn": "8978",
+                  "tvan": "8978",
+                  "cand": [
+                    {
+                      "n": "21",
+                      "sqcand": "280002551975",
+                      "nm": "EDMILSON SILVA COSTA",
+                      "nmu": "EDMILSON COSTA",
+                      "dt": "08/04/1950",
+                      "dvt": "Válido",
+                      "seq": "10",
+                      "e": "n",
+                      "st": "",
+                      "vap": "8978",
+                      "pvap": "0,02",
+                      "pvapn": "0,018691806",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002551976",
+                          "nm": "CLEUSA DOS SANTOS",
+                          "nmu": "CLEUSA SANTOS",
+                          "sgp": "PCB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800485",
+              "nm": "PARTIDO SOCIALISTA  DOS TRABALHADORES UNIFICADO",
+              "tp": "i",
+              "com": "PSTU",
+              "par": [
+                {
+                  "n": "16",
+                  "sg": "PSTU",
+                  "nm": "PARTIDO SOCIALISTA  DOS TRABALHADORES UNIFICADO",
+                  "nfed": "",
+                  "tvtn": "17603",
+                  "tvan": "17603",
+                  "cand": [
+                    {
+                      "n": "16",
+                      "sqcand": "280002541457",
+                      "nm": "HERTZ DA CONCEICAO DIAS",
+                      "nmu": "HERTZ DIAS",
+                      "dt": "20/10/1970",
+                      "dvt": "Válido",
+                      "seq": "8",
+                      "e": "n",
+                      "st": "",
+                      "vap": "17603",
+                      "pvap": "0,04",
+                      "pvapn": "0,036648682",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002541458",
+                          "nm": "VANESSA PORTUGAL BARBOSA",
+                          "nmu": "VANESSA PORTUGAL",
+                          "sgp": "PSTU"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801587",
+              "nm": "BRASIL DOS NOSSOS SONHOS",
+              "tp": "c",
+              "com": "AGIR / AVANTE",
+              "tvtn": "1416111",
+              "tvan": "1416111",
+              "par": [
+                {
+                  "n": "70",
+                  "sg": "AVANTE",
+                  "nm": "AVANTE",
+                  "nfed": "",
+                  "tvtn": "1416111",
+                  "tvan": "1416111",
+                  "cand": [
+                    {
+                      "n": "70",
+                      "sqcand": "280002551547",
+                      "nm": "AUGUSTO JORGE CURY",
+                      "nmu": "ESCRITOR AUGUSTO CURY",
+                      "dt": "02/10/1958",
+                      "dvt": "Válido",
+                      "seq": "3",
+                      "e": "n",
+                      "st": "",
+                      "vap": "1416111",
+                      "pvap": "2,95",
+                      "pvapn": "2,948281637",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002551546",
+                          "nm": "JULIO CESAR DELGADO",
+                          "nmu": "JÚLIO DELGADO",
+                          "sgp": "AVANTE"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800487",
+              "nm": "PARTIDO NOVO",
+              "tp": "i",
+              "com": "NOVO",
+              "par": [
+                {
+                  "n": "30",
+                  "sg": "NOVO",
+                  "nm": "PARTIDO NOVO",
+                  "nfed": "",
+                  "tvtn": "137066",
+                  "tvan": "137066",
+                  "cand": [
+                    {
+                      "n": "30",
+                      "sqcand": "280002539826",
+                      "nm": "ROMEU ZEMA NETO",
+                      "nmu": "ZEMA",
+                      "dt": "28/10/1964",
+                      "dvt": "Válido",
+                      "seq": "6",
+                      "e": "n",
+                      "st": "",
+                      "vap": "137066",
+                      "pvap": "0,29",
+                      "pvapn": "0,285365463",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002539825",
+                          "nm": "LUIS EDUARDO GRANGEIRO GIRÃO",
+                          "nmu": "EDUARDO GIRÃO",
+                          "sgp": "NOVO"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800442",
+              "nm": "UNIDADE POPULAR",
+              "tp": "i",
+              "com": "UP",
+              "par": [
+                {
+                  "n": "80",
+                  "sg": "UP",
+                  "nm": "UNIDADE POPULAR",
+                  "nfed": "",
+                  "tvtn": "49996",
+                  "tvan": "49996",
+                  "cand": [
+                    {
+                      "n": "80",
+                      "sqcand": "280002538811",
+                      "nm": "SAMARA MARTINS DA SILVA FEITOSA",
+                      "nmu": "SAMARA",
+                      "dt": "31/08/1987",
+                      "dvt": "Válido",
+                      "seq": "7",
+                      "e": "n",
+                      "st": "",
+                      "vap": "49996",
+                      "pvap": "0,10",
+                      "pvapn": "0,104089502",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002538812",
+                          "nm": "RAQUEL NONATO DE BRICIO",
+                          "nmu": "RAQUEL BRÍCIO",
+                          "sgp": "UP"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800972",
+              "nm": "DEMOCRATA",
+              "tp": "i",
+              "com": "DEMOCRATA",
+              "par": [
+                {
+                  "n": "35",
+                  "sg": "DEMOCRATA",
+                  "nm": "DEMOCRATA",
+                  "nfed": "",
+                  "tvtn": "7124",
+                  "tvan": "7124",
+                  "cand": [
+                    {
+                      "n": "35",
+                      "sqcand": "280002548139",
+                      "nm": "WILSON GRASSI JUNIOR",
+                      "nmu": "VETERINÁRIO WILSON GRASSI",
+                      "dt": "13/03/1970",
+                      "dvt": "Válido",
+                      "seq": "11",
+                      "e": "n",
+                      "st": "",
+                      "vap": "7124",
+                      "pvap": "0,01",
+                      "pvapn": "0,014831859",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002548140",
+                          "nm": "SUÊD HAIDAR NOGUEIRA",
+                          "nmu": "SUÊD HAIDAR",
+                          "sgp": "DEMOCRATA"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800499",
+              "nm": "PARTIDO MISSÃO",
+              "tp": "i",
+              "com": "MISSÃO",
+              "par": [
+                {
+                  "n": "14",
+                  "sg": "MISSÃO",
+                  "nm": "PARTIDO MISSÃO",
+                  "nfed": "",
+                  "tvtn": "1107591",
+                  "tvan": "1107591",
+                  "cand": [
+                    {
+                      "n": "14",
+                      "sqcand": "280002540694",
+                      "nm": "RENAN ANTONIO FERREIRA DOS SANTOS",
+                      "nmu": "RENAN SANTOS",
+                      "dt": "14/02/1984",
+                      "dvt": "Válido",
+                      "seq": "5",
+                      "e": "n",
+                      "st": "",
+                      "vap": "1107591",
+                      "pvap": "2,31",
+                      "pvapn": "2,305956388",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002540693",
+                          "nm": "AROLDO MEDINA",
+                          "nmu": "CORONEL MEDINA",
+                          "sgp": "MISSÃO"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801308",
+              "nm": "PARTIDO DA CAUSA OPERÁRIA",
+              "tp": "i",
+              "com": "PCO",
+              "par": [
+                {
+                  "n": "29",
+                  "sg": "PCO",
+                  "nm": "PARTIDO DA CAUSA OPERÁRIA",
+                  "nfed": "",
+                  "tvtn": "6617",
+                  "tvan": "6617",
+                  "cand": [
+                    {
+                      "n": "29",
+                      "sqcand": "280002552487",
+                      "nm": "RUI COSTA PIMENTA",
+                      "nmu": "RUI COSTA PIMENTA",
+                      "dt": "25/06/1957",
+                      "dvt": "Válido",
+                      "seq": "12",
+                      "e": "n",
+                      "st": "",
+                      "vap": "6617",
+                      "pvap": "0,01",
+                      "pvapn": "0,013776307",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002552486",
+                          "nm": "ANTONIO CARLOS SILVA",
+                          "nmu": "ANTÔNIO CARLOS",
+                          "sgp": "PCO"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "s": {
+        "ts": "499248",
+        "st": "207533",
+        "pst": "41,57",
+        "pstn": "41,569119956",
+        "snt": "291715",
+        "psnt": "58,43",
+        "psntn": "58,430880044",
+        "si": "207493",
+        "psi": "99,98",
+        "psin": "99,980725957",
+        "sni": "40",
+        "psni": "0,02",
+        "psnin": "0,019274043",
+        "sa": "207493",
+        "psa": "100,00",
+        "psan": "100",
+        "sna": "0",
+        "psna": "0,00",
+        "psnan": "0"
+      },
+      "e": {
+        "te": "158745502",
+        "est": "63487081",
+        "pest": "39,99",
+        "pestn": "39,992995203",
+        "esnt": "95258421",
+        "pesnt": "60,01",
+        "pesntn": "60,007004797",
+        "esi": "63486667",
+        "pesi": "99,99",
+        "pesin": "99,999347899",
+        "esni": "414",
+        "pesni": "0,01",
+        "pesnin": "0,000652101",
+        "esa": "63486667",
+        "pesa": "100,00",
+        "pesan": "100",
+        "esna": "0",
+        "pesna": "0,00",
+        "pesnan": "0",
+        "c": "50227792",
+        "pc": "79,12",
+        "pcn": "79,115496802",
+        "a": "13258875",
+        "pa": "20,88",
+        "pan": "20,884503198"
+      },
+      "v": {
+        "tv": "50227792",
+        "vvc": "48031741",
+        "pvvc": "95,63",
+        "pvvcn": "95,627816966",
+        "vv": "48031741",
+        "pvv": "100,00",
+        "pvvn": "100",
+        "vnom": "48031741",
+        "pvnom": "100,00",
+        "pvnomn": "100",
+        "van": "0",
+        "pvan": "0,00",
+        "pvann": "0",
+        "vansj": "0",
+        "pvansj": "0,00",
+        "pvansjn": "0",
+        "vb": "869509",
+        "pvb": "1,73",
+        "pvbn": "1,731131243",
+        "tvn": "1326542",
+        "ptvn": "2,64",
+        "ptvnn": "2,641051791",
+        "vn": "1324433",
+        "pvn": "99,84",
+        "pvnn": "99,841015211",
+        "vnt": "2109",
+        "pvnt": "0,16",
+        "pvntn": "0,158984789",
+        "vsan": "0",
+        "vscv": "0"
+      }
+    },
+    "gov_al": {
+      "ele": "6259",
+      "t": "1",
+      "f": "o",
+      "sup": "n",
+      "tpabr": "uf",
+      "cdabr": "al",
+      "dg": "04/10/2026",
+      "hg": "18:47:04",
+      "idg": "1491607",
+      "dt": "04/10/2026",
+      "ht": "18:47:02",
+      "dv": "s",
+      "tf": "n",
+      "and": "p",
+      "md": "n",
+      "carg": [
+        {
+          "cd": "3",
+          "nmn": "Governador",
+          "nmm": "Governador",
+          "nmf": "Governadora",
+          "nv": "1",
+          "fed": [
+            {
+              "n": "100",
+              "sg": "PSDB/CIDADANIA",
+              "nm": "FEDERAÇÃO PSDB CIDADANIA",
+              "com": "PSDB/CIDADANIA",
+              "npar": [
+                "23",
+                "45"
+              ]
+            }
+          ],
+          "agr": [
+            {
+              "n": "20001801444",
+              "nm": "PRA ALAGOAS FAZER HISTÓRIA DE NOVO",
+              "tp": "c",
+              "com": "MDB / PODE / AGIR / PSB / PSD / AVANTE / PCDOB / PT / PV",
+              "tvtn": "165639",
+              "tvan": "165639",
+              "par": [
+                {
+                  "n": "15",
+                  "sg": "MDB",
+                  "nm": "MOVIMENTO DEMOCRÁTICO BRASILEIRO",
+                  "nfed": "",
+                  "tvtn": "165639",
+                  "tvan": "165639",
+                  "cand": [
+                    {
+                      "n": "15",
+                      "sqcand": "20002553745",
+                      "nm": "JOSÉ RENAN VASCONCELOS CALHEIROS FILHO",
+                      "nmu": "RENAN FILHO",
+                      "dt": "08/10/1979",
+                      "dvt": "Válido",
+                      "seq": "1",
+                      "e": "n",
+                      "st": "",
+                      "vap": "165639",
+                      "pvap": "52,14",
+                      "pvapn": "52,137085732",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "20002553746",
+                          "nm": "YALE BARBOSA FERNANDES",
+                          "nmu": "YALE BARBOSA",
+                          "sgp": "MDB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001801313",
+              "nm": "DEMOCRATA",
+              "tp": "i",
+              "com": "DEMOCRATA",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "35",
+                  "sg": "DEMOCRATA",
+                  "nm": "DEMOCRATA",
+                  "nfed": "",
+                  "tvtn": "134",
+                  "tvan": "134",
+                  "cand": [
+                    {
+                      "n": "35",
+                      "sqcand": "20002552502",
+                      "nm": "MARCIO FERREIRA JAMBO SOBRINHO",
+                      "nmu": "MÁRCIO JAMBO",
+                      "dt": "24/06/1969",
+                      "dvt": "Válido",
+                      "seq": "4",
+                      "e": "n",
+                      "st": "",
+                      "vap": "134",
+                      "pvap": "0,04",
+                      "pvapn": "0,042178288",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "20002552503",
+                          "nm": "JAUDINETE PONTES DA SILVA",
+                          "nmu": "JAUDINETE PONTES",
+                          "sgp": "DEMOCRATA"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001801408",
+              "nm": "ALAGOAS GIGANTE",
+              "tp": "c",
+              "com": "PDT / PL / DC / CIDADANIA / PSDB / PRD / SOLIDARIEDADE / PP / UNIÃO",
+              "tvtn": "150939",
+              "tvan": "150939",
+              "par": [
+                {
+                  "n": "45",
+                  "sg": "PSDB",
+                  "nm": "PARTIDO DA SOCIAL DEMOCRACIA BRASILEIRA",
+                  "nfed": "100",
+                  "tvtn": "150939",
+                  "tvan": "150939",
+                  "cand": [
+                    {
+                      "n": "45",
+                      "sqcand": "20002553350",
+                      "nm": "JOÃO HENRIQUE HOLANDA CALDAS",
+                      "nmu": "JHC",
+                      "dt": "22/07/1987",
+                      "dvt": "Válido",
+                      "seq": "2",
+                      "e": "n",
+                      "st": "",
+                      "vap": "150939",
+                      "pvap": "47,51",
+                      "pvapn": "47,510064558",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "20002553351",
+                          "nm": "CELIA MARIA BARBOSA ROCHA",
+                          "nmu": "CÉLIA ROCHA",
+                          "sgp": "PSDB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001800463",
+              "nm": "UNIDADE POPULAR",
+              "tp": "i",
+              "com": "UP",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "80",
+                  "sg": "UP",
+                  "nm": "UNIDADE POPULAR",
+                  "nfed": "",
+                  "tvtn": "987",
+                  "tvan": "987",
+                  "cand": [
+                    {
+                      "n": "80",
+                      "sqcand": "20002539642",
+                      "nm": "LENILDA LUNA DE ALMEIDA",
+                      "nmu": "LENILDA LUNA",
+                      "dt": "04/10/1966",
+                      "dvt": "Válido",
+                      "seq": "3",
+                      "e": "n",
+                      "st": "",
+                      "vap": "987",
+                      "pvap": "0,31",
+                      "pvapn": "0,310671422",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "20002539643",
+                          "nm": "JARDEL WANDSON QUEIROZ DA CRUZ",
+                          "nmu": "JARDEL QUEIROZ",
+                          "sgp": "UP"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "s": {
+        "ts": "7101",
+        "st": "1497",
+        "pst": "21,08",
+        "pstn": "21,081537812",
+        "snt": "5604",
+        "psnt": "78,92",
+        "psntn": "78,918462188",
+        "si": "1497",
+        "psi": "100,00",
+        "psin": "100",
+        "sni": "0",
+        "psni": "0,00",
+        "psnin": "0",
+        "sa": "1497",
+        "psa": "100,00",
+        "psan": "100",
+        "sna": "0",
+        "psna": "0,00",
+        "psnan": "0"
+      },
+      "e": {
+        "te": "2439190",
+        "est": "451599",
+        "pest": "18,51",
+        "pestn": "18,514301879",
+        "esnt": "1987591",
+        "pesnt": "81,49",
+        "pesntn": "81,485698121",
+        "esi": "451599",
+        "pesi": "100,00",
+        "pesin": "100",
+        "esni": "0",
+        "pesni": "0,00",
+        "pesnin": "0",
+        "esa": "451599",
+        "pesa": "100,00",
+        "pesan": "100",
+        "esna": "0",
+        "pesna": "0,00",
+        "pesnan": "0",
+        "c": "358847",
+        "pc": "79,46",
+        "pcn": "79,461424848",
+        "a": "92752",
+        "pa": "20,54",
+        "pan": "20,538575152"
+      },
+      "v": {
+        "tv": "358847",
+        "vvc": "317699",
+        "pvvc": "88,53",
+        "pvvcn": "88,533274627",
+        "vv": "317699",
+        "pvv": "100,00",
+        "pvvn": "100",
+        "vnom": "317699",
+        "pvnom": "100,00",
+        "pvnomn": "100",
+        "van": "0",
+        "pvan": "0,00",
+        "pvann": "0",
+        "vansj": "0",
+        "pvansj": "0,00",
+        "pvansjn": "0",
+        "vb": "9579",
+        "pvb": "2,67",
+        "pvbn": "2,669382773",
+        "tvn": "31569",
+        "ptvn": "8,80",
+        "ptvnn": "8,797342600",
+        "vn": "31569",
+        "pvn": "100,00",
+        "pvnn": "100",
+        "vnt": "0",
+        "pvnt": "0,00",
+        "pvntn": "0",
+        "vsan": "0",
+        "vscv": "0"
+      }
+    },
+    "sen_al": {
+      "ele": "6259",
+      "t": "1",
+      "f": "o",
+      "sup": "n",
+      "tpabr": "uf",
+      "cdabr": "al",
+      "dg": "04/10/2026",
+      "hg": "18:47:04",
+      "idg": "1491611",
+      "dt": "04/10/2026",
+      "ht": "18:47:02",
+      "dv": "s",
+      "tf": "n",
+      "and": "p",
+      "carg": [
+        {
+          "cd": "5",
+          "nmn": "Senador",
+          "nmm": "Senador",
+          "nmf": "Senadora",
+          "nv": "2",
+          "fed": [
+            {
+              "n": "100",
+              "sg": "PSDB/CIDADANIA",
+              "nm": "FEDERAÇÃO PSDB CIDADANIA",
+              "com": "PSDB/CIDADANIA",
+              "npar": [
+                "23",
+                "45"
+              ]
+            },
+            {
+              "n": "104",
+              "sg": "UNIÃO/PP",
+              "nm": "FEDERAÇÃO UNIÃO PROGRESSISTA",
+              "com": "UNIÃO/PP",
+              "npar": [
+                "11",
+                "44"
+              ]
+            }
+          ],
+          "agr": [
+            {
+              "n": "20001801441",
+              "nm": "PRA ALAGOAS FAZER HISTÓRIA DE NOVO",
+              "tp": "c",
+              "com": "MDB / PODE / AGIR / PSB / PSD / AVANTE / PCDOB / PT / PV",
+              "tvtn": "216301",
+              "tvan": "216301",
+              "par": [
+                {
+                  "n": "15",
+                  "sg": "MDB",
+                  "nm": "MOVIMENTO DEMOCRÁTICO BRASILEIRO",
+                  "nfed": "",
+                  "tvtn": "216301",
+                  "tvan": "216301",
+                  "cand": [
+                    {
+                      "n": "151",
+                      "sqcand": "20002553727",
+                      "nm": "JOSE RENAN VASCONCELOS CALHEIROS",
+                      "nmu": "RENAN",
+                      "dt": "16/09/1955",
+                      "dvt": "Válido",
+                      "seq": "3",
+                      "e": "n",
+                      "st": "",
+                      "vap": "152041",
+                      "pvap": "24,77",
+                      "pvapn": "24,773917493",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002553957",
+                          "nm": "GUSTAVO DIAS HENRIQUE",
+                          "nmu": "GUSTAVO HENRIQUE",
+                          "sgp": "PSD"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002553956",
+                          "nm": "CHRISTIANE BULHÕES BARROS MELO SILVA",
+                          "nmu": "CHRISTIANE BULHÕES",
+                          "sgp": "MDB"
+                        }
+                      ]
+                    },
+                    {
+                      "n": "156",
+                      "sqcand": "20002553726",
+                      "nm": "JOSE WANDERLEY NETO",
+                      "nmu": "DR. WANDERLEY",
+                      "dt": "08/07/1949",
+                      "dvt": "Válido",
+                      "seq": "4",
+                      "e": "n",
+                      "st": "",
+                      "vap": "64260",
+                      "pvap": "10,47",
+                      "pvapn": "10,470675266",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002554456",
+                          "nm": "MARIA YVONE LOUREIRO RIBEIRO",
+                          "nmu": "MARIVONE LOUREIRO",
+                          "sgp": "PCDOB"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002554524",
+                          "nm": "THIAGO SOUZA SANTOS",
+                          "nmu": "THIAGO SOUZA",
+                          "sgp": "PCDOB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001800424",
+              "nm": "UNIDADE POPULAR",
+              "tp": "i",
+              "com": "UP",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "80",
+                  "sg": "UP",
+                  "nm": "UNIDADE POPULAR",
+                  "nfed": "",
+                  "tvtn": "3975",
+                  "tvan": "3975",
+                  "cand": [
+                    {
+                      "n": "800",
+                      "sqcand": "20002540197",
+                      "nm": "ALEXANDRE FLEMING VASQUES BASTOS",
+                      "nmu": "ALEXANDRE FLEMING",
+                      "dt": "08/06/1977",
+                      "dvt": "Válido",
+                      "seq": "6",
+                      "e": "n",
+                      "st": "",
+                      "vap": "3975",
+                      "pvap": "0,65",
+                      "pvapn": "0,647695832",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002540195",
+                          "nm": "LILIANE PEREIRA DA SILVA",
+                          "nmu": "LILIANE PEREIRA",
+                          "sgp": "UP"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002540196",
+                          "nm": "JOSE NIVALDO CARDOZO MOTA",
+                          "nmu": "PROFESSOR NIVALDO MOTA",
+                          "sgp": "UP"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001800974",
+              "nm": "REPUBLICANOS",
+              "tp": "i",
+              "com": "REPUBLICANOS",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "10",
+                  "sg": "REPUBLICANOS",
+                  "nm": "REPUBLICANOS",
+                  "nfed": "",
+                  "tvtn": "41305",
+                  "tvan": "41305",
+                  "cand": [
+                    {
+                      "n": "100",
+                      "sqcand": "20002548147",
+                      "nm": "DAVID CABRAL DAVINO FILHO",
+                      "nmu": "DAVI DAVINO FILHO",
+                      "dt": "01/10/1987",
+                      "dvt": "Válido",
+                      "seq": "5",
+                      "e": "n",
+                      "st": "",
+                      "vap": "41305",
+                      "pvap": "6,73",
+                      "pvapn": "6,730333673",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002548148",
+                          "nm": "ARTHUR JESSÉ MENDONÇA DE ALBUQUERQUE",
+                          "nmu": "ARTHUR ALBUQUERQUE",
+                          "sgp": "REPUBLICANOS"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002548149",
+                          "nm": "KAMILA MIRANDA DAVINO",
+                          "nmu": "DRA. KAMILA",
+                          "sgp": "REPUBLICANOS"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001801340",
+              "nm": "ALAGOAS GIGANTE II",
+              "tp": "c",
+              "com": "PDT / PL / CIDADANIA / PSDB / PRD / SOLIDARIEDADE / PP / UNIÃO / DC",
+              "tvtn": "351789",
+              "tvan": "351789",
+              "par": [
+                {
+                  "n": "11",
+                  "sg": "PP",
+                  "nm": "PROGRESSISTAS",
+                  "nfed": "104",
+                  "tvtn": "194454",
+                  "tvan": "194454",
+                  "cand": [
+                    {
+                      "n": "111",
+                      "sqcand": "20002553272",
+                      "nm": "ARTHUR CESAR PEREIRA DE LIRA",
+                      "nmu": "ARTHUR LIRA",
+                      "dt": "25/06/1969",
+                      "dvt": "Válido",
+                      "seq": "1",
+                      "e": "n",
+                      "st": "",
+                      "vap": "194454",
+                      "pvap": "31,68",
+                      "pvapn": "31,684791287",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002553273",
+                          "nm": "LUIZ ROMERO CAVALCANTE FARIAS",
+                          "nmu": "LUIZ ROMERO",
+                          "sgp": "PL"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002553274",
+                          "nm": "GUSTAVO DANTAS FEIJÓ",
+                          "nmu": "GUSTAVO FEIJÓ",
+                          "sgp": "PP"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "n": "45",
+                  "sg": "PSDB",
+                  "nm": "PARTIDO DA SOCIAL DEMOCRACIA BRASILEIRA",
+                  "nfed": "100",
+                  "tvtn": "157335",
+                  "tvan": "157335",
+                  "cand": [
+                    {
+                      "n": "456",
+                      "sqcand": "20002553711",
+                      "nm": "MARINA ANTUNES CANDIA E FIGUEIREDO",
+                      "nmu": "MARINA JHC",
+                      "dt": "27/12/1990",
+                      "dvt": "Válido",
+                      "seq": "2",
+                      "e": "n",
+                      "st": "",
+                      "vap": "157335",
+                      "pvap": "25,64",
+                      "pvapn": "25,636534281",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002553712",
+                          "nm": "EUDOCIA MARIA HOLANDA DE ARAUJO CALDAS",
+                          "nmu": "DRA. EUDOCIA",
+                          "sgp": "PSDB"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002554504",
+                          "nm": "JURANDIR BOIA ROCHA",
+                          "nmu": "JURANDIR BOIA",
+                          "sgp": "PDT"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001801320",
+              "nm": "DEMOCRATA",
+              "tp": "i",
+              "com": "DEMOCRATA",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "35",
+                  "sg": "DEMOCRATA",
+                  "nm": "DEMOCRATA",
+                  "nfed": "",
+                  "tvtn": "344",
+                  "tvan": "344",
+                  "cand": [
+                    {
+                      "n": "355",
+                      "sqcand": "20002552524",
+                      "nm": "JOSE MARIEDSON DA SILVA",
+                      "nmu": "MARIEDSON",
+                      "dt": "16/08/1973",
+                      "dvt": "Válido",
+                      "seq": "7",
+                      "e": "n",
+                      "st": "",
+                      "vap": "344",
+                      "pvap": "0,06",
+                      "pvapn": "0,056052168",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002552522",
+                          "nm": "ADRIANA NUNES DA SILVA",
+                          "nmu": "ADRIANA NUNES",
+                          "sgp": "DEMOCRATA"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002552523",
+                          "nm": "JEFFERSON GONCALVES DA SILVA",
+                          "nmu": "JEFERSON GONÇALVES",
+                          "sgp": "DEMOCRATA"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "s": {
+        "ts": "7101",
+        "st": "1497",
+        "pst": "21,08",
+        "pstn": "21,081537812",
+        "snt": "5604",
+        "psnt": "78,92",
+        "psntn": "78,918462188",
+        "si": "1497",
+        "psi": "100,00",
+        "psin": "100",
+        "sni": "0",
+        "psni": "0,00",
+        "psnin": "0",
+        "sa": "1497",
+        "psa": "100,00",
+        "psan": "100",
+        "sna": "0",
+        "psna": "0,00",
+        "psnan": "0"
+      },
+      "e": {
+        "te": "2439190",
+        "est": "451599",
+        "pest": "18,51",
+        "pestn": "18,514301879",
+        "esnt": "1987591",
+        "pesnt": "81,49",
+        "pesntn": "81,485698121",
+        "esi": "451599",
+        "pesi": "100,00",
+        "pesin": "100",
+        "esni": "0",
+        "pesni": "0,00",
+        "pesnin": "0",
+        "esa": "451599",
+        "pesa": "100,00",
+        "pesan": "100",
+        "esna": "0",
+        "pesna": "0,00",
+        "pesnan": "0",
+        "c": "358847",
+        "pc": "79,46",
+        "pcn": "79,461424848",
+        "a": "92752",
+        "pa": "20,54",
+        "pan": "20,538575152"
+      },
+      "v": {
+        "tv": "717694",
+        "vvc": "613714",
+        "pvvc": "85,51",
+        "pvvcn": "85,511931269",
+        "vv": "613714",
+        "pvv": "100,00",
+        "pvvn": "100",
+        "vnom": "613714",
+        "pvnom": "100,00",
+        "pvnomn": "100",
+        "van": "0",
+        "pvan": "0,00",
+        "pvann": "0",
+        "vansj": "0",
+        "pvansj": "0,00",
+        "pvansjn": "0",
+        "vb": "37644",
+        "pvb": "5,25",
+        "pvbn": "5,245132327",
+        "tvn": "66336",
+        "ptvn": "9,24",
+        "ptvnn": "9,242936405",
+        "vn": "66336",
+        "pvn": "100,00",
+        "pvnn": "100",
+        "vnt": "0",
+        "pvnt": "0,00",
+        "pvntn": "0",
+        "vsan": "0",
+        "vscv": "0"
+      }
+    }
+  },
+  "raw": {
+    "pres_br": {
+      "ele": "6257",
+      "t": "1",
+      "f": "o",
+      "sup": "n",
+      "tpabr": "br",
+      "cdabr": "br",
+      "dg": "04/10/2026",
+      "hg": "18:43:29",
+      "idg": "1469539",
+      "dt": "04/10/2026",
+      "ht": "18:38:05",
+      "dv": "s",
+      "tf": "n",
+      "and": "p",
+      "md": "n",
+      "carg": [
+        {
+          "cd": "1",
+          "nmn": "Presidente",
+          "nmm": "Presidente",
+          "nmf": "Presidente",
+          "nv": "1",
+          "fed": [
+            {
+              "n": "101",
+              "sg": "PT/PC do B/PV",
+              "nm": "FEDERAÇÃO BRASIL DA ESPERANÇA - FE BRASIL",
+              "com": "PT/PC do B/PV",
+              "npar": [
+                "13",
+                "43",
+                "65"
+              ]
+            }
+          ],
+          "agr": [
+            {
+              "n": "280001801177",
+              "nm": "PARTIDO LIBERAL",
+              "tp": "i",
+              "com": "PL",
+              "par": [
+                {
+                  "n": "22",
+                  "sg": "PL",
+                  "nm": "PARTIDO LIBERAL",
+                  "nfed": "",
+                  "tvtn": "24212947",
+                  "tvan": "24212947",
+                  "cand": [
+                    {
+                      "n": "22",
+                      "sqcand": "280002551544",
+                      "nm": "FLAVIO NANTES BOLSONARO",
+                      "nmu": "FLAVIO BOLSONARO",
+                      "dt": "30/04/1981",
+                      "dvt": "Válido",
+                      "seq": "1",
+                      "e": "n",
+                      "st": "",
+                      "vap": "24212947",
+                      "pvap": "50,41",
+                      "pvapn": "50,410304719",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002551543",
+                          "nm": "ALFREDO GASPAR DE MENDONÇA NETO",
+                          "nmu": "ALFREDO GASPAR",
+                          "sgp": "PL"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801222",
+              "nm": "PARTIDO SOCIAL DEMOCRÁTICO",
+              "tp": "i",
+              "com": "PSD",
+              "par": [
+                {
+                  "n": "55",
+                  "sg": "PSD",
+                  "nm": "PARTIDO SOCIAL DEMOCRÁTICO",
+                  "nfed": "",
+                  "tvtn": "1147127",
+                  "tvan": "1147127",
+                  "cand": [
+                    {
+                      "n": "55",
+                      "sqcand": "280002551932",
+                      "nm": "RONALDO RAMOS CAIADO",
+                      "nmu": "RONALDO CAIADO",
+                      "dt": "25/09/1949",
+                      "dvt": "Válido",
+                      "seq": "4",
+                      "e": "n",
+                      "st": "",
+                      "vap": "1147127",
+                      "pvap": "2,39",
+                      "pvapn": "2,388268624",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002551933",
+                          "nm": "GILBERTO KASSAB",
+                          "nmu": "GILBERTO KASSAB",
+                          "sgp": "PSD"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800617",
+              "nm": "BRASIL PRONTO PRA MAIS",
+              "tp": "c",
+              "com": "PSB / PDT / PCDOB / PT / PV / PSOL / REDE",
+              "tvtn": "19903245",
+              "tvan": "19903245",
+              "par": [
+                {
+                  "n": "13",
+                  "sg": "PT",
+                  "nm": "PARTIDO DOS TRABALHADORES",
+                  "nfed": "101",
+                  "tvtn": "19903245",
+                  "tvan": "19903245",
+                  "cand": [
+                    {
+                      "n": "13",
+                      "sqcand": "280002542548",
+                      "nm": "LUIZ INÁCIO LULA DA SILVA",
+                      "nmu": "LULA",
+                      "dt": "06/10/1945",
+                      "dvt": "Válido",
+                      "seq": "2",
+                      "e": "n",
+                      "st": "",
+                      "vap": "19903245",
+                      "pvap": "41,44",
+                      "pvapn": "41,437692213",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002542549",
+                          "nm": "GERALDO JOSE RODRIGUES ALCKMIN FILHO",
+                          "nmu": "GERALDO ALCKMIN",
+                          "sgp": "PSB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801307",
+              "nm": "DEMOCRACIA CRISTÃ",
+              "tp": "i",
+              "com": "DC",
+              "par": [
+                {
+                  "n": "27",
+                  "sg": "DC",
+                  "nm": "DEMOCRACIA CRISTÃ",
+                  "nfed": "",
+                  "tvtn": "17336",
+                  "tvan": "17336",
+                  "cand": [
+                    {
+                      "n": "27",
+                      "sqcand": "280002552484",
+                      "nm": "CLARIANA ZACARKIM BARAO",
+                      "nmu": "CLARIANA BARAO",
+                      "dt": "03/04/1987",
+                      "dvt": "Válido",
+                      "seq": "9",
+                      "e": "n",
+                      "st": "",
+                      "vap": "17336",
+                      "pvap": "0,04",
+                      "pvapn": "0,036092800",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002552485",
+                          "nm": "FABIANA CRISTINA TAVARES TORQUATO",
+                          "nmu": "FABIANA TORQUATO",
+                          "sgp": "DC"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801228",
+              "nm": "PARTIDO COMUNISTA BRASILEIRO",
+              "tp": "i",
+              "com": "PCB",
+              "par": [
+                {
+                  "n": "21",
+                  "sg": "PCB",
+                  "nm": "PARTIDO COMUNISTA BRASILEIRO",
+                  "nfed": "",
+                  "tvtn": "8978",
+                  "tvan": "8978",
+                  "cand": [
+                    {
+                      "n": "21",
+                      "sqcand": "280002551975",
+                      "nm": "EDMILSON SILVA COSTA",
+                      "nmu": "EDMILSON COSTA",
+                      "dt": "08/04/1950",
+                      "dvt": "Válido",
+                      "seq": "10",
+                      "e": "n",
+                      "st": "",
+                      "vap": "8978",
+                      "pvap": "0,02",
+                      "pvapn": "0,018691806",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002551976",
+                          "nm": "CLEUSA DOS SANTOS",
+                          "nmu": "CLEUSA SANTOS",
+                          "sgp": "PCB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800485",
+              "nm": "PARTIDO SOCIALISTA  DOS TRABALHADORES UNIFICADO",
+              "tp": "i",
+              "com": "PSTU",
+              "par": [
+                {
+                  "n": "16",
+                  "sg": "PSTU",
+                  "nm": "PARTIDO SOCIALISTA  DOS TRABALHADORES UNIFICADO",
+                  "nfed": "",
+                  "tvtn": "17603",
+                  "tvan": "17603",
+                  "cand": [
+                    {
+                      "n": "16",
+                      "sqcand": "280002541457",
+                      "nm": "HERTZ DA CONCEICAO DIAS",
+                      "nmu": "HERTZ DIAS",
+                      "dt": "20/10/1970",
+                      "dvt": "Válido",
+                      "seq": "8",
+                      "e": "n",
+                      "st": "",
+                      "vap": "17603",
+                      "pvap": "0,04",
+                      "pvapn": "0,036648682",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002541458",
+                          "nm": "VANESSA PORTUGAL BARBOSA",
+                          "nmu": "VANESSA PORTUGAL",
+                          "sgp": "PSTU"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801587",
+              "nm": "BRASIL DOS NOSSOS SONHOS",
+              "tp": "c",
+              "com": "AGIR / AVANTE",
+              "tvtn": "1416111",
+              "tvan": "1416111",
+              "par": [
+                {
+                  "n": "70",
+                  "sg": "AVANTE",
+                  "nm": "AVANTE",
+                  "nfed": "",
+                  "tvtn": "1416111",
+                  "tvan": "1416111",
+                  "cand": [
+                    {
+                      "n": "70",
+                      "sqcand": "280002551547",
+                      "nm": "AUGUSTO JORGE CURY",
+                      "nmu": "ESCRITOR AUGUSTO CURY",
+                      "dt": "02/10/1958",
+                      "dvt": "Válido",
+                      "seq": "3",
+                      "e": "n",
+                      "st": "",
+                      "vap": "1416111",
+                      "pvap": "2,95",
+                      "pvapn": "2,948281637",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002551546",
+                          "nm": "JULIO CESAR DELGADO",
+                          "nmu": "JÚLIO DELGADO",
+                          "sgp": "AVANTE"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800487",
+              "nm": "PARTIDO NOVO",
+              "tp": "i",
+              "com": "NOVO",
+              "par": [
+                {
+                  "n": "30",
+                  "sg": "NOVO",
+                  "nm": "PARTIDO NOVO",
+                  "nfed": "",
+                  "tvtn": "137066",
+                  "tvan": "137066",
+                  "cand": [
+                    {
+                      "n": "30",
+                      "sqcand": "280002539826",
+                      "nm": "ROMEU ZEMA NETO",
+                      "nmu": "ZEMA",
+                      "dt": "28/10/1964",
+                      "dvt": "Válido",
+                      "seq": "6",
+                      "e": "n",
+                      "st": "",
+                      "vap": "137066",
+                      "pvap": "0,29",
+                      "pvapn": "0,285365463",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002539825",
+                          "nm": "LUIS EDUARDO GRANGEIRO GIRÃO",
+                          "nmu": "EDUARDO GIRÃO",
+                          "sgp": "NOVO"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800442",
+              "nm": "UNIDADE POPULAR",
+              "tp": "i",
+              "com": "UP",
+              "par": [
+                {
+                  "n": "80",
+                  "sg": "UP",
+                  "nm": "UNIDADE POPULAR",
+                  "nfed": "",
+                  "tvtn": "49996",
+                  "tvan": "49996",
+                  "cand": [
+                    {
+                      "n": "80",
+                      "sqcand": "280002538811",
+                      "nm": "SAMARA MARTINS DA SILVA FEITOSA",
+                      "nmu": "SAMARA",
+                      "dt": "31/08/1987",
+                      "dvt": "Válido",
+                      "seq": "7",
+                      "e": "n",
+                      "st": "",
+                      "vap": "49996",
+                      "pvap": "0,10",
+                      "pvapn": "0,104089502",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002538812",
+                          "nm": "RAQUEL NONATO DE BRICIO",
+                          "nmu": "RAQUEL BRÍCIO",
+                          "sgp": "UP"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800972",
+              "nm": "DEMOCRATA",
+              "tp": "i",
+              "com": "DEMOCRATA",
+              "par": [
+                {
+                  "n": "35",
+                  "sg": "DEMOCRATA",
+                  "nm": "DEMOCRATA",
+                  "nfed": "",
+                  "tvtn": "7124",
+                  "tvan": "7124",
+                  "cand": [
+                    {
+                      "n": "35",
+                      "sqcand": "280002548139",
+                      "nm": "WILSON GRASSI JUNIOR",
+                      "nmu": "VETERINÁRIO WILSON GRASSI",
+                      "dt": "13/03/1970",
+                      "dvt": "Válido",
+                      "seq": "11",
+                      "e": "n",
+                      "st": "",
+                      "vap": "7124",
+                      "pvap": "0,01",
+                      "pvapn": "0,014831859",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002548140",
+                          "nm": "SUÊD HAIDAR NOGUEIRA",
+                          "nmu": "SUÊD HAIDAR",
+                          "sgp": "DEMOCRATA"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001800499",
+              "nm": "PARTIDO MISSÃO",
+              "tp": "i",
+              "com": "MISSÃO",
+              "par": [
+                {
+                  "n": "14",
+                  "sg": "MISSÃO",
+                  "nm": "PARTIDO MISSÃO",
+                  "nfed": "",
+                  "tvtn": "1107591",
+                  "tvan": "1107591",
+                  "cand": [
+                    {
+                      "n": "14",
+                      "sqcand": "280002540694",
+                      "nm": "RENAN ANTONIO FERREIRA DOS SANTOS",
+                      "nmu": "RENAN SANTOS",
+                      "dt": "14/02/1984",
+                      "dvt": "Válido",
+                      "seq": "5",
+                      "e": "n",
+                      "st": "",
+                      "vap": "1107591",
+                      "pvap": "2,31",
+                      "pvapn": "2,305956388",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002540693",
+                          "nm": "AROLDO MEDINA",
+                          "nmu": "CORONEL MEDINA",
+                          "sgp": "MISSÃO"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "280001801308",
+              "nm": "PARTIDO DA CAUSA OPERÁRIA",
+              "tp": "i",
+              "com": "PCO",
+              "par": [
+                {
+                  "n": "29",
+                  "sg": "PCO",
+                  "nm": "PARTIDO DA CAUSA OPERÁRIA",
+                  "nfed": "",
+                  "tvtn": "6617",
+                  "tvan": "6617",
+                  "cand": [
+                    {
+                      "n": "29",
+                      "sqcand": "280002552487",
+                      "nm": "RUI COSTA PIMENTA",
+                      "nmu": "RUI COSTA PIMENTA",
+                      "dt": "25/06/1957",
+                      "dvt": "Válido",
+                      "seq": "12",
+                      "e": "n",
+                      "st": "",
+                      "vap": "6617",
+                      "pvap": "0,01",
+                      "pvapn": "0,013776307",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "280002552486",
+                          "nm": "ANTONIO CARLOS SILVA",
+                          "nmu": "ANTÔNIO CARLOS",
+                          "sgp": "PCO"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "s": {
+        "ts": "499248",
+        "st": "207533",
+        "pst": "41,57",
+        "pstn": "41,569119956",
+        "snt": "291715",
+        "psnt": "58,43",
+        "psntn": "58,430880044",
+        "si": "207493",
+        "psi": "99,98",
+        "psin": "99,980725957",
+        "sni": "40",
+        "psni": "0,02",
+        "psnin": "0,019274043",
+        "sa": "207493",
+        "psa": "100,00",
+        "psan": "100",
+        "sna": "0",
+        "psna": "0,00",
+        "psnan": "0"
+      },
+      "e": {
+        "te": "158745502",
+        "est": "63487081",
+        "pest": "39,99",
+        "pestn": "39,992995203",
+        "esnt": "95258421",
+        "pesnt": "60,01",
+        "pesntn": "60,007004797",
+        "esi": "63486667",
+        "pesi": "99,99",
+        "pesin": "99,999347899",
+        "esni": "414",
+        "pesni": "0,01",
+        "pesnin": "0,000652101",
+        "esa": "63486667",
+        "pesa": "100,00",
+        "pesan": "100",
+        "esna": "0",
+        "pesna": "0,00",
+        "pesnan": "0",
+        "c": "50227792",
+        "pc": "79,12",
+        "pcn": "79,115496802",
+        "a": "13258875",
+        "pa": "20,88",
+        "pan": "20,884503198"
+      },
+      "v": {
+        "tv": "50227792",
+        "vvc": "48031741",
+        "pvvc": "95,63",
+        "pvvcn": "95,627816966",
+        "vv": "48031741",
+        "pvv": "100,00",
+        "pvvn": "100",
+        "vnom": "48031741",
+        "pvnom": "100,00",
+        "pvnomn": "100",
+        "van": "0",
+        "pvan": "0,00",
+        "pvann": "0",
+        "vansj": "0",
+        "pvansj": "0,00",
+        "pvansjn": "0",
+        "vb": "869509",
+        "pvb": "1,73",
+        "pvbn": "1,731131243",
+        "tvn": "1326542",
+        "ptvn": "2,64",
+        "ptvnn": "2,641051791",
+        "vn": "1324433",
+        "pvn": "99,84",
+        "pvnn": "99,841015211",
+        "vnt": "2109",
+        "pvnt": "0,16",
+        "pvntn": "0,158984789",
+        "vsan": "0",
+        "vscv": "0"
+      }
+    },
+    "gov_al": {
+      "ele": "6259",
+      "t": "1",
+      "f": "o",
+      "sup": "n",
+      "tpabr": "uf",
+      "cdabr": "al",
+      "dg": "04/10/2026",
+      "hg": "18:47:04",
+      "idg": "1491607",
+      "dt": "04/10/2026",
+      "ht": "18:47:02",
+      "dv": "s",
+      "tf": "n",
+      "and": "p",
+      "md": "n",
+      "carg": [
+        {
+          "cd": "3",
+          "nmn": "Governador",
+          "nmm": "Governador",
+          "nmf": "Governadora",
+          "nv": "1",
+          "fed": [
+            {
+              "n": "100",
+              "sg": "PSDB/CIDADANIA",
+              "nm": "FEDERAÇÃO PSDB CIDADANIA",
+              "com": "PSDB/CIDADANIA",
+              "npar": [
+                "23",
+                "45"
+              ]
+            }
+          ],
+          "agr": [
+            {
+              "n": "20001801444",
+              "nm": "PRA ALAGOAS FAZER HISTÓRIA DE NOVO",
+              "tp": "c",
+              "com": "MDB / PODE / AGIR / PSB / PSD / AVANTE / PCDOB / PT / PV",
+              "tvtn": "165639",
+              "tvan": "165639",
+              "par": [
+                {
+                  "n": "15",
+                  "sg": "MDB",
+                  "nm": "MOVIMENTO DEMOCRÁTICO BRASILEIRO",
+                  "nfed": "",
+                  "tvtn": "165639",
+                  "tvan": "165639",
+                  "cand": [
+                    {
+                      "n": "15",
+                      "sqcand": "20002553745",
+                      "nm": "JOSÉ RENAN VASCONCELOS CALHEIROS FILHO",
+                      "nmu": "RENAN FILHO",
+                      "dt": "08/10/1979",
+                      "dvt": "Válido",
+                      "seq": "1",
+                      "e": "n",
+                      "st": "",
+                      "vap": "165639",
+                      "pvap": "52,14",
+                      "pvapn": "52,137085732",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "20002553746",
+                          "nm": "YALE BARBOSA FERNANDES",
+                          "nmu": "YALE BARBOSA",
+                          "sgp": "MDB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001801313",
+              "nm": "DEMOCRATA",
+              "tp": "i",
+              "com": "DEMOCRATA",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "35",
+                  "sg": "DEMOCRATA",
+                  "nm": "DEMOCRATA",
+                  "nfed": "",
+                  "tvtn": "134",
+                  "tvan": "134",
+                  "cand": [
+                    {
+                      "n": "35",
+                      "sqcand": "20002552502",
+                      "nm": "MARCIO FERREIRA JAMBO SOBRINHO",
+                      "nmu": "MÁRCIO JAMBO",
+                      "dt": "24/06/1969",
+                      "dvt": "Válido",
+                      "seq": "4",
+                      "e": "n",
+                      "st": "",
+                      "vap": "134",
+                      "pvap": "0,04",
+                      "pvapn": "0,042178288",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "20002552503",
+                          "nm": "JAUDINETE PONTES DA SILVA",
+                          "nmu": "JAUDINETE PONTES",
+                          "sgp": "DEMOCRATA"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001801408",
+              "nm": "ALAGOAS GIGANTE",
+              "tp": "c",
+              "com": "PDT / PL / DC / CIDADANIA / PSDB / PRD / SOLIDARIEDADE / PP / UNIÃO",
+              "tvtn": "150939",
+              "tvan": "150939",
+              "par": [
+                {
+                  "n": "45",
+                  "sg": "PSDB",
+                  "nm": "PARTIDO DA SOCIAL DEMOCRACIA BRASILEIRA",
+                  "nfed": "100",
+                  "tvtn": "150939",
+                  "tvan": "150939",
+                  "cand": [
+                    {
+                      "n": "45",
+                      "sqcand": "20002553350",
+                      "nm": "JOÃO HENRIQUE HOLANDA CALDAS",
+                      "nmu": "JHC",
+                      "dt": "22/07/1987",
+                      "dvt": "Válido",
+                      "seq": "2",
+                      "e": "n",
+                      "st": "",
+                      "vap": "150939",
+                      "pvap": "47,51",
+                      "pvapn": "47,510064558",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "20002553351",
+                          "nm": "CELIA MARIA BARBOSA ROCHA",
+                          "nmu": "CÉLIA ROCHA",
+                          "sgp": "PSDB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001800463",
+              "nm": "UNIDADE POPULAR",
+              "tp": "i",
+              "com": "UP",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "80",
+                  "sg": "UP",
+                  "nm": "UNIDADE POPULAR",
+                  "nfed": "",
+                  "tvtn": "987",
+                  "tvan": "987",
+                  "cand": [
+                    {
+                      "n": "80",
+                      "sqcand": "20002539642",
+                      "nm": "LENILDA LUNA DE ALMEIDA",
+                      "nmu": "LENILDA LUNA",
+                      "dt": "04/10/1966",
+                      "dvt": "Válido",
+                      "seq": "3",
+                      "e": "n",
+                      "st": "",
+                      "vap": "987",
+                      "pvap": "0,31",
+                      "pvapn": "0,310671422",
+                      "vs": [
+                        {
+                          "tp": "v",
+                          "sqcand": "20002539643",
+                          "nm": "JARDEL WANDSON QUEIROZ DA CRUZ",
+                          "nmu": "JARDEL QUEIROZ",
+                          "sgp": "UP"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "s": {
+        "ts": "7101",
+        "st": "1497",
+        "pst": "21,08",
+        "pstn": "21,081537812",
+        "snt": "5604",
+        "psnt": "78,92",
+        "psntn": "78,918462188",
+        "si": "1497",
+        "psi": "100,00",
+        "psin": "100",
+        "sni": "0",
+        "psni": "0,00",
+        "psnin": "0",
+        "sa": "1497",
+        "psa": "100,00",
+        "psan": "100",
+        "sna": "0",
+        "psna": "0,00",
+        "psnan": "0"
+      },
+      "e": {
+        "te": "2439190",
+        "est": "451599",
+        "pest": "18,51",
+        "pestn": "18,514301879",
+        "esnt": "1987591",
+        "pesnt": "81,49",
+        "pesntn": "81,485698121",
+        "esi": "451599",
+        "pesi": "100,00",
+        "pesin": "100",
+        "esni": "0",
+        "pesni": "0,00",
+        "pesnin": "0",
+        "esa": "451599",
+        "pesa": "100,00",
+        "pesan": "100",
+        "esna": "0",
+        "pesna": "0,00",
+        "pesnan": "0",
+        "c": "358847",
+        "pc": "79,46",
+        "pcn": "79,461424848",
+        "a": "92752",
+        "pa": "20,54",
+        "pan": "20,538575152"
+      },
+      "v": {
+        "tv": "358847",
+        "vvc": "317699",
+        "pvvc": "88,53",
+        "pvvcn": "88,533274627",
+        "vv": "317699",
+        "pvv": "100,00",
+        "pvvn": "100",
+        "vnom": "317699",
+        "pvnom": "100,00",
+        "pvnomn": "100",
+        "van": "0",
+        "pvan": "0,00",
+        "pvann": "0",
+        "vansj": "0",
+        "pvansj": "0,00",
+        "pvansjn": "0",
+        "vb": "9579",
+        "pvb": "2,67",
+        "pvbn": "2,669382773",
+        "tvn": "31569",
+        "ptvn": "8,80",
+        "ptvnn": "8,797342600",
+        "vn": "31569",
+        "pvn": "100,00",
+        "pvnn": "100",
+        "vnt": "0",
+        "pvnt": "0,00",
+        "pvntn": "0",
+        "vsan": "0",
+        "vscv": "0"
+      }
+    },
+    "sen_al": {
+      "ele": "6259",
+      "t": "1",
+      "f": "o",
+      "sup": "n",
+      "tpabr": "uf",
+      "cdabr": "al",
+      "dg": "04/10/2026",
+      "hg": "18:47:04",
+      "idg": "1491611",
+      "dt": "04/10/2026",
+      "ht": "18:47:02",
+      "dv": "s",
+      "tf": "n",
+      "and": "p",
+      "carg": [
+        {
+          "cd": "5",
+          "nmn": "Senador",
+          "nmm": "Senador",
+          "nmf": "Senadora",
+          "nv": "2",
+          "fed": [
+            {
+              "n": "100",
+              "sg": "PSDB/CIDADANIA",
+              "nm": "FEDERAÇÃO PSDB CIDADANIA",
+              "com": "PSDB/CIDADANIA",
+              "npar": [
+                "23",
+                "45"
+              ]
+            },
+            {
+              "n": "104",
+              "sg": "UNIÃO/PP",
+              "nm": "FEDERAÇÃO UNIÃO PROGRESSISTA",
+              "com": "UNIÃO/PP",
+              "npar": [
+                "11",
+                "44"
+              ]
+            }
+          ],
+          "agr": [
+            {
+              "n": "20001801441",
+              "nm": "PRA ALAGOAS FAZER HISTÓRIA DE NOVO",
+              "tp": "c",
+              "com": "MDB / PODE / AGIR / PSB / PSD / AVANTE / PCDOB / PT / PV",
+              "tvtn": "216301",
+              "tvan": "216301",
+              "par": [
+                {
+                  "n": "15",
+                  "sg": "MDB",
+                  "nm": "MOVIMENTO DEMOCRÁTICO BRASILEIRO",
+                  "nfed": "",
+                  "tvtn": "216301",
+                  "tvan": "216301",
+                  "cand": [
+                    {
+                      "n": "151",
+                      "sqcand": "20002553727",
+                      "nm": "JOSE RENAN VASCONCELOS CALHEIROS",
+                      "nmu": "RENAN",
+                      "dt": "16/09/1955",
+                      "dvt": "Válido",
+                      "seq": "3",
+                      "e": "n",
+                      "st": "",
+                      "vap": "152041",
+                      "pvap": "24,77",
+                      "pvapn": "24,773917493",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002553957",
+                          "nm": "GUSTAVO DIAS HENRIQUE",
+                          "nmu": "GUSTAVO HENRIQUE",
+                          "sgp": "PSD"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002553956",
+                          "nm": "CHRISTIANE BULHÕES BARROS MELO SILVA",
+                          "nmu": "CHRISTIANE BULHÕES",
+                          "sgp": "MDB"
+                        }
+                      ]
+                    },
+                    {
+                      "n": "156",
+                      "sqcand": "20002553726",
+                      "nm": "JOSE WANDERLEY NETO",
+                      "nmu": "DR. WANDERLEY",
+                      "dt": "08/07/1949",
+                      "dvt": "Válido",
+                      "seq": "4",
+                      "e": "n",
+                      "st": "",
+                      "vap": "64260",
+                      "pvap": "10,47",
+                      "pvapn": "10,470675266",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002554456",
+                          "nm": "MARIA YVONE LOUREIRO RIBEIRO",
+                          "nmu": "MARIVONE LOUREIRO",
+                          "sgp": "PCDOB"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002554524",
+                          "nm": "THIAGO SOUZA SANTOS",
+                          "nmu": "THIAGO SOUZA",
+                          "sgp": "PCDOB"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001800424",
+              "nm": "UNIDADE POPULAR",
+              "tp": "i",
+              "com": "UP",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "80",
+                  "sg": "UP",
+                  "nm": "UNIDADE POPULAR",
+                  "nfed": "",
+                  "tvtn": "3975",
+                  "tvan": "3975",
+                  "cand": [
+                    {
+                      "n": "800",
+                      "sqcand": "20002540197",
+                      "nm": "ALEXANDRE FLEMING VASQUES BASTOS",
+                      "nmu": "ALEXANDRE FLEMING",
+                      "dt": "08/06/1977",
+                      "dvt": "Válido",
+                      "seq": "6",
+                      "e": "n",
+                      "st": "",
+                      "vap": "3975",
+                      "pvap": "0,65",
+                      "pvapn": "0,647695832",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002540195",
+                          "nm": "LILIANE PEREIRA DA SILVA",
+                          "nmu": "LILIANE PEREIRA",
+                          "sgp": "UP"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002540196",
+                          "nm": "JOSE NIVALDO CARDOZO MOTA",
+                          "nmu": "PROFESSOR NIVALDO MOTA",
+                          "sgp": "UP"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001800974",
+              "nm": "REPUBLICANOS",
+              "tp": "i",
+              "com": "REPUBLICANOS",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "10",
+                  "sg": "REPUBLICANOS",
+                  "nm": "REPUBLICANOS",
+                  "nfed": "",
+                  "tvtn": "41305",
+                  "tvan": "41305",
+                  "cand": [
+                    {
+                      "n": "100",
+                      "sqcand": "20002548147",
+                      "nm": "DAVID CABRAL DAVINO FILHO",
+                      "nmu": "DAVI DAVINO FILHO",
+                      "dt": "01/10/1987",
+                      "dvt": "Válido",
+                      "seq": "5",
+                      "e": "n",
+                      "st": "",
+                      "vap": "41305",
+                      "pvap": "6,73",
+                      "pvapn": "6,730333673",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002548148",
+                          "nm": "ARTHUR JESSÉ MENDONÇA DE ALBUQUERQUE",
+                          "nmu": "ARTHUR ALBUQUERQUE",
+                          "sgp": "REPUBLICANOS"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002548149",
+                          "nm": "KAMILA MIRANDA DAVINO",
+                          "nmu": "DRA. KAMILA",
+                          "sgp": "REPUBLICANOS"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001801340",
+              "nm": "ALAGOAS GIGANTE II",
+              "tp": "c",
+              "com": "PDT / PL / CIDADANIA / PSDB / PRD / SOLIDARIEDADE / PP / UNIÃO / DC",
+              "tvtn": "351789",
+              "tvan": "351789",
+              "par": [
+                {
+                  "n": "11",
+                  "sg": "PP",
+                  "nm": "PROGRESSISTAS",
+                  "nfed": "104",
+                  "tvtn": "194454",
+                  "tvan": "194454",
+                  "cand": [
+                    {
+                      "n": "111",
+                      "sqcand": "20002553272",
+                      "nm": "ARTHUR CESAR PEREIRA DE LIRA",
+                      "nmu": "ARTHUR LIRA",
+                      "dt": "25/06/1969",
+                      "dvt": "Válido",
+                      "seq": "1",
+                      "e": "n",
+                      "st": "",
+                      "vap": "194454",
+                      "pvap": "31,68",
+                      "pvapn": "31,684791287",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002553273",
+                          "nm": "LUIZ ROMERO CAVALCANTE FARIAS",
+                          "nmu": "LUIZ ROMERO",
+                          "sgp": "PL"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002553274",
+                          "nm": "GUSTAVO DANTAS FEIJÓ",
+                          "nmu": "GUSTAVO FEIJÓ",
+                          "sgp": "PP"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "n": "45",
+                  "sg": "PSDB",
+                  "nm": "PARTIDO DA SOCIAL DEMOCRACIA BRASILEIRA",
+                  "nfed": "100",
+                  "tvtn": "157335",
+                  "tvan": "157335",
+                  "cand": [
+                    {
+                      "n": "456",
+                      "sqcand": "20002553711",
+                      "nm": "MARINA ANTUNES CANDIA E FIGUEIREDO",
+                      "nmu": "MARINA JHC",
+                      "dt": "27/12/1990",
+                      "dvt": "Válido",
+                      "seq": "2",
+                      "e": "n",
+                      "st": "",
+                      "vap": "157335",
+                      "pvap": "25,64",
+                      "pvapn": "25,636534281",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002553712",
+                          "nm": "EUDOCIA MARIA HOLANDA DE ARAUJO CALDAS",
+                          "nmu": "DRA. EUDOCIA",
+                          "sgp": "PSDB"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002554504",
+                          "nm": "JURANDIR BOIA ROCHA",
+                          "nmu": "JURANDIR BOIA",
+                          "sgp": "PDT"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "20001801320",
+              "nm": "DEMOCRATA",
+              "tp": "i",
+              "com": "DEMOCRATA",
+              "vag": "0",
+              "par": [
+                {
+                  "n": "35",
+                  "sg": "DEMOCRATA",
+                  "nm": "DEMOCRATA",
+                  "nfed": "",
+                  "tvtn": "344",
+                  "tvan": "344",
+                  "cand": [
+                    {
+                      "n": "355",
+                      "sqcand": "20002552524",
+                      "nm": "JOSE MARIEDSON DA SILVA",
+                      "nmu": "MARIEDSON",
+                      "dt": "16/08/1973",
+                      "dvt": "Válido",
+                      "seq": "7",
+                      "e": "n",
+                      "st": "",
+                      "vap": "344",
+                      "pvap": "0,06",
+                      "pvapn": "0,056052168",
+                      "vs": [
+                        {
+                          "tp": "s1",
+                          "sqcand": "20002552522",
+                          "nm": "ADRIANA NUNES DA SILVA",
+                          "nmu": "ADRIANA NUNES",
+                          "sgp": "DEMOCRATA"
+                        },
+                        {
+                          "tp": "s2",
+                          "sqcand": "20002552523",
+                          "nm": "JEFFERSON GONCALVES DA SILVA",
+                          "nmu": "JEFERSON GONÇALVES",
+                          "sgp": "DEMOCRATA"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "s": {
+        "ts": "7101",
+        "st": "1497",
+        "pst": "21,08",
+        "pstn": "21,081537812",
+        "snt": "5604",
+        "psnt": "78,92",
+        "psntn": "78,918462188",
+        "si": "1497",
+        "psi": "100,00",
+        "psin": "100",
+        "sni": "0",
+        "psni": "0,00",
+        "psnin": "0",
+        "sa": "1497",
+        "psa": "100,00",
+        "psan": "100",
+        "sna": "0",
+        "psna": "0,00",
+        "psnan": "0"
+      },
+      "e": {
+        "te": "2439190",
+        "est": "451599",
+        "pest": "18,51",
+        "pestn": "18,514301879",
+        "esnt": "1987591",
+        "pesnt": "81,49",
+        "pesntn": "81,485698121",
+        "esi": "451599",
+        "pesi": "100,00",
+        "pesin": "100",
+        "esni": "0",
+        "pesni": "0,00",
+        "pesnin": "0",
+        "esa": "451599",
+        "pesa": "100,00",
+        "pesan": "100",
+        "esna": "0",
+        "pesna": "0,00",
+        "pesnan": "0",
+        "c": "358847",
+        "pc": "79,46",
+        "pcn": "79,461424848",
+        "a": "92752",
+        "pa": "20,54",
+        "pan": "20,538575152"
+      },
+      "v": {
+        "tv": "717694",
+        "vvc": "613714",
+        "pvvc": "85,51",
+        "pvvcn": "85,511931269",
+        "vv": "613714",
+        "pvv": "100,00",
+        "pvvn": "100",
+        "vnom": "613714",
+        "pvnom": "100,00",
+        "pvnomn": "100",
+        "van": "0",
+        "pvan": "0,00",
+        "pvann": "0",
+        "vansj": "0",
+        "pvansj": "0,00",
+        "pvansjn": "0",
+        "vb": "37644",
+        "pvb": "5,25",
+        "pvbn": "5,245132327",
+        "tvn": "66336",
+        "ptvn": "9,24",
+        "ptvnn": "9,242936405",
+        "vn": "66336",
+        "pvn": "100,00",
+        "pvnn": "100",
+        "vnt": "0",
+        "pvnt": "0,00",
+        "pvntn": "0",
+        "vsan": "0",
+        "vscv": "0"
+      }
+    }
+  }
+}
