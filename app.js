@@ -480,47 +480,39 @@
         const bolso = cands.find(c => c.numero === '22') || cands[0];
         const lula = cands.find(c => c.numero === '13') || cands[1];
 
+        const setAllText = (id, val) => document.querySelectorAll('#' + id).forEach(el => el.textContent = val);
+        const setAllSrc = (id, src) => document.querySelectorAll('#' + id).forEach(el => el.src = src);
+        const setAllWidth = (id, w) => document.querySelectorAll('#' + id).forEach(el => el.style.width = w);
+
         if (bolso) {
-            const elPct = document.getElementById('hero-pct-22');
-            if (elPct) elPct.textContent = bolso.pct_str || formatPct(bolso.pct);
-            const elVotes = document.getElementById('hero-votes-22');
-            if (elVotes) elVotes.textContent = `${formatNumber(bolso.votos)} votos`;
-            const elFoto = document.getElementById('hero-foto-22');
-            if (elFoto && bolso.foto) elFoto.src = bolso.foto;
+            setAllText('hero-pct-22', bolso.pct_str || formatPct(bolso.pct));
+            setAllText('hero-votes-22', `${formatNumber(bolso.votos)} votos`);
+            if (bolso.foto) setAllSrc('hero-foto-22', bolso.foto);
         }
 
         if (lula) {
-            const elPct = document.getElementById('hero-pct-13');
-            if (elPct) elPct.textContent = lula.pct_str || formatPct(lula.pct);
-            const elVotes = document.getElementById('hero-votes-13');
-            if (elVotes) elVotes.textContent = `${formatNumber(lula.votos)} votos`;
-            const elFoto = document.getElementById('hero-foto-13');
-            if (elFoto && lula.foto) elFoto.src = lula.foto;
+            setAllText('hero-pct-13', lula.pct_str || formatPct(lula.pct));
+            setAllText('hero-votes-13', `${formatNumber(lula.votos)} votos`);
+            if (lula.foto) setAllSrc('hero-foto-13', lula.foto);
         }
 
         // Diferença entre os dois
         if (bolso && lula) {
             const delta = Math.abs(bolso.votos - lula.votos);
             const totalDupla = bolso.votos + lula.votos;
-            const pctDelta = totalDupla > 0 ? (delta / pres.votos_validos * 100).toFixed(2).replace('.', ',') : '0,00';
+            const pctDelta = totalDupla > 0 ? (delta / (pres.votos_validos || totalDupla) * 100).toFixed(2).replace('.', ',') : '0,00';
 
-            const elDelta = document.getElementById('hero-delta-votos');
-            if (elDelta) elDelta.textContent = formatNumber(delta);
+            setAllText('hero-delta-votos', formatNumber(delta));
 
-            const elDeltaPct = document.getElementById('hero-delta-pct');
-            if (elDeltaPct) {
-                const lider = bolso.votos > lula.votos ? 'Bolsonaro' : 'Lula';
-                elDeltaPct.textContent = `${pctDelta}% (${lider} à frente)`;
-            }
+            const lider = bolso.votos > lula.votos ? 'Bolsonaro' : 'Lula';
+            setAllText('hero-delta-pct', `${pctDelta}% (${lider} à frente)`);
 
             // Cabo de guerra
             if (totalDupla > 0) {
                 const pctPl = (bolso.votos / totalDupla * 100).toFixed(1);
                 const pctPt = (lula.votos / totalDupla * 100).toFixed(1);
-                const elTugPl = document.getElementById('hero-tug-pl');
-                const elTugPt = document.getElementById('hero-tug-pt');
-                if (elTugPl) elTugPl.style.width = `${pctPl}%`;
-                if (elTugPt) elTugPt.style.width = `${pctPt}%`;
+                setAllWidth('hero-tug-pl', `${pctPl}%`);
+                setAllWidth('hero-tug-pt', `${pctPt}%`);
             }
         }
 
@@ -2235,36 +2227,29 @@
             else if (uf.lider === '13') lulaWins++;
         });
 
-        const elCountBolso = document.getElementById('states-count-bolso');
-        const elCountLula = document.getElementById('states-count-lula');
-        const elVotesBolso = document.getElementById('states-votes-bolso');
-        const elVotesLula = document.getElementById('states-votes-lula');
-        const elBarPl = document.getElementById('states-bar-pl');
-        const elBarPt = document.getElementById('states-bar-pt');
-        const elDiffSub = document.getElementById('states-diff-sub');
+        const setAllText = (id, val) => document.querySelectorAll('#' + id).forEach(el => el.textContent = val);
+        const setAllWidth = (id, w) => document.querySelectorAll('#' + id).forEach(el => el.style.width = w);
 
-        if (elCountBolso) elCountBolso.textContent = bolsoWins;
-        if (elCountLula) elCountLula.textContent = lulaWins;
-        if (elVotesBolso) elVotesBolso.textContent = `${formatNumber(bolsoVotes)} votos (47,0%)`;
-        if (elVotesLula) elVotesLula.textContent = `${formatNumber(lulaVotes)} votos (45,2%)`;
+        setAllText('states-count-bolso', bolsoWins);
+        setAllText('states-count-lula', lulaWins);
+        setAllText('states-votes-bolso', `${formatNumber(bolsoVotes)} votos (47,0%)`);
+        setAllText('states-votes-lula', `${formatNumber(lulaVotes)} votos (45,2%)`);
 
         const totalWins = bolsoWins + lulaWins;
         if (totalWins > 0) {
             const pctPl = (bolsoWins / totalWins * 100).toFixed(1);
             const pctPt = (lulaWins / totalWins * 100).toFixed(1);
-            if (elBarPl) elBarPl.style.width = `${pctPl}%`;
-            if (elBarPt) elBarPt.style.width = `${pctPt}%`;
+            setAllWidth('states-bar-pl', `${pctPl}%`);
+            setAllWidth('states-bar-pt', `${pctPt}%`);
         }
 
-        if (elDiffSub) {
-            if (bolsoWins > lulaWins) {
-                elDiffSub.textContent = `PL lidera por vantagem de ${bolsoWins - lulaWins} estados`;
-            } else if (lulaWins > bolsoWins) {
-                elDiffSub.textContent = `PT lidera por vantagem de ${lulaWins - bolsoWins} estados`;
-            } else {
-                elDiffSub.textContent = `Empate em estados: ${bolsoWins} a ${lulaWins}`;
-            }
+        let diffText = `Empate em estados: ${bolsoWins} a ${lulaWins}`;
+        if (bolsoWins > lulaWins) {
+            diffText = `PL lidera por vantagem de ${bolsoWins - lulaWins} estados`;
+        } else if (lulaWins > bolsoWins) {
+            diffText = `PT lidera por vantagem de ${lulaWins - bolsoWins} estados`;
         }
+        setAllText('states-diff-sub', diffText);
     }
 
     // --- COLÉGIOS ELEITORAIS PRINCIPAIS (ACESSO RÁPIDO) ---

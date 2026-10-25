@@ -525,185 +525,10 @@
         <!-- ========================================== -->
         <section id="view-estados" class="view-panel active">
             <div class="section-block">
-                <div class="section-header">
-                    <div>
-                        <span class="badge-tag">🗺️ GEOGRAFIA ELEITORAL COMPLETA</span>
-                        <h2 class="section-title">Mapa Interativo do Brasil & Explorador de Cidades</h2>
-                        <span class="section-sub">Apuração automatizada em tempo real com porcentagens oficiais, transição automática e busca cidade a cidade</span>
-                    </div>
-
-                    <!-- SELETOR DE ESTADO DROPDOWN RÁPIDO -->
-                    <div class="map-state-quick-select">
-                        <label for="select-map-uf">ESTADO SELECIONADO:</label>
-                        <select id="select-map-uf" class="clean-select" onchange="window.selectStateFromDropdown(this.value)">
-                            <!-- Gerado dinamicamente -->
-                        </select>
-                    </div>
-                </div>
-
-                <!-- PLACAR GERAL DOS ESTADOS // HUD DE DUELO NACIONAL -->
-                <div class="states-scoreboard-card">
-                    <div class="states-score-side pl-side">
-                        <div class="states-score-meta">
-                            <span class="states-score-party pl-color">PL &bull; FLÁVIO BOLSONARO</span>
-                            <div class="states-score-lead">
-                                <strong class="states-count pl-color" id="states-count-bolso">14</strong>
-                                <span class="states-unit">ESTADOS VENCIDOS</span>
-                            </div>
-                            <span class="states-votes-lead" id="states-votes-bolso">56.104.503 votos (47,03%)</span>
-                        </div>
-                        <div class="states-score-avatar">
-                            <img src="fotos/pres_22.jpeg" alt="Bolsonaro" class="mini-hud-photo pl-border">
-                        </div>
-                    </div>
-
-                    <div class="states-score-center">
-                        <span class="states-score-vs">VS</span>
-                        <div class="states-tug-bar">
-                            <div class="states-bar-fill-pl" id="states-bar-pl" style="width: 51.9%;"></div>
-                            <div class="states-bar-fill-pt" id="states-bar-pt" style="width: 48.1%;"></div>
-                        </div>
-                        <span class="states-score-sub" id="states-diff-sub">PL lidera em 14 de 27 estados</span>
-                    </div>
-
-                    <div class="states-score-side pt-side">
-                        <div class="states-score-avatar">
-                            <img src="fotos/pres_13.jpeg" alt="Lula" class="mini-hud-photo pt-border">
-                        </div>
-                        <div class="states-score-meta text-right">
-                            <span class="states-score-party pt-color">PT &bull; LULA</span>
-                            <div class="states-score-lead">
-                                <strong class="states-count pt-color" id="states-count-lula">13</strong>
-                                <span class="states-unit">ESTADOS + DF</span>
-                            </div>
-                            <span class="states-votes-lead" id="states-votes-lula">53.879.538 votos (45,17%)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ======================================================== -->
-                <!-- TERMÔMETRO DA GALERA // REAÇÕES AO VIVO DA TORCIDA -->
-                <!-- ======================================================== -->
-                <div class="audience-reaction-banner">
-                    <div class="reaction-banner-header">
-                        <div class="reaction-title-wrap">
-                            <span class="reaction-fire-icon">🔥</span>
-                            <div>
-                                <h3 class="reaction-title">Termômetro da Eleição // Reações da Torcida ao Vivo</h3>
-                                <span class="reaction-sub">Toque nos botões para reagir e agitar a apuração em tempo real com toda a comunidade!</span>
-                            </div>
-                        </div>
-                        <div class="reaction-live-indicator">
-                            <span class="pulse-indicator-red"></span>
-                            <span id="reaction-total-count">9.074 reações hoje</span>
-                        </div>
-                    </div>
-
-                    <!-- BOTÕES DE REAÇÃO INTERATIVOS -->
-                    <div class="reaction-buttons-grid">
-                        <button class="reaction-pill-btn btn-tenso" onclick="window.triggerReaction('tenso')" title="Clima de tensão total!">
-                            <span class="reaction-emoji">🔥</span>
-                            <div class="reaction-text-col">
-                                <strong class="reaction-label">Clima Tenso</strong>
-                                <span class="reaction-count" id="count-tenso">1.342</span>
-                            </div>
-                        </button>
-
-                        <button class="reaction-pill-btn btn-pipoca" onclick="window.triggerReaction('pipoca')" title="Comendo pipoca assistindo o circo pegar fogo!">
-                            <span class="reaction-emoji">🍿</span>
-                            <div class="reaction-text-col">
-                                <strong class="reaction-label">Só na Pipoca</strong>
-                                <span class="reaction-count" id="count-pipoca">985</span>
-                            </div>
-                        </button>
-
-                        <button class="reaction-pill-btn btn-picanha" onclick="window.triggerReaction('picanha')" title="Chama a picanha e a cerveja! Lula 13!">
-                            <span class="reaction-emoji">🥩</span>
-                            <div class="reaction-text-col">
-                                <strong class="reaction-label">Picanha (Lula 13)</strong>
-                                <span class="reaction-count" id="count-picanha">2.420</span>
-                            </div>
-                        </button>
-
-                        <button class="reaction-pill-btn btn-capitao" onclick="window.triggerReaction('capitao')" title="Acelera capitão! Flávio Bolsonaro 22!">
-                            <span class="reaction-emoji">🏍️</span>
-                            <div class="reaction-text-col">
-                                <strong class="reaction-label">Acelera (Bolso 22)</strong>
-                                <span class="reaction-count" id="count-capitao">2.490</span>
-                            </div>
-                        </button>
-
-                        <button class="reaction-pill-btn btn-virada" onclick="window.triggerReaction('virada')" title="Vai dar virada histórica?">
-                            <span class="reaction-emoji">⚡</span>
-                            <div class="reaction-text-col">
-                                <strong class="reaction-label">Vai Dar Virada?</strong>
-                                <span class="reaction-count" id="count-virada">1.835</span>
-                            </div>
-                        </button>
-                    </div>
-
-                    <!-- BARRA TERMÔMETRO DE ENERGIA -->
-                    <div class="reaction-thermometer-bar">
-                        <div class="thermometer-fill pl" id="thermometer-pl" style="width: 50.7%;" title="Bolsonaro 22: 50.7%"></div>
-                        <div class="thermometer-fill pt" id="thermometer-pt" style="width: 49.3%;" title="Lula 13: 49.3%"></div>
-                    </div>
-                    <div class="thermometer-legend">
-                        <span class="pl-color">● Torcida Bolsonaro 22: <strong id="thermo-pct-bolso">50.7%</strong></span>
-                        <span class="pt-color"><strong id="thermo-pct-lula">49.3%</strong> :Torcida Lula 13 ●</span>
-                    </div>
-                </div>
-
-                <!-- BARRA DE ACESSO RÁPIDO AOS COLÉGIOS ELEITORAIS -->
-                <div class="quick-colleges-bar">
-                    <div class="quick-colleges-header">
-                        <span class="quick-colleges-badge">⚡ COLÉGIOS ELEITORAIS DECISIVOS:</span>
-                        <span class="quick-colleges-hint hide-mobile">Toque em qualquer estado para focar o mapa e carregar as cidades</span>
-                    </div>
-                    <div class="quick-colleges-scroll" id="quick-colleges-scroll">
-                        <!-- Gerado dinamicamente via JS -->
-                    </div>
-                </div>
-
-                <!-- BARRA DE CONTROLES: ROTAÇÃO AUTOMÁTICA, PORCENTAGENS E FILTROS -->
-                <div class="map-controls-bar">
-                    <div class="map-controls-left">
-                        <!-- BOTÃO DE ROTAÇÃO AUTOMÁTICA -->
-                        <button id="btn-auto-tour" class="auto-tour-toggle paused" onclick="window.toggleAutoTour()" title="Ativar transmissão automática pelos estados">
-                            <span id="auto-tour-icon">▶️</span>
-                            <span id="auto-tour-lbl">Transmissão Automática: <strong>DESLIGADA</strong></span>
-                            <span class="auto-tour-progress-wrap">
-                                <span id="auto-tour-progress-bar" class="auto-tour-progress-bar"></span>
-                            </span>
-                        </button>
-
-                        <!-- TOGGLE DE PORCENTAGENS NO MAPA -->
-                        <button id="btn-toggle-labels" class="map-feature-btn active" onclick="window.toggleMapLabels()" title="Exibir porcentagens diretamente sobre os estados no mapa">
-                            <span>🏷️ Porcentagens no Mapa: <strong id="lbl-labels-state">ATIVAS</strong></span>
-                        </button>
-                    </div>
-
-                    <!-- FILTROS RÁPIDOS DE ESTADO -->
-                    <div class="map-filters-pills">
-                        <button class="map-filter-pill active" data-filter="all" onclick="window.setMapFilter('all')">Todos (27)</button>
-                        <button class="map-filter-pill pl" data-filter="bolso" onclick="window.setMapFilter('bolso')">🔵 Bolsonaro (14)</button>
-                        <button class="map-filter-pill pt" data-filter="lula" onclick="window.setMapFilter('lula')">🔴 Lula (13)</button>
-                        <button class="map-filter-pill battle" data-filter="tight" onclick="window.setMapFilter('tight')">⚔️ Acirrados (&lt;5%)</button>
-                    </div>
-                </div>
-
-                <!-- LAYOUT SPLIT: MAPA SVG À ESQUERDA + DETALHES/CIDADES À DIREITA -->
-                <div class="map-explorer-layout">
-                    <!-- ÁREA DO MAPA DO BRASIL SVG & CANVAS SEUIMPOSTO -->
-                    <div class="map-visual-pane">
-                        <div class="map-svg-header">
-                            <div class="map-header-status">
-                                <span class="pulse-indicator pulse-fast"></span>
-                                <span id="map-header-title">MAPA SEUIMPOSTO &bull; 5.570 CIDADES EM TEMPO REAL</span>
-                                <span class="map-speed-telemetry hide-mobile" id="map-speed-telemetry">⚡ Latência: <strong>48ms</strong> • 1.0s</span>
-                            </div>
-                            <span class="map-header-tip" id="map-header-tip-text">Arraste para navegar &bull; Clique na cidade para ver detalhes</span>
-                        </div>
-
+                
+                <!-- BARRA DE COMANDO SUPERIOR // CONTROLES DO MAPA E FILTROS -->
+                <div class="hud-controls-strip">
+                    <div class="hud-controls-left">
                         <!-- TOGGLE DE MODO DE MAPA: 5.570 CIDADES (SEUIMPOSTO) VS 27 ESTADOS (MACRO) -->
                         <div class="map-mode-toggle-group">
                             <button class="map-mode-btn active" id="btn-mode-muni" onclick="window.setMapMode('muni')" title="Visualizar todas as 5.570 cidades do Brasil com o mapa oficial do SeuImposto">
@@ -713,8 +538,56 @@
                             </button>
                             <button class="map-mode-btn" id="btn-mode-macro" onclick="window.setMapMode('macro')" title="Visualizar visão macro por 27 estados">
                                 <span class="mode-icon">🗺️</span>
-                                <span class="mode-label">Visão Macro (27 Estados)</span>
+                                <span class="mode-label">27 Estados (Macro)</span>
                             </button>
+                        </div>
+
+                        <!-- TOGGLE DE PORCENTAGENS NO MAPA -->
+                        <button id="btn-toggle-labels" class="map-feature-btn active" onclick="window.toggleMapLabels()" title="Exibir porcentagens diretamente sobre os estados no mapa">
+                            <span>🏷️ Labels: <strong id="lbl-labels-state">ATIVAS</strong></span>
+                        </button>
+
+                        <!-- BOTÃO DE ROTAÇÃO AUTOMÁTICA -->
+                        <button id="btn-auto-tour" class="auto-tour-toggle paused" onclick="window.toggleAutoTour()" title="Ativar transmissão automática pelos estados">
+                            <span id="auto-tour-icon">▶️</span>
+                            <span id="auto-tour-lbl">Transmissão: <strong>OFF</strong></span>
+                            <span class="auto-tour-progress-wrap">
+                                <span id="auto-tour-progress-bar" class="auto-tour-progress-bar"></span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="hud-controls-right">
+                        <!-- SELETOR DE ESTADO DROPDOWN RÁPIDO -->
+                        <div class="map-state-quick-select">
+                            <label for="select-map-uf">ESTADO:</label>
+                            <select id="select-map-uf" class="clean-select" onchange="window.selectStateFromDropdown(this.value)">
+                                <!-- Gerado dinamicamente -->
+                            </select>
+                        </div>
+
+                        <!-- FILTROS RÁPIDOS DE ESTADO -->
+                        <div class="map-filters-pills">
+                            <button class="map-filter-pill active" data-filter="all" onclick="window.setMapFilter('all')">Todos (27)</button>
+                            <button class="map-filter-pill pl" data-filter="bolso" onclick="window.setMapFilter('bolso')">🔵 Bolsonaro (14)</button>
+                            <button class="map-filter-pill pt" data-filter="lula" onclick="window.setMapFilter('lula')">🔴 Lula (13)</button>
+                            <button class="map-filter-pill battle" data-filter="tight" onclick="window.setMapFilter('tight')">⚔️ Acirrados</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LAYOUT SPLIT EXPANSIVO ESTILO SEUIMPOSTO // MAPA PRINCIPAL + HUD LATERAL -->
+                <div class="map-explorer-layout">
+                    
+                    <!-- COLUNA ESQUERDA: TEATRO VISUAL DO MAPA DO BRASIL -->
+                    <div class="map-visual-pane">
+                        <div class="map-svg-header">
+                            <div class="map-header-status">
+                                <span class="pulse-indicator pulse-fast"></span>
+                                <span id="map-header-title">MAPA SEUIMPOSTO &bull; 5.570 CIDADES EM TEMPO REAL</span>
+                                <span class="map-speed-telemetry hide-mobile" id="map-speed-telemetry">⚡ Latência: <strong>48ms</strong> • 1.0s</span>
+                            </div>
+                            <span class="map-header-tip" id="map-header-tip-text">Arraste para navegar &bull; Clique na cidade para ver detalhes</span>
                         </div>
 
                         <div class="map-svg-container" id="map-svg-container">
@@ -727,7 +600,7 @@
                             </div>
 
                             <!-- MOTOR 1: CANVAS DE ALTA PERFORMANCE (5.570 CIDADES SEUIMPOSTO) -->
-                            <canvas id="seuimposto-canvas-map" class="seuimposto-canvas" width="900" height="850"></canvas>
+                            <canvas id="seuimposto-canvas-map" class="seuimposto-canvas" width="1000" height="850"></canvas>
 
                             <!-- MOTOR 2: SVG DOS 27 ESTADOS (MACRO) -->
                             <svg viewBox="0 0 750 750" id="brazil-svg" class="brazil-svg hidden">
@@ -747,58 +620,224 @@
                                     <!-- Paths dos 27 estados e grupos de labels inseridos dinamicamente -->
                                 </g>
                             </svg>
+
                             <!-- TOOLTIP FLUTUANTE DO MAPA -->
                             <div id="map-tooltip" class="map-tooltip hidden"></div>
+
                             <!-- CONTAINER DE PARTÍCULAS DE REAÇÃO FLUTUANTES -->
                             <div id="reaction-particles-container" class="reaction-particles-container"></div>
-                        </div>
 
-                        <!-- GUIA INTERATIVO DE NAVEGAÇÃO DO MAPA -->
-                        <div class="map-interactive-hints">
-                            <span class="hint-pill">💡 Dica de Navegação</span>
-                            <span class="hint-text"><strong>Duplo-clique</strong> no estado para ampliar &bull; <strong>Arraste</strong> para mover &bull; Roda do mouse ou <strong>🔍+</strong> para zoom</span>
-                        </div>
-
-                        <!-- LEGENDA COMPLETA DO MAPA COM GRADUAÇÃO -->
-                        <div class="map-legend">
-                            <div class="legend-group">
-                                <span class="legend-group-title pl-color">FLÁVIO BOLSONARO (PL):</span>
-                                <div class="legend-item"><span class="legend-color pl-bg-deep"></span> &gt;60% Amplo</div>
-                                <div class="legend-item"><span class="legend-color pl-bg-mid"></span> 53-60%</div>
-                                <div class="legend-item"><span class="legend-color pl-bg-light"></span> 50-53% Voto a voto</div>
+                            <!-- LEGENDA COMPLETA DO MAPA COM GRADUAÇÃO FLUTUANTE -->
+                            <div class="map-legend floating">
+                                <div class="legend-group">
+                                    <span class="legend-group-title pl-color">FLÁVIO (PL):</span>
+                                    <div class="legend-item"><span class="legend-color pl-bg-deep"></span> &gt;60%</div>
+                                    <div class="legend-item"><span class="legend-color pl-bg-mid"></span> 53-60%</div>
+                                    <div class="legend-item"><span class="legend-color pl-bg-light"></span> 50-53%</div>
+                                </div>
+                                <div class="legend-group">
+                                    <span class="legend-group-title pt-color">LULA (PT):</span>
+                                    <div class="legend-item"><span class="legend-color pt-bg-deep"></span> &gt;60%</div>
+                                    <div class="legend-item"><span class="legend-color pt-bg-mid"></span> 53-60%</div>
+                                    <div class="legend-item"><span class="legend-color pt-bg-light"></span> 50-53%</div>
+                                </div>
                             </div>
-                            <div class="legend-group">
-                                <span class="legend-group-title pt-color">LULA (PT):</span>
-                                <div class="legend-item"><span class="legend-color pt-bg-deep"></span> &gt;60% Amplo</div>
-                                <div class="legend-item"><span class="legend-color pt-bg-mid"></span> 53-60%</div>
-                                <div class="legend-item"><span class="legend-color pt-bg-light"></span> 50-53% Voto a voto</div>
+                        </div>
+
+                        <!-- BARRA DE ACESSO RÁPIDO AOS COLÉGIOS ELEITORAIS DECISIVOS -->
+                        <div class="quick-colleges-bar">
+                            <div class="quick-colleges-header">
+                                <span class="quick-colleges-badge">⚡ COLÉGIOS ELEITORAIS DECISIVOS:</span>
+                                <span class="quick-colleges-hint hide-mobile">Toque em qualquer estado para focar o mapa e carregar as cidades</span>
+                            </div>
+                            <div class="quick-colleges-scroll" id="quick-colleges-scroll">
+                                <!-- Gerado dinamicamente via JS -->
                             </div>
                         </div>
                     </div>
 
-                    <!-- ÁREA DO EXPLORADOR DE CIDADES DO ESTADO -->
-                    <div class="state-cities-pane">
-                        <!-- CARD DO ESTADO ATUAL COM VISUAL PREMIUM -->
-                        <div class="selected-state-card" id="selected-state-card">
-                            <!-- Renderizado via JS: Nome do estado, votos, % apurado, duelo -->
+                    <!-- COLUNA DIREITA: HUD FLUTUANTE DE COMANDO // DUELO, REAÇÕES E CIDADES -->
+                    <div class="map-hud-sidebar">
+                        
+                        <!-- CARD 1: DUELO DOS LÍDERES // ESTILO MODERNO SEUIMPOSTO -->
+                        <div class="hud-card hud-duel-card">
+                            <div class="hud-card-header">
+                                <div class="hud-card-title-col">
+                                    <span class="hud-badge-live">🇧🇷 2º TURNO AO VIVO</span>
+                                    <h3 class="hud-card-title">Duelo Presidencial</h3>
+                                </div>
+                                <div class="hud-sections-pill" id="pres-status-pill">
+                                    <span class="pulse-indicator"></span>
+                                    <span id="pres-validos-info">99,99% APURADO</span>
+                                </div>
+                            </div>
+
+                            <!-- PLACAR FRENTE A FRENTE -->
+                            <div class="hud-duel-fighters">
+                                <!-- BOLSONARO 22 -->
+                                <div class="hud-fighter pl-fighter">
+                                    <div class="hud-fighter-top">
+                                        <div class="hud-avatar-frame pl-glow">
+                                            <img id="hero-foto-22" src="fotos/pres_22.jpeg" alt="Bolsonaro" class="hud-avatar-img">
+                                            <span class="hud-num-badge pl-bg">22</span>
+                                        </div>
+                                        <div class="hud-fighter-meta">
+                                            <span class="hud-party-tag pl-color">PL &bull; 22</span>
+                                            <h4 class="hud-fighter-name" id="hero-name-22">FLÁVIO BOLSONARO</h4>
+                                        </div>
+                                    </div>
+                                    <div class="hud-fighter-score">
+                                        <span class="hud-score-pct pl-color" id="hero-pct-22">47,03%</span>
+                                        <span class="hud-score-votes" id="hero-votes-22">56.104.503 votos</span>
+                                    </div>
+                                </div>
+
+                                <!-- LULA 13 -->
+                                <div class="hud-fighter pt-fighter">
+                                    <div class="hud-fighter-top">
+                                        <div class="hud-avatar-frame pt-glow">
+                                            <img id="hero-foto-13" src="fotos/pres_13.jpeg" alt="Lula" class="hud-avatar-img">
+                                            <span class="hud-num-badge pt-bg">13</span>
+                                        </div>
+                                        <div class="hud-fighter-meta">
+                                            <span class="hud-party-tag pt-color">PT &bull; 13</span>
+                                            <h4 class="hud-fighter-name" id="hero-name-13">LULA</h4>
+                                        </div>
+                                    </div>
+                                    <div class="hud-fighter-score">
+                                        <span class="hud-score-pct pt-color" id="hero-pct-13">45,17%</span>
+                                        <span class="hud-score-votes" id="hero-votes-13">53.879.538 votos</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BARRA DE CABO DE GUERRA PROPORCIONAL -->
+                            <div class="hud-tug-wrapper">
+                                <div class="hud-tug-bar">
+                                    <div class="hud-tug-fill pl-fill" id="hero-tug-pl" style="width: 51%;"></div>
+                                    <div class="hud-tug-fill pt-fill" id="hero-tug-pt" style="width: 49%;"></div>
+                                </div>
+                                <div class="hud-tug-labels">
+                                    <span class="pl-color">● Flávio Bolsonaro (51,0%)</span>
+                                    <span class="pt-color">Lula (49,0%) ●</span>
+                                </div>
+                            </div>
+
+                            <!-- VANTAGEM & ESTADOS VENCIDOS -->
+                            <div class="hud-duel-stats-row">
+                                <div class="hud-stat-box">
+                                    <span class="hud-stat-lbl">VANTAGEM ATUAL</span>
+                                    <strong class="hud-stat-val" id="hero-delta-votos">2.224.965</strong>
+                                    <span class="hud-stat-sub" id="hero-delta-pct">1,87% à frente</span>
+                                </div>
+                                <div class="hud-stat-box">
+                                    <span class="hud-stat-lbl">ESTADOS VENCIDOS</span>
+                                    <div class="hud-states-count-line">
+                                        <span class="pl-color"><strong id="states-count-bolso">14</strong> UFs</span>
+                                        <span class="stat-sep">x</span>
+                                        <span class="pt-color"><strong id="states-count-lula">13</strong> UFs</span>
+                                    </div>
+                                    <div class="hud-states-mini-bar">
+                                        <div id="states-bar-pl" style="width: 51.9%"></div>
+                                        <div id="states-bar-pt" style="width: 48.1%"></div>
+                                    </div>
+                                    <span class="hud-stat-sub" id="states-diff-sub">PL lidera em 14 de 27 estados</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- BUSCA DE CIDADES DO ESTADO -->
-                        <div class="cities-search-bar">
-                            <span class="cities-search-icon">🔍</span>
-                            <input type="text" id="cities-filter-input" class="cities-filter-input" placeholder="Buscar cidade do estado (ex: Arapiraca, Campinas, Niterói)..." autocomplete="off" oninput="window.filterCities(this.value)">
+                        <!-- CARD 2: TERMÔMETRO DA GALERA // REAÇÕES AO VIVO (DIFERENCIAL EXCLUSIVO) -->
+                        <div class="hud-card hud-reactions-card">
+                            <div class="hud-card-header">
+                                <div class="hud-card-title-col">
+                                    <span class="reaction-fire-icon">🔥</span>
+                                    <h3 class="hud-card-title">Termômetro da Torcida</h3>
+                                </div>
+                                <div class="reaction-live-indicator">
+                                    <span class="pulse-indicator-red"></span>
+                                    <span id="reaction-total-count">9.074 reações</span>
+                                </div>
+                            </div>
+
+                            <!-- BOTÕES DE REAÇÃO COMPACTOS -->
+                            <div class="hud-reaction-buttons-grid">
+                                <button class="reaction-pill-btn btn-tenso" onclick="window.triggerReaction('tenso')" title="Clima de tensão total!">
+                                    <span class="reaction-emoji">🔥</span>
+                                    <div class="reaction-text-col">
+                                        <strong class="reaction-label">Tenso</strong>
+                                        <span class="reaction-count" id="count-tenso">1.342</span>
+                                    </div>
+                                </button>
+
+                                <button class="reaction-pill-btn btn-pipoca" onclick="window.triggerReaction('pipoca')" title="Comendo pipoca assistindo o circo pegar fogo!">
+                                    <span class="reaction-emoji">🍿</span>
+                                    <div class="reaction-text-col">
+                                        <strong class="reaction-label">Pipoca</strong>
+                                        <span class="reaction-count" id="count-pipoca">985</span>
+                                    </div>
+                                </button>
+
+                                <button class="reaction-pill-btn btn-picanha" onclick="window.triggerReaction('picanha')" title="Chama a picanha e a cerveja! Lula 13!">
+                                    <span class="reaction-emoji">🥩</span>
+                                    <div class="reaction-text-col">
+                                        <strong class="reaction-label">Lula 13</strong>
+                                        <span class="reaction-count" id="count-picanha">2.420</span>
+                                    </div>
+                                </button>
+
+                                <button class="reaction-pill-btn btn-capitao" onclick="window.triggerReaction('capitao')" title="Acelera capitão! Flávio Bolsonaro 22!">
+                                    <span class="reaction-emoji">🏍️</span>
+                                    <div class="reaction-text-col">
+                                        <strong class="reaction-label">Bolso 22</strong>
+                                        <span class="reaction-count" id="count-capitao">2.490</span>
+                                    </div>
+                                </button>
+
+                                <button class="reaction-pill-btn btn-virada" onclick="window.triggerReaction('virada')" title="Vai dar virada histórica?">
+                                    <span class="reaction-emoji">⚡</span>
+                                    <div class="reaction-text-col">
+                                        <strong class="reaction-label">Virada?</strong>
+                                        <span class="reaction-count" id="count-virada">1.835</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- BARRA DE ENERGIA DAS TORCIDAS -->
+                            <div class="reaction-thermometer-bar">
+                                <div class="thermometer-fill pl" id="thermometer-pl" style="width: 50.7%;" title="Bolsonaro 22: 50.7%"></div>
+                                <div class="thermometer-fill pt" id="thermometer-pt" style="width: 49.3%;" title="Lula 13: 49.3%"></div>
+                            </div>
+                            <div class="thermometer-legend">
+                                <span class="pl-color">● Bolso 22: <strong id="thermo-pct-bolso">50.7%</strong></span>
+                                <span class="pt-color"><strong id="thermo-pct-lula">49.3%</strong> :Lula 13 ●</span>
+                            </div>
                         </div>
 
-                        <!-- LISTA DE CIDADES COM APURAÇÃO VOTO A VOTO -->
-                        <div class="cities-stream-wrapper">
-                            <div class="cities-stream-header">
-                                <span id="cities-count-label">Cidades do Estado:</span>
-                                <span id="cities-loading-tag" class="cities-loading-tag hidden">🔄 Puxando do TSE...</span>
+                        <!-- CARD 3: INSPECTOR DE ESTADO & CIDADES DO TSE -->
+                        <div class="hud-card hud-cities-card state-cities-pane">
+                            <!-- CARD DO ESTADO SELECIONADO -->
+                            <div class="selected-state-card" id="selected-state-card">
+                                <!-- Renderizado via JS -->
                             </div>
-                            <div class="cities-list" id="cities-list">
-                                <!-- Cards das cidades renderizados dinamicamente -->
+
+                            <!-- BUSCA RÁPIDA DE CIDADES -->
+                            <div class="cities-search-bar">
+                                <span class="cities-search-icon">🔍</span>
+                                <input type="text" id="cities-filter-input" class="cities-filter-input" placeholder="Buscar cidade do estado (ex: Arapiraca, Campinas)..." autocomplete="off" oninput="window.filterCities(this.value)">
+                            </div>
+
+                            <!-- LISTA DE CIDADES COM APURAÇÃO VOTO A VOTO -->
+                            <div class="cities-stream-wrapper">
+                                <div class="cities-stream-header">
+                                    <span id="cities-count-label">Cidades do Estado:</span>
+                                    <span id="cities-loading-tag" class="cities-loading-tag hidden">🔄 Puxando do TSE...</span>
+                                </div>
+                                <div class="cities-list" id="cities-list">
+                                    <!-- Cards das cidades renderizados dinamicamente -->
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 

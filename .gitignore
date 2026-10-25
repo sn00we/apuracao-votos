@@ -9,3 +9,7 @@ extract_geo_module.py
 app_seuimposto.js
 seuimposto_mapa.js
 cache_cidades/
+inspect_seuimposto_ui.js
+seuimposto_dump.html
+seuimposto_style.css
+
