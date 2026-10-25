@@ -378,17 +378,18 @@ def process_and_normalize_seuimposto():
             "segundo_nacional": c2['numero'] if c2 else "",
             "segundo_nome": c2['nome'] if c2 else ""
         }
-        tse_state["uf_matrix"] = uf_matrix
-        tse_state["pres"] = {
-            "secoes_total": s_ts,
-            "secoes_apuradas": s_st,
-            "pct_secoes": pct_secoes_str,
-            "total_votos": total_votos,
-            "votos_validos": validos,
-            "brancos": brancos,
-            "nulos": nulos,
-            "candidatos": cands_list
-        }
+        if validos > 0:
+            tse_state["uf_matrix"] = uf_matrix
+            tse_state["pres"] = {
+                "secoes_total": s_ts,
+                "secoes_apuradas": s_st,
+                "pct_secoes": pct_secoes_str,
+                "total_votos": total_votos,
+                "votos_validos": validos,
+                "brancos": brancos,
+                "nulos": nulos,
+                "candidatos": cands_list
+            }
         if gov_al_cands:
             tse_state["gov_al"] = {
                 "secoes_total": int(gov_al_data.get('secoes', 7101)),
