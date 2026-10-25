@@ -1,17 +1,17 @@
 {
   "status": "online",
-  "last_sync": "11:25:59",
+  "last_sync": "12:09:08",
   "tse_horario": "18:19:31",
   "tse_data": "04/10/2026",
   "micro_engine": {
     "status": "online",
     "metodo": "Feed em Tempo Real // SeuImposto.com (Cloudflare Edge Stream)",
     "fonte": "https://seuimposto.com/feed/agora.json",
-    "seq": 1792938302,
-    "gerado": 1792938302350,
+    "seq": 1792940885,
+    "gerado": 1792940885461,
     "ufs_total": 28,
     "ufs_ok": 28,
-    "tempo_ms": 156.3,
+    "tempo_ms": 153.6,
     "secoes_total": 499248,
     "secoes_apuradas": 0,
     "pct_secoes": "0,00%",
@@ -23,16 +23,916 @@
     "segundo_nacional": "22",
     "segundo_nome": "Flávio Bolsonaro"
   },
-  "uf_matrix": {},
+  "uf_matrix": {
+    "AC": {
+      "uf": "AC",
+      "nome": "AC",
+      "secoes_total": 2270,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "AL": {
+      "uf": "AL",
+      "nome": "AL",
+      "secoes_total": 7101,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "AM": {
+      "uf": "AM",
+      "nome": "AM",
+      "secoes_total": 8157,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "AP": {
+      "uf": "AP",
+      "nome": "AP",
+      "secoes_total": 1914,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "BA": {
+      "uf": "BA",
+      "nome": "BA",
+      "secoes_total": 35476,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "CE": {
+      "uf": "CE",
+      "nome": "CE",
+      "secoes_total": 23765,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "DF": {
+      "uf": "DF",
+      "nome": "DF",
+      "secoes_total": 6969,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "ES": {
+      "uf": "ES",
+      "nome": "ES",
+      "secoes_total": 9844,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "GO": {
+      "uf": "GO",
+      "nome": "GO",
+      "secoes_total": 15686,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "MA": {
+      "uf": "MA",
+      "nome": "MA",
+      "secoes_total": 18093,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "MG": {
+      "uf": "MG",
+      "nome": "MG",
+      "secoes_total": 52062,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "MS": {
+      "uf": "MS",
+      "nome": "MS",
+      "secoes_total": 7106,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "MT": {
+      "uf": "MT",
+      "nome": "MT",
+      "secoes_total": 8287,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "PA": {
+      "uf": "PA",
+      "nome": "PA",
+      "secoes_total": 20827,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "PB": {
+      "uf": "PB",
+      "nome": "PB",
+      "secoes_total": 10712,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "PE": {
+      "uf": "PE",
+      "nome": "PE",
+      "secoes_total": 21418,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "PI": {
+      "uf": "PI",
+      "nome": "PI",
+      "secoes_total": 10225,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "PR": {
+      "uf": "PR",
+      "nome": "PR",
+      "secoes_total": 27142,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "RJ": {
+      "uf": "RJ",
+      "nome": "RJ",
+      "secoes_total": 37675,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "RN": {
+      "uf": "RN",
+      "nome": "RN",
+      "secoes_total": 8115,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "RO": {
+      "uf": "RO",
+      "nome": "RO",
+      "secoes_total": 4698,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "RR": {
+      "uf": "RR",
+      "nome": "RR",
+      "secoes_total": 1519,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "RS": {
+      "uf": "RS",
+      "nome": "RS",
+      "secoes_total": 27547,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "SC": {
+      "uf": "SC",
+      "nome": "SC",
+      "secoes_total": 17326,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "SE": {
+      "uf": "SE",
+      "nome": "SE",
+      "secoes_total": 5923,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "SP": {
+      "uf": "SP",
+      "nome": "SP",
+      "secoes_total": 103656,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "TO": {
+      "uf": "TO",
+      "nome": "TO",
+      "secoes_total": 4384,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    },
+    "ZZ": {
+      "uf": "ZZ",
+      "nome": "ZZ",
+      "secoes_total": 1351,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "",
+      "lider_nome": "Aguardando",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
+      "top3": [
+        {
+          "numero": "13",
+          "nome": "Lula",
+          "partido": "PT",
+          "votos": 0,
+          "pct_str": "0,00%"
+        },
+        {
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
+        }
+      ]
+    }
+  },
   "pres": {
     "secoes_total": 499248,
-    "secoes_apuradas": 499248,
-    "pct_secoes": "100,00%",
-    "total_votos": 118580000,
-    "votos_validos": 113400000,
-    "brancos": 2100000,
-    "nulos": 3080000,
-    "candidatos": []
+    "secoes_apuradas": 0,
+    "pct_secoes": "0,00%",
+    "total_votos": 0,
+    "votos_validos": 0,
+    "brancos": 0,
+    "nulos": 0,
+    "candidatos": [
+      {
+        "id": "13",
+        "numero": "13",
+        "sqcand": "280002542548",
+        "nome": "Lula",
+        "nome_completo": "LUIZ INÁCIO LULA DA SILVA",
+        "partido": "PT",
+        "votos": 0,
+        "pct": 0,
+        "pct_str": "0,00%",
+        "foto": "fotos/pres_13.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002542548.jpeg",
+        "eleito": false,
+        "ufs_vencidas": 0
+      },
+      {
+        "id": "22",
+        "numero": "22",
+        "sqcand": "280002551544",
+        "nome": "Flávio Bolsonaro",
+        "nome_completo": "FLAVIO NANTES BOLSONARO",
+        "partido": "PL",
+        "votos": 0,
+        "pct": 0,
+        "pct_str": "0,00%",
+        "foto": "fotos/pres_22.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551544.jpeg",
+        "eleito": false,
+        "ufs_vencidas": 0
+      }
+    ]
   },
   "gov_al": {
     "secoes_total": 7101,

@@ -464,26 +464,40 @@
         if (elTotalVotos) elTotalVotos.textContent = formatNumber(pres.total_votos);
 
         const elValidos = document.getElementById('pres-votos-validos');
-        if (elValidos) elValidos.textContent = formatNumber(pres.votos_validos);
+        if (elValidos) elValidos.textContent = formatNumber(pres.votos_validos || 0);
 
         const elHeaderStatus = document.getElementById('header-status-text');
-        if (elHeaderStatus) elHeaderStatus.textContent = `${pctSecoes} DAS SEÇÕES APURADAS`;
+        if (elHeaderStatus) {
+            elHeaderStatus.textContent = (pctSecoes && pctSecoes !== '0,00%') 
+                ? `${pctSecoes} DAS SEÇÕES APURADAS` 
+                : '0,00% DAS SEÇÕES APURADAS';
+        }
+
+        const elValidosInfo = document.getElementById('pres-validos-info');
+        if (elValidosInfo) {
+            elValidosInfo.textContent = (pctSecoes && pctSecoes !== '0,00%') 
+                ? `${pctSecoes} APURADO` 
+                : '0,00% APURADO';
+        }
 
         const elBarFill = document.getElementById('pres-bar-fill');
         if (elBarFill) {
-            const rawPct = parseFloat((pctSecoes || '').replace(',', '.')) || 100;
+            const rawPct = parseFloat((pctSecoes || '0').replace(',', '.')) || 0;
             elBarFill.style.width = `${rawPct}%`;
         }
 
         // Hero: Duelo 22 vs 13
         const cands = pres.candidatos || [];
-        const bolso = cands.find(c => c.numero === '22') || cands[0] || {};
-        const lula = cands.find(c => c.numero === '13') || cands[1] || {};
+        const bolso = cands.find(c => c.numero === '22') || {};
+        const lula = cands.find(c => c.numero === '13') || {};
 
-        const vBolso = (bolso.votos && bolso.votos > 0) ? bolso.votos : 56104503;
-        const vLula = (lula.votos && lula.votos > 0) ? lula.votos : 53879538;
-        const pctBolso = (bolso.votos && bolso.votos > 0) ? (bolso.pct_str || formatPct(bolso.pct)) : '47,03%';
-        const pctLula = (lula.votos && lula.votos > 0) ? (lula.pct_str || formatPct(lula.pct)) : '45,17%';
+        const vBolso = Number(bolso.votos || 0);
+        const vLula = Number(lula.votos || 0);
+        const totalDupla = vBolso + vLula;
+        const validos = Number(pres.votos_validos || totalDupla);
+
+        const pctBolso = validos > 0 ? (bolso.pct_str || formatPct(vBolso / validos)) : '0,00%';
+        const pctLula = validos > 0 ? (lula.pct_str || formatPct(vLula / validos)) : '0,00%';
 
         const setAllText = (id, val) => document.querySelectorAll('#' + id).forEach(el => el.textContent = val);
         const setAllSrc = (id, src) => document.querySelectorAll('#' + id).forEach(el => el.src = src);
@@ -499,16 +513,17 @@
 
         // Diferença entre os dois
         const delta = Math.abs(vBolso - vLula);
-        const totalDupla = vBolso + vLula;
-        const pctDelta = totalDupla > 0 ? (delta / (pres.votos_validos || totalDupla) * 100).toFixed(2).replace('.', ',') : '1,87';
-
         setAllText('hero-delta-votos', formatNumber(delta));
 
-        const lider = vBolso > vLula ? 'Bolsonaro' : 'Lula';
-        setAllText('hero-delta-pct', `${pctDelta}% (${lider} à frente)`);
+        if (totalDupla === 0) {
+            setAllText('hero-delta-pct', 'Aguardando apuração');
+            setAllWidth('hero-tug-pl', '50%');
+            setAllWidth('hero-tug-pt', '50%');
+        } else {
+            const pctDelta = (delta / validos * 100).toFixed(2).replace('.', ',');
+            const lider = vBolso > vLula ? 'Bolsonaro' : (vLula > vBolso ? 'Lula' : 'Empate');
+            setAllText('hero-delta-pct', `${pctDelta}% (${lider} à frente)`);
 
-        // Cabo de guerra
-        if (totalDupla > 0) {
             const pctPl = (vBolso / totalDupla * 100).toFixed(1);
             const pctPt = (vLula / totalDupla * 100).toFixed(1);
             setAllWidth('hero-tug-pl', `${pctPl}%`);
@@ -602,13 +617,14 @@
 
     // Pista de corrida da linha de chegada 50% + 1
     function updateRaceTrack(bolso, lula, validos) {
-        if (!validos) return;
-        const pctBolso = (bolso.votos / validos * 100);
-        const pctLula = (lula.votos / validos * 100);
-
-        // O centro 50% fica em 50% da largura. Mapeamos de 40% a 55% para visualização dramática
         const runnerBolso = document.getElementById('runner-bolso');
         const runnerLula = document.getElementById('runner-lula');
+
+        if (!validos) {
+            if (runnerBolso) runnerBolso.style.left = '5%';
+            if (runnerLula) runnerLula.style.left = '5%';
+            return;
+        }
 
         if (runnerBolso) {
             // Mapeia proporção para posição no trilho (0 a 90%)
@@ -1698,8 +1714,8 @@
         // 1. Renderiza cada um dos 5.570 municípios
         for (let i = 0; i < total; i++) {
             const m = munis[i];
-            let leader = muniData ? muniData.l[i] : (i % 2 === 0 ? 22 : 13);
-            let margin = muniData ? muniData.m[i] : 200;
+            let leader = (muniData && muniData.l) ? muniData.l[i] : null;
+            let margin = (muniData && muniData.m) ? muniData.m[i] : 0;
             let isDimmed = false;
 
             if (filter === 'bolso' && leader !== 22) isDimmed = true;
@@ -1721,7 +1737,7 @@
                 else if (margin >= 60) ctx.fillStyle = '#ef4444'; // 6-15%
                 else ctx.fillStyle = '#f87171'; // <6% voto a voto
             } else {
-                ctx.fillStyle = '#334155';
+                ctx.fillStyle = '#162238'; // Neutro // Aguardando apuração oficial
             }
 
             ctx.fill(m.path);
@@ -2231,8 +2247,12 @@
 
         setAllText('states-count-bolso', bolsoWins);
         setAllText('states-count-lula', lulaWins);
-        setAllText('states-votes-bolso', `${formatNumber(bolsoVotes)} votos (47,0%)`);
-        setAllText('states-votes-lula', `${formatNumber(lulaVotes)} votos (45,2%)`);
+
+        const totalVotes = bolsoVotes + lulaVotes;
+        const pctBolsoState = totalVotes > 0 ? `${(bolsoVotes / totalVotes * 100).toFixed(1)}%` : '0,0%';
+        const pctLulaState = totalVotes > 0 ? `${(lulaVotes / totalVotes * 100).toFixed(1)}%` : '0,0%';
+        setAllText('states-votes-bolso', `${formatNumber(bolsoVotes)} votos (${pctBolsoState})`);
+        setAllText('states-votes-lula', `${formatNumber(lulaVotes)} votos (${pctLulaState})`);
 
         const totalWins = bolsoWins + lulaWins;
         if (totalWins > 0) {
@@ -2240,15 +2260,18 @@
             const pctPt = (lulaWins / totalWins * 100).toFixed(1);
             setAllWidth('states-bar-pl', `${pctPl}%`);
             setAllWidth('states-bar-pt', `${pctPt}%`);
+            let diffText = `Empate em estados: ${bolsoWins} a ${lulaWins}`;
+            if (bolsoWins > lulaWins) {
+                diffText = `PL lidera por vantagem de ${bolsoWins - lulaWins} estados`;
+            } else if (lulaWins > bolsoWins) {
+                diffText = `PT lidera por vantagem de ${lulaWins - bolsoWins} estados`;
+            }
+            setAllText('states-diff-sub', diffText);
+        } else {
+            setAllWidth('states-bar-pl', '50%');
+            setAllWidth('states-bar-pt', '50%');
+            setAllText('states-diff-sub', 'Aguardando abertura das primeiras seções');
         }
-
-        let diffText = `Empate em estados: ${bolsoWins} a ${lulaWins}`;
-        if (bolsoWins > lulaWins) {
-            diffText = `PL lidera por vantagem de ${bolsoWins - lulaWins} estados`;
-        } else if (lulaWins > bolsoWins) {
-            diffText = `PT lidera por vantagem de ${lulaWins - bolsoWins} estados`;
-        }
-        setAllText('states-diff-sub', diffText);
     }
 
     // --- COLÉGIOS ELEITORAIS PRINCIPAIS (ACESSO RÁPIDO) ---

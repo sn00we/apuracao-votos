@@ -59,83 +59,109 @@ export default async function handler(req, res) {
         const pres = agora.presidente || {};
         const br = pres.br || {};
         const vDict = br.votos || {};
-        const validos = Object.values(vDict).reduce((a, b) => a + Number(b), 0);
+        const v13 = Number(vDict['13'] || 0);
+        const v22 = Number(vDict['22'] || 0);
+        const validos = v13 + v22;
+        const secTot = Number(br.secoes || 499248);
+        const secApu = Number(br.totalizadas || 0);
+        const pctSec = secTot > 0 ? `${((secApu / secTot) * 100).toFixed(2)}%`.replace('.', ',') : '0,00%';
+        const pct13 = validos > 0 ? (v13 / validos) : 0;
+        const pct22 = validos > 0 ? (v22 / validos) : 0;
 
-        // Se a apuração ao vivo já tiver votos, retorna a apuração em tempo real
-        if (validos > 0) {
-            const backup = getBackupData() || {};
-            const normalized = {
-                status: 'online',
-                last_sync: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
-                micro_engine: {
-                    status: 'online',
-                    metodo: 'Feed em Tempo Real // SeuImposto.com (Cloudflare Edge Stream)',
-                    fonte: 'https://seuimposto.com/feed/agora.json',
-                    seq: agora.seq,
-                    gerado: agora.gerado,
-                    tempo_ms: Date.now() - t0,
-                    secoes_total: Number(br.secoes || 499248),
-                    secoes_apuradas: Number(br.totalizadas || 499248),
-                    pct_secoes: `${((Number(br.totalizadas || 0) / Number(br.secoes || 1)) * 100).toFixed(2)}%`.replace('.', ','),
-                    votos_validos: validos
-                },
-                pres: {
-                    secoes_total: Number(br.secoes || 499248),
-                    secoes_apuradas: Number(br.totalizadas || 499248),
-                    pct_secoes: `${((Number(br.totalizadas || 0) / Number(br.secoes || 1)) * 100).toFixed(2)}%`.replace('.', ','),
-                    votos_validos: validos,
-                    total_votos: validos + Number(br.brancos || 0) + Number(br.nulos || 0),
-                    brancos: Number(br.brancos || 0),
-                    nulos: Number(br.nulos || 0),
-                    candidatos: Object.entries(vDict).map(([num, cnt]) => {
-                        const v = Number(cnt);
-                        const pct = validos > 0 ? v / validos : 0;
-                        const isBolso = num === '22';
-                        return {
-                            id: num,
-                            numero: num,
-                            nome: isBolso ? 'Flávio Bolsonaro' : (num === '13' ? 'Lula' : num),
-                            partido: isBolso ? 'PL' : (num === '13' ? 'PT' : ''),
-                            votos: v,
-                            pct: pct,
-                            pct_str: `${(pct * 100).toFixed(2)}%`.replace('.', ','),
-                            foto: `fotos/pres_${num}.jpeg`
-                        };
-                    }).sort((a, b) => b.votos - a.votos)
-                },
-                uf_matrix: backup.uf_matrix || {},
-                gov_al: backup.gov_al || {},
-                sen_al: backup.sen_al || {}
+        // Constrói a matriz das 28 UFs a partir do feed ao vivo
+        const ufMatrix = {};
+        for (const [ufKey, ufData] of Object.entries(pres.uf || {})) {
+            const u = ufKey.toUpperCase();
+            const u13 = Number(ufData.votos?.['13'] || 0);
+            const u22 = Number(ufData.votos?.['22'] || 0);
+            const uVal = u13 + u22;
+            const uSecTot = Number(ufData.secoes || 0);
+            const uSecApu = Number(ufData.totalizadas || 0);
+            const uPctSec = uSecTot > 0 ? `${((uSecApu / uSecTot) * 100).toFixed(2)}%`.replace('.', ',') : '0,00%';
+            const uPct13 = uVal > 0 ? (u13 / uVal) : 0;
+            const uPct22 = uVal > 0 ? (u22 / uVal) : 0;
+            const uLider = u22 > u13 ? '22' : (u13 > u22 ? '13' : '');
+
+            ufMatrix[u] = {
+                uf: u,
+                nome: u,
+                secoes_total: uSecTot,
+                secoes_apuradas: uSecApu,
+                pct_secoes: uPctSec,
+                votos_validos: uVal,
+                lider: uLider,
+                lider_nome: uLider === '22' ? 'Flávio Bolsonaro' : (uLider === '13' ? 'Lula' : 'Aguardando'),
+                lula_votos: u13,
+                lula_pct: `${(uPct13 * 100).toFixed(2)}%`.replace('.', ','),
+                bolsonaro_votos: u22,
+                bolsonaro_pct: `${(uPct22 * 100).toFixed(2)}%`.replace('.', ','),
+                delta_votos: Math.abs(u22 - u13),
+                top3: [
+                    { numero: '22', nome: 'Flávio Bolsonaro', partido: 'PL', votos: u22, pct_str: `${(uPct22 * 100).toFixed(2)}%`.replace('.', ',') },
+                    { numero: '13', nome: 'Lula', partido: 'PT', votos: u13, pct_str: `${(uPct13 * 100).toFixed(2)}%`.replace('.', ',') }
+                ]
             };
-            return res.status(200).json(normalized);
         }
 
-        // Dados consolidados oficiais
-        const backup = getBackupData();
-        if (backup) {
-            backup.micro_engine = {
+        const backup = getBackupData() || {};
+
+        const normalized = {
+            status: 'online',
+            turno: 2,
+            last_sync: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+            micro_engine: {
                 status: 'online',
                 metodo: 'Feed em Tempo Real // SeuImposto.com (Cloudflare Edge Stream)',
                 fonte: 'https://seuimposto.com/feed/agora.json',
                 seq: agora.seq,
                 gerado: agora.gerado,
                 tempo_ms: Date.now() - t0,
-                ufs_total: 28,
-                ufs_ok: 28,
-                secoes_total: 499248,
-                secoes_apuradas: 499248,
-                pct_secoes: '100,00%',
-                votos_validos: 119300788,
-                delta_votos: 2224965,
-                delta_pct: '1.87%',
-                lider_nacional: '22',
-                lider_nome: 'Flávio Bolsonaro',
-                segundo_nacional: '13',
-                segundo_nome: 'Lula'
-            };
-            backup.last_sync = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-            return res.status(200).json(backup);
-        }
+                secoes_total: secTot,
+                secoes_apuradas: secApu,
+                pct_secoes: pctSec,
+                votos_validos: validos,
+                delta_votos: Math.abs(v22 - v13),
+                delta_pct: validos > 0 ? `${(Math.abs(v22 - v13) / validos * 100).toFixed(2)}%` : '0.00%',
+                lider_nacional: v22 > v13 ? '22' : (v13 > v22 ? '13' : ''),
+                lider_nome: v22 > v13 ? 'Flávio Bolsonaro' : (v13 > v22 ? 'Lula' : 'Aguardando Apuração')
+            },
+            pres: {
+                secoes_total: secTot,
+                secoes_apuradas: secApu,
+                pct_secoes: pctSec,
+                votos_validos: validos,
+                total_votos: validos + Number(br.brancos || 0) + Number(br.nulos || 0),
+                brancos: Number(br.brancos || 0),
+                nulos: Number(br.nulos || 0),
+                candidatos: [
+                    {
+                        id: '22',
+                        numero: '22',
+                        nome: 'Flávio Bolsonaro',
+                        partido: 'PL',
+                        votos: v22,
+                        pct: pct22,
+                        pct_str: `${(pct22 * 100).toFixed(2)}%`.replace('.', ','),
+                        foto: 'fotos/pres_22.jpeg'
+                    },
+                    {
+                        id: '13',
+                        numero: '13',
+                        nome: 'Lula',
+                        partido: 'PT',
+                        votos: v13,
+                        pct: pct13,
+                        pct_str: `${(pct13 * 100).toFixed(2)}%`.replace('.', ','),
+                        foto: 'fotos/pres_13.jpeg'
+                    }
+                ]
+            },
+            uf_matrix: ufMatrix,
+            gov_al: backup.gov_al || {},
+            sen_al: backup.sen_al || {}
+        };
+
+        return res.status(200).json(normalized);
 
         throw new Error('Sem dados de backup');
     } catch (err) {

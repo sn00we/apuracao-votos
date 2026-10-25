@@ -123,6 +123,16 @@ tse_state = {
     "raw": {}
 }
 
+# Carrega estado inicial do disco se existir
+if os.path.exists('dados_tse_atual.json'):
+    try:
+        with open('dados_tse_atual.json', 'r', encoding='utf-8') as f:
+            loaded_state = json.load(f)
+            if loaded_state and isinstance(loaded_state, dict):
+                tse_state = loaded_state
+    except Exception as e:
+        print("[!] Erro ao carregar dados_tse_atual.json inicial:", e)
+
 def fetch_json(url, timeout=3.5):
     """Executa requisição HTTP otimizada para a CDN do TSE"""
     try:
@@ -274,13 +284,14 @@ def process_and_normalize_seuimposto():
             })
         uf_cands.sort(key=lambda x: x['votos'], reverse=True)
 
-        lider_num = uf_cands[0]['numero'] if uf_cands else ('22' if bolso_v >= lula_v else '13')
-        lider_nome = uf_cands[0]['nome'] if uf_cands else ('Flávio Bolsonaro' if lider_num == '22' else 'Lula')
+        lider_num = "" if val_uf == 0 else (uf_cands[0]['numero'] if uf_cands else ('22' if bolso_v > lula_v else '13'))
+        lider_nome = "Aguardando" if val_uf == 0 else (uf_cands[0]['nome'] if uf_cands else ('Flávio Bolsonaro' if lider_num == '22' else 'Lula'))
 
         # Contabiliza UFs vencidas nos candidatos nacionais
-        for c in cands_list:
-            if c['numero'] == lider_num:
-                c['ufs_vencidas'] += 1
+        if val_uf > 0:
+            for c in cands_list:
+                if c['numero'] == lider_num:
+                    c['ufs_vencidas'] += 1
 
         sec_tot = uf_data.get('secoes', 0)
         sec_apu = uf_data.get('totalizadas', 0)
@@ -378,18 +389,17 @@ def process_and_normalize_seuimposto():
             "segundo_nacional": c2['numero'] if c2 else "",
             "segundo_nome": c2['nome'] if c2 else ""
         }
-        if validos > 0:
-            tse_state["uf_matrix"] = uf_matrix
-            tse_state["pres"] = {
-                "secoes_total": s_ts,
-                "secoes_apuradas": s_st,
-                "pct_secoes": pct_secoes_str,
-                "total_votos": total_votos,
-                "votos_validos": validos,
-                "brancos": brancos,
-                "nulos": nulos,
-                "candidatos": cands_list
-            }
+        tse_state["uf_matrix"] = uf_matrix
+        tse_state["pres"] = {
+            "secoes_total": s_ts,
+            "secoes_apuradas": s_st,
+            "pct_secoes": pct_secoes_str,
+            "total_votos": total_votos,
+            "votos_validos": validos,
+            "brancos": brancos,
+            "nulos": nulos,
+            "candidatos": cands_list
+        }
         if gov_al_cands:
             tse_state["gov_al"] = {
                 "secoes_total": int(gov_al_data.get('secoes', 7101)),
