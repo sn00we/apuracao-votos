@@ -1,64 +1,57 @@
 {
   "status": "online",
-  "last_sync": "10:49:41",
+  "last_sync": "11:01:08",
   "tse_horario": "18:19:31",
   "tse_data": "04/10/2026",
   "micro_engine": {
     "status": "online",
     "metodo": "Feed em Tempo Real // SeuImposto.com (Cloudflare Edge Stream)",
     "fonte": "https://seuimposto.com/feed/agora.json",
-    "seq": 1792847216,
-    "gerado": 1792847216391,
+    "seq": 1792936865,
+    "gerado": 1792936865978,
     "ufs_total": 28,
     "ufs_ok": 28,
-    "tempo_ms": 148.1,
+    "tempo_ms": 358.6,
     "secoes_total": 499248,
-    "secoes_apuradas": 499248,
-    "pct_secoes": "100,00%",
-    "votos_validos": 119300788,
-    "delta_votos": 2224965,
-    "delta_pct": "1.87%",
-    "lider_nacional": "22",
-    "lider_nome": "Flávio Bolsonaro",
-    "segundo_nacional": "13",
-    "segundo_nome": "Lula"
+    "secoes_apuradas": 0,
+    "pct_secoes": "0,00%",
+    "votos_validos": 0,
+    "delta_votos": 0,
+    "delta_pct": "0.00%",
+    "lider_nacional": "13",
+    "lider_nome": "Lula",
+    "segundo_nacional": "22",
+    "segundo_nome": "Flávio Bolsonaro"
   },
   "uf_matrix": {
     "AC": {
       "uf": "AC",
       "nome": "AC",
       "secoes_total": 2270,
-      "secoes_apuradas": 2270,
-      "pct_secoes": "100,00%",
-      "votos_validos": 469066,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 134770,
-      "lula_pct": "28,73%",
-      "bolsonaro_votos": 302807,
-      "bolsonaro_pct": "64,56%",
-      "delta_votos": 168037,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 302807,
-          "pct_str": "64,56%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 134770,
-          "pct_str": "28,73%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 13523,
-          "pct_str": "2,88%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -66,37 +59,30 @@
       "uf": "AL",
       "nome": "AL",
       "secoes_total": 7101,
-      "secoes_apuradas": 7101,
-      "pct_secoes": "100,00%",
-      "votos_validos": 1818856,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 995459,
-      "lula_pct": "54,73%",
-      "bolsonaro_votos": 735718,
-      "bolsonaro_pct": "40,45%",
-      "delta_votos": 259741,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 995459,
-          "pct_str": "54,73%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 735718,
-          "pct_str": "40,45%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 42427,
-          "pct_str": "2,33%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -104,37 +90,30 @@
       "uf": "AM",
       "nome": "AM",
       "secoes_total": 8157,
-      "secoes_apuradas": 8157,
-      "pct_secoes": "100,00%",
-      "votos_validos": 2170763,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 1046996,
-      "lula_pct": "48,23%",
-      "bolsonaro_votos": 976764,
-      "bolsonaro_pct": "45,00%",
-      "delta_votos": 70232,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 1046996,
-          "pct_str": "48,23%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 976764,
-          "pct_str": "45,00%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 77531,
-          "pct_str": "3,57%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -142,37 +121,30 @@
       "uf": "AP",
       "nome": "AP",
       "secoes_total": 1914,
-      "secoes_apuradas": 1914,
-      "pct_secoes": "100,00%",
-      "votos_validos": 464858,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 212503,
-      "lula_pct": "45,71%",
-      "bolsonaro_votos": 212278,
-      "bolsonaro_pct": "45,67%",
-      "delta_votos": 225,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 212503,
-          "pct_str": "45,71%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 212278,
-          "pct_str": "45,67%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 19057,
-          "pct_str": "4,10%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -180,37 +152,30 @@
       "uf": "BA",
       "nome": "BA",
       "secoes_total": 35476,
-      "secoes_apuradas": 35476,
-      "pct_secoes": "100,00%",
-      "votos_validos": 8560291,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 5664771,
-      "lula_pct": "66,17%",
-      "bolsonaro_votos": 2442585,
-      "bolsonaro_pct": "28,53%",
-      "delta_votos": 3222186,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 5664771,
-          "pct_str": "66,17%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 2442585,
-          "pct_str": "28,53%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 195451,
-          "pct_str": "2,28%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -218,37 +183,30 @@
       "uf": "CE",
       "nome": "CE",
       "secoes_total": 23765,
-      "secoes_apuradas": 23765,
-      "pct_secoes": "100,00%",
-      "votos_validos": 5617814,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 3555263,
-      "lula_pct": "63,29%",
-      "bolsonaro_votos": 1756850,
-      "bolsonaro_pct": "31,27%",
-      "delta_votos": 1798413,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 3555263,
-          "pct_str": "63,29%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 1756850,
-          "pct_str": "31,27%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 140524,
-          "pct_str": "2,50%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -256,37 +214,30 @@
       "uf": "DF",
       "nome": "DF",
       "secoes_total": 6969,
-      "secoes_apuradas": 6969,
-      "pct_secoes": "100,00%",
-      "votos_validos": 1772808,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 675627,
-      "lula_pct": "38,11%",
-      "bolsonaro_votos": 909616,
-      "bolsonaro_pct": "51,31%",
-      "delta_votos": 233989,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 909616,
-          "pct_str": "51,31%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 675627,
-          "pct_str": "38,11%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "55",
-          "nome": "Ronaldo Caiado",
-          "partido": "PSD",
-          "votos": 85076,
-          "pct_str": "4,80%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -294,37 +245,30 @@
       "uf": "ES",
       "nome": "ES",
       "secoes_total": 9844,
-      "secoes_apuradas": 9844,
-      "pct_secoes": "100,00%",
-      "votos_validos": 2251078,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 850028,
-      "lula_pct": "37,76%",
-      "bolsonaro_votos": 1233194,
-      "bolsonaro_pct": "54,78%",
-      "delta_votos": 383166,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 1233194,
-          "pct_str": "54,78%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 850028,
-          "pct_str": "37,76%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 65121,
-          "pct_str": "2,89%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -332,37 +276,30 @@
       "uf": "GO",
       "nome": "GO",
       "secoes_total": 15686,
-      "secoes_apuradas": 15686,
-      "pct_secoes": "100,00%",
-      "votos_validos": 3827823,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 1188880,
-      "lula_pct": "31,06%",
-      "bolsonaro_votos": 2051888,
-      "bolsonaro_pct": "53,60%",
-      "delta_votos": 863008,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 2051888,
-          "pct_str": "53,60%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 1188880,
-          "pct_str": "31,06%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "55",
-          "nome": "Ronaldo Caiado",
-          "partido": "PSD",
-          "votos": 472041,
-          "pct_str": "12,33%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -370,37 +307,30 @@
       "uf": "MA",
       "nome": "MA",
       "secoes_total": 18093,
-      "secoes_apuradas": 18093,
-      "pct_secoes": "100,00%",
-      "votos_validos": 4010439,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 2566301,
-      "lula_pct": "63,99%",
-      "bolsonaro_votos": 1239040,
-      "bolsonaro_pct": "30,90%",
-      "delta_votos": 1327261,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 2566301,
-          "pct_str": "63,99%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 1239040,
-          "pct_str": "30,90%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 84830,
-          "pct_str": "2,12%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -408,37 +338,30 @@
       "uf": "MG",
       "nome": "MG",
       "secoes_total": 52062,
-      "secoes_apuradas": 52062,
-      "pct_secoes": "100,00%",
-      "votos_validos": 11976235,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 5188936,
-      "lula_pct": "43,33%",
-      "bolsonaro_votos": 5777548,
-      "bolsonaro_pct": "48,24%",
-      "delta_votos": 588612,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 5777548,
-          "pct_str": "48,24%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 5188936,
-          "pct_str": "43,33%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 409737,
-          "pct_str": "3,42%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -446,37 +369,30 @@
       "uf": "MS",
       "nome": "MS",
       "secoes_total": 7106,
-      "secoes_apuradas": 7106,
-      "pct_secoes": "100,00%",
-      "votos_validos": 1490278,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 516855,
-      "lula_pct": "34,68%",
-      "bolsonaro_votos": 873351,
-      "bolsonaro_pct": "58,60%",
-      "delta_votos": 356496,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 873351,
-          "pct_str": "58,60%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 516855,
-          "pct_str": "34,68%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 39148,
-          "pct_str": "2,63%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -484,37 +400,30 @@
       "uf": "MT",
       "nome": "MT",
       "secoes_total": 8287,
-      "secoes_apuradas": 8287,
-      "pct_secoes": "100,00%",
-      "votos_validos": 1993288,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 581681,
-      "lula_pct": "29,18%",
-      "bolsonaro_votos": 1298581,
-      "bolsonaro_pct": "65,15%",
-      "delta_votos": 716900,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 1298581,
-          "pct_str": "65,15%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 581681,
-          "pct_str": "29,18%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 40019,
-          "pct_str": "2,01%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -522,37 +431,30 @@
       "uf": "PA",
       "nome": "PA",
       "secoes_total": 20827,
-      "secoes_apuradas": 20827,
-      "pct_secoes": "100,00%",
-      "votos_validos": 4863172,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 2427237,
-      "lula_pct": "49,91%",
-      "bolsonaro_votos": 2163957,
-      "bolsonaro_pct": "44,50%",
-      "delta_votos": 263280,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 2427237,
-          "pct_str": "49,91%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 2163957,
-          "pct_str": "44,50%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 125172,
-          "pct_str": "2,57%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -560,37 +462,30 @@
       "uf": "PB",
       "nome": "PB",
       "secoes_total": 10712,
-      "secoes_apuradas": 10712,
-      "pct_secoes": "100,00%",
-      "votos_validos": 2513747,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 1541127,
-      "lula_pct": "61,31%",
-      "bolsonaro_votos": 831377,
-      "bolsonaro_pct": "33,07%",
-      "delta_votos": 709750,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 1541127,
-          "pct_str": "61,31%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 831377,
-          "pct_str": "33,07%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 73831,
-          "pct_str": "2,94%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -598,37 +493,30 @@
       "uf": "PE",
       "nome": "PE",
       "secoes_total": 21418,
-      "secoes_apuradas": 21418,
-      "pct_secoes": "100,00%",
-      "votos_validos": 5601017,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 3553971,
-      "lula_pct": "63,45%",
-      "bolsonaro_votos": 1738043,
-      "bolsonaro_pct": "31,03%",
-      "delta_votos": 1815928,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 3553971,
-          "pct_str": "63,45%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 1738043,
-          "pct_str": "31,03%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 137960,
-          "pct_str": "2,46%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -636,37 +524,30 @@
       "uf": "PI",
       "nome": "PI",
       "secoes_total": 10225,
-      "secoes_apuradas": 10225,
-      "pct_secoes": "100,00%",
-      "votos_validos": 2146394,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 1523710,
-      "lula_pct": "70,99%",
-      "bolsonaro_votos": 517028,
-      "bolsonaro_pct": "24,09%",
-      "delta_votos": 1006682,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 1523710,
-          "pct_str": "70,99%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 517028,
-          "pct_str": "24,09%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 47692,
-          "pct_str": "2,22%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -674,37 +555,30 @@
       "uf": "PR",
       "nome": "PR",
       "secoes_total": 27142,
-      "secoes_apuradas": 27142,
-      "pct_secoes": "100,00%",
-      "votos_validos": 6585243,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 2054597,
-      "lula_pct": "31,20%",
-      "bolsonaro_votos": 3945345,
-      "bolsonaro_pct": "59,91%",
-      "delta_votos": 1890748,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 3945345,
-          "pct_str": "59,91%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 2054597,
-          "pct_str": "31,20%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 205095,
-          "pct_str": "3,11%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -712,37 +586,30 @@
       "uf": "RJ",
       "nome": "RJ",
       "secoes_total": 37675,
-      "secoes_apuradas": 37675,
-      "pct_secoes": "100,00%",
-      "votos_validos": 9369700,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 3693021,
-      "lula_pct": "39,41%",
-      "bolsonaro_votos": 4966844,
-      "bolsonaro_pct": "53,01%",
-      "delta_votos": 1273823,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 4966844,
-          "pct_str": "53,01%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 3693021,
-          "pct_str": "39,41%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 247397,
-          "pct_str": "2,64%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -750,37 +617,30 @@
       "uf": "RN",
       "nome": "RN",
       "secoes_total": 8115,
-      "secoes_apuradas": 8115,
-      "pct_secoes": "100,00%",
-      "votos_validos": 2071898,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 1237963,
-      "lula_pct": "59,75%",
-      "bolsonaro_votos": 720493,
-      "bolsonaro_pct": "34,77%",
-      "delta_votos": 517470,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 1237963,
-          "pct_str": "59,75%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 720493,
-          "pct_str": "34,77%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 57367,
-          "pct_str": "2,77%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -788,37 +648,30 @@
       "uf": "RO",
       "nome": "RO",
       "secoes_total": 4698,
-      "secoes_apuradas": 4698,
-      "pct_secoes": "100,00%",
-      "votos_validos": 968059,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 250667,
-      "lula_pct": "25,89%",
-      "bolsonaro_votos": 652988,
-      "bolsonaro_pct": "67,45%",
-      "delta_votos": 402321,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 652988,
-          "pct_str": "67,45%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 250667,
-          "pct_str": "25,89%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 25280,
-          "pct_str": "2,61%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -826,37 +679,30 @@
       "uf": "RR",
       "nome": "RR",
       "secoes_total": 1519,
-      "secoes_apuradas": 1519,
-      "pct_secoes": "100,00%",
-      "votos_validos": 325545,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 74420,
-      "lula_pct": "22,86%",
-      "bolsonaro_votos": 231322,
-      "bolsonaro_pct": "71,06%",
-      "delta_votos": 156902,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 231322,
-          "pct_str": "71,06%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 74420,
-          "pct_str": "22,86%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 8579,
-          "pct_str": "2,64%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -864,37 +710,30 @@
       "uf": "RS",
       "nome": "RS",
       "secoes_total": 27547,
-      "secoes_apuradas": 27547,
-      "pct_secoes": "100,00%",
-      "votos_validos": 6423046,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 2294759,
-      "lula_pct": "35,73%",
-      "bolsonaro_votos": 3573783,
-      "bolsonaro_pct": "55,64%",
-      "delta_votos": 1279024,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 3573783,
-          "pct_str": "55,64%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 2294759,
-          "pct_str": "35,73%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 195296,
-          "pct_str": "3,04%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -902,37 +741,30 @@
       "uf": "SC",
       "nome": "SC",
       "secoes_total": 17326,
-      "secoes_apuradas": 17326,
-      "pct_secoes": "100,00%",
-      "votos_validos": 4500897,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 1127168,
-      "lula_pct": "25,04%",
-      "bolsonaro_votos": 3000020,
-      "bolsonaro_pct": "66,65%",
-      "delta_votos": 1872852,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 3000020,
-          "pct_str": "66,65%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 1127168,
-          "pct_str": "25,04%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 134273,
-          "pct_str": "2,98%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -940,37 +772,30 @@
       "uf": "SE",
       "nome": "SE",
       "secoes_total": 5923,
-      "secoes_apuradas": 5923,
-      "pct_secoes": "100,00%",
-      "votos_validos": 1364196,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 856019,
-      "lula_pct": "62,75%",
-      "bolsonaro_votos": 417839,
-      "bolsonaro_pct": "30,63%",
-      "delta_votos": 438180,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 856019,
-          "pct_str": "62,75%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 417839,
-          "pct_str": "30,63%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 38895,
-          "pct_str": "2,85%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -978,37 +803,30 @@
       "uf": "SP",
       "nome": "SP",
       "secoes_total": 103656,
-      "secoes_apuradas": 103656,
-      "pct_secoes": "100,00%",
-      "votos_validos": 24882948,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 9505413,
-      "lula_pct": "38,20%",
-      "bolsonaro_votos": 12922023,
-      "bolsonaro_pct": "51,93%",
-      "delta_votos": 3416610,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 12922023,
-          "pct_str": "51,93%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 9505413,
-          "pct_str": "38,20%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 892368,
-          "pct_str": "3,59%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -1016,37 +834,30 @@
       "uf": "TO",
       "nome": "TO",
       "secoes_total": 4384,
-      "secoes_apuradas": 4384,
-      "pct_secoes": "100,00%",
-      "votos_validos": 930447,
-      "lider": "22",
-      "lider_nome": "Flávio Bolsonaro",
-      "lula_votos": 404009,
-      "lula_pct": "43,42%",
-      "bolsonaro_votos": 469321,
-      "bolsonaro_pct": "50,44%",
-      "delta_votos": 65312,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
+      "lider": "13",
+      "lider_nome": "Lula",
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
-        {
-          "numero": "22",
-          "nome": "Flávio Bolsonaro",
-          "partido": "PL",
-          "votos": 469321,
-          "pct_str": "50,44%"
-        },
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 404009,
-          "pct_str": "43,42%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 22434,
-          "pct_str": "2,41%"
+          "numero": "22",
+          "nome": "Flávio Bolsonaro",
+          "partido": "PL",
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     },
@@ -1054,65 +865,43 @@
       "uf": "ZZ",
       "nome": "ZZ",
       "secoes_total": 1351,
-      "secoes_apuradas": 1351,
-      "pct_secoes": "100,00%",
-      "votos_validos": 330882,
+      "secoes_apuradas": 0,
+      "pct_secoes": "0,00%",
+      "votos_validos": 0,
       "lider": "13",
       "lider_nome": "Lula",
-      "lula_votos": 157387,
-      "lula_pct": "47,57%",
-      "bolsonaro_votos": 143900,
-      "bolsonaro_pct": "43,49%",
-      "delta_votos": 13487,
+      "lula_votos": 0,
+      "lula_pct": "0,00%",
+      "bolsonaro_votos": 0,
+      "bolsonaro_pct": "0,00%",
+      "delta_votos": 0,
       "top3": [
         {
           "numero": "13",
           "nome": "Lula",
           "partido": "PT",
-          "votos": 157387,
-          "pct_str": "47,57%"
+          "votos": 0,
+          "pct_str": "0,00%"
         },
         {
           "numero": "22",
           "nome": "Flávio Bolsonaro",
           "partido": "PL",
-          "votos": 143900,
-          "pct_str": "43,49%"
-        },
-        {
-          "numero": "70",
-          "nome": "Escritor Augusto Cury",
-          "partido": "AVANTE",
-          "votos": 9734,
-          "pct_str": "2,94%"
+          "votos": 0,
+          "pct_str": "0,00%"
         }
       ]
     }
   },
   "pres": {
     "secoes_total": 499248,
-    "secoes_apuradas": 499248,
-    "pct_secoes": "100,00%",
-    "total_votos": 125275835,
-    "votos_validos": 119300788,
-    "brancos": 2300798,
-    "nulos": 3674249,
+    "secoes_apuradas": 0,
+    "pct_secoes": "0,00%",
+    "total_votos": 0,
+    "votos_validos": 0,
+    "brancos": 0,
+    "nulos": 0,
     "candidatos": [
-      {
-        "id": "22",
-        "numero": "22",
-        "sqcand": "280002551544",
-        "nome": "Flávio Bolsonaro",
-        "nome_completo": "FLAVIO NANTES BOLSONARO",
-        "partido": "PL",
-        "votos": 56104503,
-        "pct": 0.47027772356373704,
-        "pct_str": "47,03%",
-        "foto": "fotos/pres_22.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551544.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 15
-      },
       {
         "id": "13",
         "numero": "13",
@@ -1120,161 +909,26 @@
         "nome": "Lula",
         "nome_completo": "LUIZ INÁCIO LULA DA SILVA",
         "partido": "PT",
-        "votos": 53879538,
-        "pct": 0.451627679106361,
-        "pct_str": "45,16%",
+        "votos": 0,
+        "pct": 0,
+        "pct_str": "0,00%",
         "foto": "fotos/pres_13.jpeg",
         "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002542548.jpeg",
         "eleito": false,
-        "ufs_vencidas": 13
+        "ufs_vencidas": 28
       },
       {
-        "id": "70",
-        "numero": "70",
-        "sqcand": "280002551547",
-        "nome": "Escritor Augusto Cury",
-        "nome_completo": "AUGUSTO JORGE CURY",
-        "partido": "AVANTE",
-        "votos": 3448569,
-        "pct": 0.028906506468339505,
-        "pct_str": "2,89%",
-        "foto": "fotos/pres_70.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551547.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "14",
-        "numero": "14",
-        "sqcand": "280002540694",
-        "nome": "Renan Santos",
-        "nome_completo": "RENAN ANTONIO FERREIRA DOS SANTOS",
-        "partido": "MISSÃO",
-        "votos": 2675887,
-        "pct": 0.022429751260318584,
-        "pct_str": "2,24%",
-        "foto": "fotos/pres_14.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002540694.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "55",
-        "numero": "55",
-        "sqcand": "280002551932",
-        "nome": "Ronaldo Caiado",
-        "nome_completo": "RONALDO RAMOS CAIADO",
-        "partido": "PSD",
-        "votos": 2605148,
-        "pct": 0.021836804632002934,
-        "pct_str": "2,18%",
-        "foto": "fotos/pres_55.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551932.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "30",
-        "numero": "30",
-        "sqcand": "280002539826",
-        "nome": "Zema",
-        "nome_completo": "ROMEU ZEMA NETO",
-        "partido": "NOVO",
-        "votos": 326488,
-        "pct": 0.0027366793252027806,
-        "pct_str": "0,27%",
-        "foto": "fotos/pres_30.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002539826.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "80",
-        "numero": "80",
-        "sqcand": "280002538811",
-        "nome": "Samara",
-        "nome_completo": "SAMARA MARTINS DA SILVA FEITOSA",
-        "partido": "UP",
-        "votos": 122911,
-        "pct": 0.001030261426269875,
-        "pct_str": "0,10%",
-        "foto": "fotos/pres_80.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002538811.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "16",
-        "numero": "16",
-        "sqcand": "280002541457",
-        "nome": "Hertz Dias",
-        "nome_completo": "HERTZ DA CONCEICAO DIAS",
-        "partido": "PSTU",
-        "votos": 43103,
-        "pct": 0.00036129685916240554,
-        "pct_str": "0,04%",
-        "foto": "fotos/pres_16.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002541457.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "27",
-        "numero": "27",
-        "sqcand": "280002552484",
-        "nome": "Clariana Barão",
-        "nome_completo": "CLARIANA ZACARKIM BARAO",
-        "partido": "DC",
-        "votos": 40043,
-        "pct": 0.0003356474057824329,
-        "pct_str": "0,03%",
-        "foto": "fotos/pres_27.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002552484.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "21",
-        "numero": "21",
-        "sqcand": "280002551975",
-        "nome": "Edmilson Costa",
-        "nome_completo": "EDMILSON SILVA COSTA",
-        "partido": "PCB",
-        "votos": 22693,
-        "pct": 0.00019021668155284942,
-        "pct_str": "0,02%",
-        "foto": "fotos/pres_21.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551975.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "35",
-        "numero": "35",
-        "sqcand": "280002548139",
-        "nome": "Veterinário Wilson Grassi",
-        "nome_completo": "WILSON GRASSI JUNIOR",
-        "partido": "DEMOCRATA",
-        "votos": 16881,
-        "pct": 0.00014149948447951576,
-        "pct_str": "0,01%",
-        "foto": "fotos/pres_35.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002548139.jpeg",
-        "eleito": false,
-        "ufs_vencidas": 0
-      },
-      {
-        "id": "29",
-        "numero": "29",
-        "sqcand": "280002552487",
-        "nome": "Rui Costa Pimenta",
-        "nome_completo": "RUI COSTA PIMENTA",
-        "partido": "PCO",
-        "votos": 15024,
-        "pct": 0.00012593378679108137,
-        "pct_str": "0,01%",
-        "foto": "fotos/pres_29.jpeg",
-        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002552487.jpeg",
+        "id": "22",
+        "numero": "22",
+        "sqcand": "280002551544",
+        "nome": "Flávio Bolsonaro",
+        "nome_completo": "FLAVIO NANTES BOLSONARO",
+        "partido": "PL",
+        "votos": 0,
+        "pct": 0,
+        "pct_str": "0,00%",
+        "foto": "fotos/pres_22.jpeg",
+        "foto_tse": "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551544.jpeg",
         "eleito": false,
         "ufs_vencidas": 0
       }

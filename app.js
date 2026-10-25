@@ -3252,8 +3252,8 @@
         // Foco total: abre imediatamente no Mapa Interativo e Cidades
         window.switchTab('view-estados');
 
-        // Polling contínuo oficial do TSE a cada 2.5s
-        setInterval(loadData, 2500);
+        // Polling contínuo em tempo real (1.5s - ultra veloz estilo SeuImposto)
+        setInterval(loadData, 1500);
     }
 
     if (document.readyState === 'loading') {
