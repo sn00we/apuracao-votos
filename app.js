@@ -309,16 +309,69 @@
         }
     };
 
+    // --- MOTOR DE STREAM ULTRA-RÁPIDO (ALTA FREQUÊNCIA 800MS - 1000MS) ---
+    let activePollController = null;
+    let lastDataHash = null;
+    let isPolling = false;
+
+    function updateTelemetryUI(latency, engine) {
+        const pill = document.getElementById('header-latency-pill');
+        if (pill) {
+            pill.innerHTML = `⚡ <strong>${latency}ms</strong> • EDGE`;
+            if (latency < 100) {
+                pill.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                pill.style.color = '#6ee7b7';
+            } else if (latency < 250) {
+                pill.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+                pill.style.color = '#fde68a';
+            } else {
+                pill.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                pill.style.color = '#fca5a5';
+            }
+        }
+
+        const mapTele = document.getElementById('map-speed-telemetry');
+        if (mapTele) {
+            mapTele.innerHTML = `⚡ Latência: <strong>${latency}ms</strong> • 1.0s • SP (GRU)`;
+        }
+    }
+
+    function highlightLiveChange() {
+        const liveDot = document.querySelector('.live-dot');
+        if (liveDot) {
+            liveDot.classList.add('flash-gold');
+            setTimeout(() => liveDot.classList.remove('flash-gold'), 600);
+        }
+        audio.beep(1200, 0.03, 'sine', 0.12);
+    }
+
     // --- CARREGAMENTO E SINCRONIZAÇÃO DE DADOS ---
     async function loadData() {
+        const t0 = performance.now();
         try {
-            // Tenta puxar do backend ativo ou do json estático
-            let res = await fetch('/api/tse-live');
+            if (activePollController) {
+                activePollController.abort();
+            }
+            activePollController = new AbortController();
+
+            // Cache buster com timestamp para contornar qualquer cache intermediário
+            let res = await fetch(`/api/tse-live?_=${Date.now()}`, {
+                signal: activePollController.signal,
+                headers: { 'Cache-Control': 'no-cache, no-store' }
+            });
             if (!res.ok) {
                 res = await fetch('dados_tse_atual.json');
             }
             if (res.ok) {
                 const data = await res.json();
+                const latency = Math.round(performance.now() - t0);
+                updateTelemetryUI(latency, data.micro_engine);
+
+                // Detecta mudança nos dados para animação instantânea
+                const newHash = `${data.micro_engine?.seq}_${data.pres?.votos_validos}_${data.pres?.secoes_apuradas}`;
+                const hasChanged = lastDataHash && lastDataHash !== newHash;
+                lastDataHash = newHash;
+
                 state.data = data;
                 state.pres = data.pres || null;
                 state.gov_al = data.gov_al || null;
@@ -328,10 +381,39 @@
                 state.uf_matrix = data.uf_matrix || {};
 
                 renderAllViews();
+
+                if (hasChanged) {
+                    highlightLiveChange();
+                }
             }
         } catch (e) {
-            console.warn('Erro ao carregar dados:', e);
+            if (e.name !== 'AbortError') {
+                console.warn('Erro ao carregar dados:', e);
+            }
         }
+    }
+
+    // Loop adaptativo de alta frequência: 800ms ativo / 3.5s em segundo plano
+    function startFastPolling() {
+        if (isPolling) return;
+        isPolling = true;
+
+        async function step() {
+            const t0 = performance.now();
+            await loadData();
+            const elapsed = performance.now() - t0;
+            const nextDelay = document.hidden ? 3500 : Math.max(700, 1000 - elapsed);
+            setTimeout(step, nextDelay);
+        }
+
+        step();
+
+        // Acorda no mesmo milissegundo quando o usuário volta para a aba
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadData();
+            }
+        });
     }
 
     window.manualRefresh = async function () {
@@ -3252,8 +3334,8 @@
         // Foco total: abre imediatamente no Mapa Interativo e Cidades
         window.switchTab('view-estados');
 
-        // Polling contínuo em tempo real (1.5s - ultra veloz estilo SeuImposto)
-        setInterval(loadData, 1500);
+        // Ativa motor de alta frequência adaptativo (800ms - 1000ms com auto-recuperação)
+        startFastPolling();
     }
 
     if (document.readyState === 'loading') {

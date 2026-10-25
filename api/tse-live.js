@@ -21,7 +21,7 @@ function getBackupData() {
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Cache-Control', 'public, s-maxage=1, stale-while-revalidate=1');
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=1, stale-while-revalidate=1');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -31,9 +31,10 @@ export default async function handler(req, res) {
 
     try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 2800);
+        const timeout = setTimeout(() => controller.abort(), 1800);
 
-        const response = await fetch('https://seuimposto.com/feed/agora.json', {
+        const url = `https://seuimposto.com/feed/agora.json?t=${Date.now()}`;
+        const response = await fetch(url, {
             signal: controller.signal,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -42,7 +43,9 @@ export default async function handler(req, res) {
                 'Sec-Fetch-Dest': 'empty',
                 'Sec-Fetch-Mode': 'cors',
                 'Sec-Fetch-Site': 'same-origin',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache, no-store, max-age=0',
+                'Pragma': 'no-cache'
             }
         });
 
