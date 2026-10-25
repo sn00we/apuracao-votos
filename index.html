@@ -3,932 +3,920 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TSE TOTALIZADOR PRO // BRASIL & ALAGOAS 2026</title>
+    <title>Apuração Eleições 2026 // TSE ao Vivo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="styles.css?v=20261004_mobile_pc">
+    <link rel="stylesheet" href="styles.css?v=20261024_v1">
 </head>
-<body class="theme-oled">
-    <!-- SCANLINE & BACKGROUND FX -->
-    <div class="matrix-bg"></div>
-    <div class="scanlines"></div>
+<body class="theme-clean">
 
-    <!-- TOP BROADCAST HEADER -->
-    <header class="broadcast-header">
-        <div class="header-left">
-            <div class="badge-live">
-                <span class="live-dot"></span>
-                <span>AO VIVO &bull; 04/10/2026</span>
+    <!-- CABEÇALHO PRINCIPAL LIMPO -->
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="brand-area" onclick="window.switchTab('view-presidente')" title="Ir para Presidente">
+                <div class="brand-logo">🗳️</div>
+                <div class="brand-info">
+                    <div class="brand-title-row">
+                        <span class="brand-title">ELEIÇÕES 2026</span>
+                        <span class="live-indicator"><span class="live-dot"></span> SEUIMPOSTO AO VIVO</span>
+                    </div>
+                    <span class="brand-sub" id="header-status-text">100% APURADO • STREAM EM TEMPO REAL (SEUIMPOSTO.COM)</span>
+                </div>
             </div>
-            <div class="tse-branding">
-                <span class="brand-title">TSE &bull; APURAÇÃO OFICIAL ELEIÇÕES 2026</span>
-                <span class="brand-sub">1º TURNO &bull; 04 DE OUTUBRO DE 2026 // TRANSMISSÃO 1.000 Hz (1ms)</span>
-            </div>
-        </div>
 
-        <div class="header-center">
-            <div class="telemetry-pill">
-                <span class="pill-label">DATA:</span>
-                <span class="pill-value text-gold" id="telemetry-date">04/10/2026</span>
-            </div>
-            <div class="telemetry-pill">
-                <span class="pill-label">ÚLTIMO BU TSE:</span>
-                <span class="pill-value text-green" id="telemetry-tse-time">18:13:47</span>
-            </div>
-            <div class="telemetry-pill">
-                <span class="pill-label">VAZÃO:</span>
-                <span class="pill-value text-cyan" id="telemetry-rate">1.482 votos/ms</span>
-            </div>
-            <div class="telemetry-pill">
-                <span class="pill-label">BRASÍLIA (MS):</span>
-                <span class="pill-value text-gold" id="telemetry-clock">18:14:00.000</span>
-            </div>
-        </div>
+            <!-- NAVEGAÇÃO ENTRE ABAS -->
+            <nav class="nav-tabs" id="main-nav-tabs">
+                <button class="nav-tab-btn active" data-target="view-estados" onclick="window.switchTab('view-estados')">
+                    <span class="tab-icon">🗺️</span> <span>Mapa & Cidades</span>
+                </button>
+                <button class="nav-tab-btn" data-target="view-presidente" onclick="window.switchTab('view-presidente')">
+                    <span class="tab-icon">🇧🇷</span> <span>Presidente</span>
+                </button>
+                <button class="nav-tab-btn" data-target="view-segundo-turno" onclick="window.switchTab('view-segundo-turno')">
+                    <span class="tab-icon">🥊</span> <span>2º Turno</span>
+                </button>
+                <button class="nav-tab-btn" data-target="view-comparador" onclick="window.switchTab('view-comparador')">
+                    <span class="tab-icon">⚔️</span> <span>Comparar</span>
+                </button>
+            </nav>
 
-        <div class="header-right">
-            <button id="btn-force-refresh" class="ctrl-btn btn-refresh-glow" title="Consultar novos dados do TSE agora">
-                <span class="icon" id="spin-refresh-icon">🔄</span> <strong id="lbl-refresh" class="btn-text-desktop">ATUALIZAR TSE</strong><strong class="btn-text-mobile">ATUALIZAR</strong>
-            </button>
-            <button id="btn-lula-13" class="ctrl-btn btn-lula-glow" title="Lula 13">
-                <span class="icon">⭐</span> <strong class="btn-text-desktop">LULA 13</strong><strong class="btn-text-mobile">13</strong>
-            </button>
-            <a href="https://github.com/sn00we" target="_blank" rel="noopener noreferrer" class="ctrl-btn btn-github-glow" title="Perfil GitHub @sn00we">
-                <span class="icon">🐙</span> <strong class="btn-text-desktop">@sn00we</strong><strong class="btn-text-mobile">GH</strong>
-            </a>
-            <a href="https://resultados.tse.jus.br/oficial/app/index.html#/eleicao/6257/uf/br/cargo/1/vis/nominal/resultados" target="_blank" rel="noopener noreferrer" class="ctrl-btn hide-on-mobile" style="text-decoration: none; border-color: var(--neon-cyan); color: var(--neon-cyan);" title="Abrir aplicativo oficial de apuração do TSE">
-                <span class="icon">🔗</span> TSE OFICIAL
-            </a>
-            <button id="btn-audio" class="ctrl-btn hide-on-mobile" title="Ativar/Desativar Efeitos Sonoros">
-                <span class="icon">🔊</span> <span id="audio-status">SOM: ON</span>
-            </button>
-            <button id="btn-fullscreen" class="ctrl-btn hide-on-mobile" title="Tela Cheia">
-                <span class="icon">⛶</span> FULLSCREEN
-            </button>
-            <button id="btn-controls" class="ctrl-btn highlight" title="Central de Operações">
-                <span class="icon">⚙️</span> <span class="btn-text-desktop">PAINEL</span>
-            </button>
+            <!-- AÇÕES DO HEADER -->
+            <div class="header-actions">
+                <div class="presence-badge" onclick="window.toggleChat()" title="Pessoas acompanhando agora. Clique para abrir o chat!">
+                    <span class="presence-dot"></span>
+                    <span id="presence-online-val">1 online</span>
+                </div>
+
+                <button class="action-btn" id="btn-toggle-sound" onclick="window.toggleAudio()" title="Ativar/Desativar Sons">
+                    <span id="sound-icon">🔊</span>
+                </button>
+
+                <button class="action-btn chat-btn" onclick="window.toggleChat()" title="Abrir Chat ao Vivo">
+                    <span>💬</span>
+                    <span class="hide-mobile">Chat</span>
+                    <span id="chat-header-badge" class="unread-badge hidden">0</span>
+                </button>
+
+                <button class="action-btn refresh-btn" onclick="window.manualRefresh()" title="Atualizar dados agora">
+                    <span id="refresh-icon">🔄</span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- CONTROL DRAWER / MODAL -->
-    <aside id="control-drawer" class="control-drawer hidden">
-        <div class="drawer-header">
-            <h3>⚙️ CENTRAL DE CONTROLE & SIMULAÇÃO 1ms</h3>
-            <button id="btn-close-drawer" class="btn-close">&times;</button>
+    <!-- BARRA DE PESQUISA INTUITIVA -->
+    <div class="search-bar-wrap">
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="omni-search" class="search-input" placeholder="Buscar candidato (Lula, 22), estado (SP, MG) ou cidade (Campinas, Maceió)..." autocomplete="off">
+            <span class="search-kbd-shortcut hide-mobile" title="Pressione / para buscar">/</span>
+            <button id="search-clear" class="search-clear hidden" onclick="window.clearSearch()">&times;</button>
         </div>
-        <div class="drawer-content">
-
-            <!-- BLOCO DO DESENVOLVEDOR GITHUB -->
-            <div class="ctrl-group author-group">
-                <label>DESENVOLVEDOR & CÓDIGO-FONTE</label>
-                <div class="author-drawer-card">
-                    <div class="author-drawer-top">
-                        <span class="author-avatar-gh">🐙</span>
-                        <div class="author-meta-gh">
-                            <strong>JORGE // @sn00we</strong>
-                            <span>github.com/sn00we</span>
-                        </div>
-                    </div>
-                    <a href="https://github.com/sn00we" target="_blank" rel="noopener noreferrer" class="act-btn primary author-link-btn">
-                        🔗 Acessar GitHub @sn00we
-                    </a>
-                </div>
-            </div>
-
-            <!-- CONTROLES MOBILE RÁPIDOS -->
-            <div class="ctrl-group show-on-mobile-only">
-                <label>UTILITÁRIOS RÁPIDOS</label>
-                <div class="btn-group-scenario">
-                    <button id="btn-audio-mobile" class="act-btn">🔊 Alternar Áudio</button>
-                    <a href="https://resultados.tse.jus.br/oficial/app/index.html#/eleicao/6257/uf/br/cargo/1/vis/nominal/resultados" target="_blank" rel="noopener noreferrer" class="act-btn primary" style="text-decoration:none; text-align:center;">🔗 App Oficial TSE</a>
-                </div>
-            </div>
-
-            <div class="ctrl-group">
-                <label>VELOCIDADE DA APURAÇÃO (FPS/TICK)</label>
-                <div class="btn-group-speed">
-                    <button class="speed-btn" data-speed="0.2">0.2x Lento</button>
-                    <button class="speed-btn active" data-speed="1">1x Normal</button>
-                    <button class="speed-btn" data-speed="3">3x Rápido</button>
-                    <button class="speed-btn" data-speed="10">10x Turbo</button>
-                    <button class="speed-btn" data-speed="50">50x Ultra (1ms)</button>
-                </div>
-            </div>
-
-            <div class="ctrl-group">
-                <label>AÇÕES RÁPIDAS DE CENÁRIO (04/10/2026)</label>
-                <div class="btn-group-scenario">
-                    <button id="btn-sync-now" class="act-btn primary">🕒 Sincronizar com 17:54 (Atual)</button>
-                    <button id="btn-pause" class="act-btn">⏸️ Pausar / Retomar</button>
-                    <button id="btn-virada" class="act-btn warning">⚡ Simular Virada Histórica</button>
-                    <button id="btn-reset" class="act-btn danger">🔄 Reiniciar Apuração (0%)</button>
-                    <button id="btn-finish" class="act-btn success">🏁 Finalizar 100% das Urnas</button>
-                </div>
-            </div>
-
-            <div class="ctrl-group">
-                <label>MODO DE ALIMENTAÇÃO DE DADOS</label>
-                <div class="feed-mode-select">
-                    <label class="radio-label">
-                        <input type="radio" name="feed-mode" value="simulated" checked>
-                        <span>Motor Autônomo Milissegundo (Física Eleitoral 1000Hz)</span>
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="feed-mode" value="tse-custom">
-                        <span>Entrada de Dados Customizada / API Externa</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="ctrl-group">
-                <label>CANDIDATOS OFICIAIS TSE (04/10/2026)</label>
-                <p class="ctrl-hint">Personalize ou consulte os concorrentes oficiais:</p>
-                <div class="edit-inputs">
-                    <div class="input-row">
-                        <span>Pres. 1:</span>
-                        <input type="text" id="edit-p1-name" value="FLÁVIO BOLSONARO" class="custom-input">
-                        <input type="text" id="edit-p1-party" value="PL" class="custom-input input-short">
-                    </div>
-                    <div class="input-row">
-                        <span>Pres. 2:</span>
-                        <input type="text" id="edit-p2-name" value="LULA" class="custom-input">
-                        <input type="text" id="edit-p2-party" value="PT" class="custom-input input-short">
-                    </div>
-                    <div class="input-row">
-                        <span>Gov. AL 1:</span>
-                        <input type="text" id="edit-al1-name" value="RENAN FILHO" class="custom-input">
-                        <input type="text" id="edit-al1-party" value="MDB" class="custom-input input-short">
-                    </div>
-                    <div class="input-row">
-                        <span>Gov. AL 2:</span>
-                        <input type="text" id="edit-al2-name" value="JHC" class="custom-input">
-                        <input type="text" id="edit-al2-party" value="PSDB" class="custom-input input-short">
-                    </div>
-                    <button id="btn-apply-names" class="act-btn primary">Salvar Alterações</button>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ==========================================================================
-         EXECUTIVE NAVIGATION HUB & OMNI-SEARCH SUITE
-         ========================================================================== -->
-    <div class="command-hub">
-        <!-- TOP ROW: SEGMENTED NAVIGATION & MOBILE SELECTOR -->
-        <div class="nav-bar-container">
-            <!-- MOBILE QUICK SELECTOR DROPDOWN -->
-            <div class="mobile-nav-wrapper">
-                <span class="mobile-nav-label">CARGO:</span>
-                <select id="mobile-nav-select" class="mobile-nav-select" aria-label="Seletor de Cargo">
-                    <option value="view-split">⚡ Visão Integrada (BR + AL)</option>
-                    <option value="view-presidente">🇧🇷 Presidente da República</option>
-                    <option value="view-alagoas">🌴 Governador de Alagoas</option>
-                    <option value="view-senado-al">🏛️ Senador por Alagoas</option>
-                    <option value="view-deputado-federal">📋 Deputado Federal (AL) — 9 Vagas</option>
-                    <option value="view-deputado-estadual">🏛️ Deputado Estadual (AL) — 27 Vagas</option>
-                    <option value="view-comparador">⚔️ Confronto Direto (X1) — Comparador</option>
-                    <option value="view-telemetry">📡 Telemetria & Logs 1ms</option>
-                </select>
-            </div>
-
-            <!-- DESKTOP SCROLLABLE SEGMENTED PILLS -->
-            <nav class="nav-tabs" id="main-nav-tabs">
-                <button class="nav-tab active" data-target="view-split">
-                    <span class="tab-icon">⚡</span>
-                    <span class="tab-title">VISÃO INTEGRADA</span>
-                </button>
-                <button class="nav-tab" data-target="view-presidente">
-                    <span class="tab-icon">🇧🇷</span>
-                    <span class="tab-title">PRESIDENTE</span>
-                </button>
-                <button class="nav-tab" data-target="view-alagoas">
-                    <span class="tab-icon">🌴</span>
-                    <span class="tab-title">GOV. ALAGOAS</span>
-                </button>
-                <button class="nav-tab" data-target="view-senado-al">
-                    <span class="tab-icon">🏛️</span>
-                    <span class="tab-title">SENADO (AL)</span>
-                </button>
-                <button class="nav-tab" data-target="view-deputado-federal">
-                    <span class="tab-icon">📋</span>
-                    <span class="tab-title">DEP. FEDERAL</span>
-                    <span class="nav-pill-badge badge-purple">9 Vagas</span>
-                </button>
-                <button class="nav-tab" data-target="view-deputado-estadual">
-                    <span class="tab-icon">🏛️</span>
-                    <span class="tab-title">DEP. ESTADUAL</span>
-                    <span class="nav-pill-badge badge-teal">27 Vagas</span>
-                </button>
-                <button class="nav-tab nav-tab-highlight" data-target="view-comparador">
-                    <span class="tab-icon">⚔️</span>
-                    <span class="tab-title">CONFRONTO DIRETO (X1)</span>
-                    <span class="nav-pill-badge badge-gold">COMPARADOR</span>
-                </button>
-                <button class="nav-tab" data-target="view-telemetry">
-                    <span class="tab-icon">📡</span>
-                    <span class="tab-title">TELEMETRIA 1ms</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- BOTTOM ROW: PROFESSIONAL OMNI-SEARCH BAR WITH FILTERS & DROPDOWN -->
-        <div class="omni-search-bar-wrap">
-            <div class="omni-search-inner">
-                <div class="omni-search-input-box">
-                    <span class="omni-search-icon">🔍</span>
-                    <input type="text" id="omni-search-input" class="omni-search-input" placeholder="Buscar qualquer candidato por nome, cargo, partido ou número em tempo real... (ex: Lula, Bolsonaro, Renan, Arthur Lira, 1111)" autocomplete="off">
-                    <button id="omni-search-clear" class="omni-search-clear hidden" title="Limpar busca">&times;</button>
-                    <span class="omni-kbd-hint hide-on-mobile">Ctrl + K</span>
-                </div>
-                
-                <!-- FILTER PILLS BY RACE -->
-                <div class="omni-filter-chips">
-                    <button class="chip active" data-race="all">TODOS OS CARGOS</button>
-                    <button class="chip" data-race="pres">🇧🇷 PRESIDENTE</button>
-                    <button class="chip" data-race="gov">🌴 GOVERNADOR</button>
-                    <button class="chip" data-race="sen">🏛️ SENADO</button>
-                    <button class="chip" data-race="dep">📋 DEP. FEDERAL</button>
-                    <button class="chip" data-race="est">🏛️ DEP. ESTADUAL</button>
-                </div>
-            </div>
-
-            <!-- FLOATING AUTOCOMPLETE DROPDOWN RESULTS -->
-            <div id="omni-dropdown-results" class="omni-dropdown-results hidden">
-                <div class="dropdown-header">
-                    <span id="omni-results-count">0 candidatos encontrados</span>
-                    <span class="dropdown-tip">Clique no candidato para navegar ou no botão ⚔️ para comparar</span>
-                </div>
-                <div class="dropdown-list" id="omni-results-list">
-                    <!-- Populated dynamically via JS -->
-                </div>
-            </div>
-        </div>
+        <div id="search-results-dropdown" class="search-results-dropdown hidden"></div>
     </div>
 
-    <!-- MAIN DISPLAY CANVAS -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-content">
 
-        <!-- ================= VIEW: SPLIT SCREEN (PRESIDENTE + ALAGOAS) ================= -->
-        <section id="view-split" class="view-panel active">
-            <div class="split-grid">
-                
-                <!-- CARD 1: PRESIDENTE NACIONAL -->
-                <article class="contest-card glass-panel glow-blue" id="contest-pres-split">
-                    <div class="card-header">
-                        <div class="race-identity">
-                            <span class="flag-icon">🇧🇷</span>
-                            <div>
-                                <h2 class="race-title">PRESIDENTE DA REPÚBLICA</h2>
-                                <span class="race-scope">TOTALIZAÇÃO NACIONAL &bull; 1º TURNO 2026</span>
-                            </div>
-                        </div>
-                        <div class="status-box">
-                            <span class="status-indicator live"></span>
-                            <span class="status-text" id="pres-status-badge">APURANDO</span>
-                        </div>
-                    </div>
-
-                    <!-- TOTAL PROGRESS BAR -->
-                    <div class="progress-section">
-                        <div class="progress-labels">
-                            <span>SEÇÕES APURADAS: <strong id="pres-sec-percent" class="numeric">0.0000%</strong></span>
-                            <span>URNAS: <strong id="pres-sec-count" class="numeric">0 / 472.075</strong></span>
-                        </div>
-                        <div class="progress-bar-wrap">
-                            <div class="progress-bar-fill bg-cyan" id="pres-progress-bar" style="width: 0%;">
-                                <span class="glow-edge"></span>
-                            </div>
-                            <div class="marker-50" title="Linha de 50% dos votos">50%</div>
-                        </div>
-                        <div class="sub-progress-stats">
-                            <span>TOTAL VOTOS: <strong id="pres-total-votos" class="numeric">0</strong></span>
-                            <span>VOTOS VÁLIDOS: <strong id="pres-votos-validos" class="numeric">0 (0.00%)</strong></span>
-                            <span>BRANCOS/NULOS: <strong id="pres-brancos-nulos" class="numeric">0 (0.00%)</strong></span>
-                        </div>
-                    </div>
-
-                    <!-- LEADING CANDIDATES RANKING -->
-                    <div class="candidates-list" id="pres-candidates-container">
-                        <!-- Injected via JS -->
-                    </div>
-
-                    <!-- LEAD MARGIN HUD -->
-                    <div class="margin-hud">
-                        <div class="hud-item">
-                            <span class="hud-label">DIFERENÇA ENTRE 1º E 2º:</span>
-                            <span class="hud-val text-gold numeric" id="pres-margin-diff">0 votos</span>
-                        </div>
-                        <div class="hud-item">
-                            <span class="hud-label">VARIAÇÃO / SEGUNDO:</span>
-                            <span class="hud-val text-green numeric" id="pres-margin-rate">+0 votos/s</span>
-                        </div>
-                        <div class="hud-item">
-                            <span class="hud-label">PROJEÇÃO MATEMÁTICA:</span>
-                            <span class="hud-val text-white" id="pres-projection">AGUARDANDO QUÓRUM</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- CARD 2: GOVERNO DE ALAGOAS -->
-                <article class="contest-card glass-panel glow-teal" id="contest-gov-split">
-                    <div class="card-header">
-                        <div class="race-identity">
-                            <span class="flag-icon">🌴</span>
-                            <div>
-                                <h2 class="race-title">GOVERNADOR DE ALAGOAS</h2>
-                                <span class="race-scope">ESTADO DE ALAGOAS &bull; PALÁCIO REPÚBLICA DOS PALMARES</span>
-                            </div>
-                        </div>
-                        <div class="status-box">
-                            <span class="status-indicator live"></span>
-                            <span class="status-text" id="gov-status-badge">APURANDO</span>
-                        </div>
-                    </div>
-
-                    <!-- TOTAL PROGRESS BAR -->
-                    <div class="progress-section">
-                        <div class="progress-labels">
-                            <span>SEÇÕES APURADAS: <strong id="gov-sec-percent" class="numeric">0.0000%</strong></span>
-                            <span>URNAS: <strong id="gov-sec-count" class="numeric">0 / 7.218</strong></span>
-                        </div>
-                        <div class="progress-bar-wrap">
-                            <div class="progress-bar-fill bg-teal" id="gov-progress-bar" style="width: 0%;">
-                                <span class="glow-edge"></span>
-                            </div>
-                            <div class="marker-50" title="Linha de 50% dos votos">50%</div>
-                        </div>
-                        <div class="sub-progress-stats">
-                            <span>TOTAL ALAGOAS: <strong id="gov-total-votos" class="numeric">0</strong></span>
-                            <span>VOTOS VÁLIDOS: <strong id="gov-votos-validos" class="numeric">0 (0.00%)</strong></span>
-                            <span>MACEIÓ APURADA: <strong id="gov-maceio-percent" class="numeric">0.00%</strong></span>
-                        </div>
-                    </div>
-
-                    <!-- LEADING CANDIDATES RANKING -->
-                    <div class="candidates-list" id="gov-candidates-container">
-                        <!-- Injected via JS -->
-                    </div>
-
-                    <!-- ALAGOAS REGIONAL RADAR -->
-                    <div class="margin-hud">
-                        <div class="hud-item">
-                            <span class="hud-label">VANTAGEM LÍDER AL:</span>
-                            <span class="hud-val text-gold numeric" id="gov-margin-diff">0 votos</span>
-                        </div>
-                        <div class="hud-item">
-                            <span class="hud-label">MUNICÍPIO DESTAQUE:</span>
-                            <span class="hud-val text-cyan" id="gov-active-city">Maceió - 1ª Zona Eleitoral</span>
-                        </div>
-                        <div class="hud-item">
-                            <span class="hud-label">PROJEÇÃO ALAGOAS:</span>
-                            <span class="hud-val text-white" id="gov-projection">EM APURAÇÃO</span>
-                        </div>
-                    </div>
-                </article>
-
-            </div>
-
-            <!-- BOTTON LIVE TICKER STRIP -->
-            <div class="bottom-ticker">
-                <div class="ticker-title">
-                    <span class="pulse-icon"></span>
-                    <span>FEED DE URNAS MILISSEGUNDO:</span>
-                </div>
-                <div class="ticker-wrapper">
-                    <div class="ticker-content" id="live-stream-ticker">
-                        <!-- Urna stream injected by ticker -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= VIEW: PRESIDENTE FULL SCREEN ================= -->
+        <!-- ========================================== -->
+        <!-- ABA 1: PRESIDENTE (TOTALIZAÇÃO NACIONAL) -->
+        <!-- ========================================== -->
         <section id="view-presidente" class="view-panel">
-            <div class="single-race-hero glass-panel">
-                <div class="race-hero-header">
-                    <div class="hero-titles">
-                        <span class="kicker">BRASIL &bull; ELEIÇÃO PRESIDENCIAL 2026</span>
-                        <h1>TOTALIZAÇÃO NACIONAL DOS VOTOS PARA PRESIDENTE</h1>
-                        <p class="hero-desc">Dados consolidados de todas as 27 Unidades Federativas + Votação no Exterior</p>
+            
+            <!-- CARD DE PROGRESSO NACIONAL -->
+            <div class="summary-banner">
+                <div class="summary-progress-top">
+                    <div class="summary-metric">
+                        <span class="metric-label">SEÇÕES APURADAS</span>
+                        <strong class="metric-value highlight" id="pres-pct-secoes">100,00%</strong>
+                        <span class="metric-sub" id="pres-secoes-ratio">499.248 de 499.248</span>
                     </div>
-                    <div class="hero-mega-stats">
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">SEÇÕES ELEITORAIS</span>
-                            <span class="stat-number numeric" id="hero-pres-secoes">0.0000%</span>
-                            <span class="stat-sub" id="hero-pres-urnas-ratio">0 de 472.075</span>
-                        </div>
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">ELEITORADO APURADO</span>
-                            <span class="stat-number numeric text-cyan" id="hero-pres-eleitores">0</span>
-                            <span class="stat-sub">VOTOS TOTAIS COMPUTADOS</span>
+                    <div class="summary-metric">
+                        <span class="metric-label">TOTAL DE VOTOS</span>
+                        <strong class="metric-value" id="pres-total-votos">119.300.788</strong>
+                        <span class="metric-sub" id="pres-validos-info">100% apurado</span>
+                    </div>
+                    <div class="summary-metric">
+                        <span class="metric-label">VOTOS VÁLIDOS</span>
+                        <strong class="metric-value" id="pres-votos-validos">119.300.788</strong>
+                        <span class="metric-sub">Brancos: 382.410 | Nulos: 643.645</span>
+                    </div>
+                    <div class="summary-metric">
+                        <span class="metric-label">STATUS OFICIAL</span>
+                        <div class="status-pill status-turn2">🚨 2º TURNO CONFIRMADO</div>
+                        <span class="metric-sub">Disputa em 25 de Outubro</span>
+                    </div>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="pres-bar-fill" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- HERO: DUELO DOS LÍDERES (FLAVIO BOLSONARO VS LULA) -->
+            <div class="duel-hero-card">
+                <div class="duel-side cand-side-right" id="hero-cand-right">
+                    <div class="cand-avatar-wrap">
+                        <img id="hero-foto-22" src="fotos/pres_22.jpeg" alt="Flávio Bolsonaro" class="cand-avatar">
+                        <span class="cand-number-badge pl-color">22</span>
+                    </div>
+                    <div class="cand-details">
+                        <span class="cand-party pl-color">PL &bull; 22</span>
+                        <h2 class="cand-name" id="hero-name-22">FLÁVIO BOLSONARO</h2>
+                        <div class="cand-votes-wrap">
+                            <span class="cand-pct pl-color" id="hero-pct-22">47,03%</span>
+                            <span class="cand-votes" id="hero-votes-22">56.104.503 votos</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- DETAILED CANDIDATES EXPANDED -->
-                <div class="detailed-candidates-grid" id="pres-detailed-grid">
-                    <!-- Cards de detalhe ampliado com foto, partido, número, % e gráfico de barra -->
+                <div class="duel-center">
+                    <div class="duel-badge">VS</div>
+                    <div class="duel-delta-box">
+                        <span class="delta-label">DIFERENÇA DE VOTOS</span>
+                        <strong class="delta-val" id="hero-delta-votos">2.224.965</strong>
+                        <span class="delta-pct" id="hero-delta-pct">1,87% à frente</span>
+                    </div>
                 </div>
 
-                <!-- REGIONAL UF BREAKDOWN -->
-                <div class="uf-matrix-section">
-                    <h3>⚡ TRANSMISSÃO POR ESTADOS (DESTAQUE ALAGOAS & GRANDES COLÉGIOS)</h3>
-                    <div class="uf-cards-row" id="uf-telemetry-row">
-                        <!-- Cards de SP, MG, RJ, BA, RS, ALAGOAS -->
+                <div class="duel-side cand-side-left" id="hero-cand-left">
+                    <div class="cand-avatar-wrap">
+                        <img id="hero-foto-13" src="fotos/pres_13.jpeg" alt="Lula" class="cand-avatar">
+                        <span class="cand-number-badge pt-color">13</span>
+                    </div>
+                    <div class="cand-details">
+                        <span class="cand-party pt-color">PT &bull; 13</span>
+                        <h2 class="cand-name" id="hero-name-13">LULA</h2>
+                        <div class="cand-votes-wrap">
+                            <span class="cand-pct pt-color" id="hero-pct-13">45,17%</span>
+                            <span class="cand-votes" id="hero-votes-13">53.879.538 votos</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- ================= VIEW: ALAGOAS FULL SCREEN ================= -->
-        <section id="view-alagoas" class="view-panel">
-            <div class="single-race-hero glass-panel">
-                <div class="race-hero-header">
-                    <div class="hero-titles">
-                        <span class="kicker">ALAGOAS &bull; GOVERNO DO ESTADO 2026</span>
-                        <h1>TOTALIZAÇÃO OFICIAL PARA O GOVERNO DE ALAGOAS</h1>
-                        <p class="hero-desc">Monitoramento ao vivo dos 102 municípios alagoanos e 7.218 seções eleitorais</p>
-                    </div>
-                    <div class="hero-mega-stats">
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">SEÇÕES DE ALAGOAS</span>
-                            <span class="stat-number numeric" id="hero-gov-secoes">0.0000%</span>
-                            <span class="stat-sub" id="hero-gov-urnas-ratio">0 de 7.218</span>
-                        </div>
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">VOTOS APURADOS EM AL</span>
-                            <span class="stat-number numeric text-teal" id="hero-gov-eleitores">0</span>
-                            <span class="stat-sub">ELEITORADO ESTIMADO: 2.325.656</span>
-                        </div>
-                    </div>
+            <!-- BARRA DE DISPUTA DIRETA (CABO DE GUERRA PROPORCIONAL) -->
+            <div class="tug-bar-wrap">
+                <div class="tug-bar">
+                    <div class="tug-fill-pl" id="hero-tug-pl" style="width: 51%;"></div>
+                    <div class="tug-fill-pt" id="hero-tug-pt" style="width: 49%;"></div>
+                </div>
+                <div class="tug-legend">
+                    <span class="pl-color">● Flávio Bolsonaro (51,0%)</span>
+                    <span class="pt-color">Lula (49,0%) ●</span>
+                </div>
+            </div>
+
+            <!-- LISTA COMPLETA DOS DEMAIS CANDIDATOS -->
+            <div class="section-block">
+                <div class="section-header">
+                    <h3 class="section-title">Classificação Completa dos Candidatos</h3>
+                    <span class="section-sub">Total de votos apurados no Brasil e exterior</span>
                 </div>
 
-                <!-- ALAGOAS CANDIDATES DETAILED -->
-                <div class="detailed-candidates-grid" id="gov-detailed-grid">
-                    <!-- Cards governadores -->
-                </div>
-
-                <!-- MUNICIPALITIES OF ALAGOAS BREAKDOWN -->
-                <div class="alagoas-cities-section">
-                    <h3>🌴 APURAÇÃO NOS PRINCIPAIS MUNICÍPIOS DE ALAGOAS</h3>
-                    <div class="cities-grid" id="alagoas-cities-grid">
-                        <!-- Maceió, Arapiraca, Rio Largo, Palmeira dos Índios, etc. -->
+                <div class="candidates-table-wrap">
+                    <div class="candidates-list" id="pres-candidates-full-list">
+                        <!-- Gerado dinamicamente -->
                     </div>
                 </div>
             </div>
+
         </section>
 
-        <!-- ================= VIEW: SENADO & CÂMARA ALAGOAS ================= -->
-        <section id="view-senado-al" class="view-panel">
-            <div class="split-grid">
-                <!-- SENADO ALAGOAS -->
-                <article class="contest-card glass-panel">
-                    <div class="card-header">
-                        <div class="race-identity">
-                            <span class="flag-icon">🏛️</span>
-                            <div>
-                                <h2 class="race-title">SENADO POR ALAGOAS (2026)</h2>
-                                <span class="race-scope">DUAS VAGAS EM DISPUTA &bull; RENOVAÇÃO DE 2/3 &bull; MANDATO 8 ANOS</span>
-                            </div>
-                        </div>
-                        <span class="status-indicator live"></span>
-                    </div>
-                    <div class="progress-section">
-                        <div class="progress-labels">
-                            <span>APURAÇÃO: <strong id="sen-sec-percent" class="numeric">0.0000%</strong></span>
-                            <span>URNAS: <strong id="sen-sec-count" class="numeric">0 / 7.218</strong></span>
-                        </div>
-                        <div class="progress-bar-wrap">
-                            <div class="progress-bar-fill bg-gold" id="sen-progress-bar" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <div class="candidates-list" id="sen-candidates-container">
-                        <!-- Injected via JS -->
-                    </div>
-                </article>
-
-                <!-- DEPUTADOS FEDERAIS MAIS VOTADOS AL -->
-                <article class="contest-card glass-panel">
-                    <div class="card-header">
-                        <div class="race-identity">
-                            <span class="flag-icon">📋</span>
-                            <div>
-                                <h2 class="race-title">DEPUTADO FEDERAL - ALAGOAS</h2>
-                                <span class="race-scope">TOP CANDIDATOS MAIS VOTADOS (9 VAGAS)</span>
-                            </div>
-                        </div>
-                        <span class="status-indicator live"></span>
-                    </div>
-                    <div class="progress-section">
-                        <div class="progress-labels">
-                            <span>APURAÇÃO GERAL: <strong id="dep-sec-percent" class="numeric">0.0000%</strong></span>
-                            <span>VOTOS NOMINAIS/LEGENDA: <strong id="dep-total-votos" class="numeric">0</strong></span>
-                        </div>
-                        <div class="progress-bar-wrap">
-                            <div class="progress-bar-fill bg-purple" id="dep-progress-bar" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <div class="candidates-list deputies-list" id="dep-candidates-container">
-                        <!-- Injected via JS -->
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <!-- ================= VIEW: DEPUTADO FEDERAL (ALAGOAS - 9 VAGAS) ================= -->
-        <section id="view-deputado-federal" class="view-panel">
-            <div class="single-race-hero glass-panel glow-purple">
-                <div class="race-hero-header">
-                    <div class="hero-titles">
-                        <span class="kicker text-purple">CONGRESSO NACIONAL // CÂMARA DOS DEPUTADOS</span>
-                        <h1>📋 DEPUTADO FEDERAL POR ALAGOAS (2026)</h1>
-                        <span class="hero-desc">BANCADA FEDERAL DE ALAGOAS &bull; 9 VAGAS EM DISPUTA &bull; QUOCIENTE ELEITORAL E SOBRAS</span>
-                    </div>
-                    <div class="hero-mega-stats">
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">SEÇÕES APURADAS</span>
-                            <span class="stat-number text-purple numeric" id="fed-sec-percent">0.00%</span>
-                            <span class="stat-sub" id="fed-sec-count">0 / 7.101 urnas</span>
-                        </div>
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">VOTOS VÁLIDOS</span>
-                            <span class="stat-number text-cyan numeric" id="fed-votos-validos">0</span>
-                            <span class="stat-sub" id="fed-total-votos">TOTAL: 0 votos</span>
-                        </div>
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">VAGAS EM DISPUTA</span>
-                            <span class="stat-number text-gold">9 VAGAS</span>
-                            <span class="stat-sub">TOP 9 ELEITOS PROJETADOS</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PROGRESS BAR -->
-                <div class="progress-section">
-                    <div class="progress-labels">
-                        <span>TOTALIZAÇÃO GERAL (AL): <strong id="fed-progress-label" class="numeric text-purple">0.0000%</strong></span>
-                        <span class="text-dim">ATUALIZAÇÃO DIRETA DA CDN DO TSE (1ms)</span>
-                    </div>
-                    <div class="progress-bar-wrap">
-                        <div class="progress-bar-fill bg-purple" id="fed-progress-bar" style="width: 0%;">
-                            <span class="glow-edge"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FILTRO DE BUSCA -->
-                <div class="filter-bar">
-                    <div class="search-input-wrap">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="filter-fed" class="custom-input filter-search-input" placeholder="Buscar deputado federal por nome, número ou partido (ex: Alvinho Lira, Luciano Amaral, 1111, PP)...">
-                    </div>
-                    <div class="filter-count text-muted" id="fed-count-pill">Exibindo candidatos</div>
-                </div>
-
-                <!-- GRID DETALHADO DOS CANDIDATOS FEDERAIS -->
-                <div class="detailed-candidates-grid" id="fed-detailed-grid">
-                    <!-- Injetado via JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= VIEW: DEPUTADO ESTADUAL (ALAGOAS - 27 VAGAS) ================= -->
-        <section id="view-deputado-estadual" class="view-panel">
-            <div class="single-race-hero glass-panel glow-teal">
-                <div class="race-hero-header">
-                    <div class="hero-titles">
-                        <span class="kicker text-teal">ASSEMBLEIA LEGISLATIVA DE ALAGOAS // ALEAL</span>
-                        <h1>🏛️ DEPUTADO ESTADUAL POR ALAGOAS (2026)</h1>
-                        <span class="hero-desc">PALÁCIO TAVARES BASTOS &bull; 27 VAGAS EM DISPUTA &bull; QUOCIENTE ELEITORAL E PARTIDÁRIO</span>
-                    </div>
-                    <div class="hero-mega-stats">
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">SEÇÕES APURADAS</span>
-                            <span class="stat-number text-teal numeric" id="est-sec-percent">0.00%</span>
-                            <span class="stat-sub" id="est-sec-count">0 / 7.101 urnas</span>
-                        </div>
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">VOTOS VÁLIDOS</span>
-                            <span class="stat-number text-cyan numeric" id="est-votos-validos">0</span>
-                            <span class="stat-sub" id="est-total-votos">TOTAL: 0 votos</span>
-                        </div>
-                        <div class="mega-stat-box">
-                            <span class="stat-caption">VAGAS EM DISPUTA</span>
-                            <span class="stat-number text-gold">27 VAGAS</span>
-                            <span class="stat-sub">TOP 27 ELEITOS PROJETADOS</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PROGRESS BAR -->
-                <div class="progress-section">
-                    <div class="progress-labels">
-                        <span>TOTALIZAÇÃO GERAL (AL): <strong id="est-progress-label" class="numeric text-teal">0.0000%</strong></span>
-                        <span class="text-dim">ATUALIZAÇÃO DIRETA DA CDN DO TSE (1ms)</span>
-                    </div>
-                    <div class="progress-bar-wrap">
-                        <div class="progress-bar-fill bg-teal" id="est-progress-bar" style="width: 0%;">
-                            <span class="glow-edge"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FILTRO DE BUSCA -->
-                <div class="filter-bar">
-                    <div class="search-input-wrap">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="filter-est" class="custom-input filter-search-input" placeholder="Buscar deputado estadual por nome, número ou partido (ex: Marcelo Victor, Cabo Bebeto, 15789, MDB)...">
-                    </div>
-                    <div class="filter-count text-muted" id="est-count-pill">Exibindo candidatos</div>
-                </div>
-
-                <!-- GRID DETALHADO DOS CANDIDATOS ESTADUAIS -->
-                <div class="detailed-candidates-grid" id="est-detailed-grid">
-                    <!-- Injetado via JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= VIEW: COMPARADOR DIRETO // HEAD-TO-HEAD (X1) ================= -->
-        <section id="view-comparador" class="view-panel">
-            <div class="comparador-hero glass-panel glow-gold">
-                <!-- HERO TITLE & STATUS -->
-                <div class="comparador-header">
-                    <div class="comp-title-group">
-                        <span class="kicker text-gold">RADAR BI-NOMINAL // HEAD-TO-HEAD</span>
-                        <h1>⚔️ CONFRONTO DIRETO DE CANDIDATOS (X1)</h1>
-                        <span class="comp-desc">ANÁLISE COMPARATIVA MATEMÁTICA EM TEMPO REAL &bull; VANTAGEM NOMINAL, RELAÇÃO DIRETA E PROJEÇÃO DE VIRADA</span>
-                    </div>
-                    <div class="comp-badge-live">
-                        <span class="pulse-icon pulse-gold"></span>
-                        <span>SISTEMA DE DUELO 1.000 Hz</span>
-                    </div>
-                </div>
-
-                <!-- PRESET DUEL SHORTCUTS -->
-                <div class="duel-presets-bar">
-                    <span class="presets-label">⚡ CONFRONTOS HISTÓRICOS RÁPIDOS:</span>
-                    <div class="preset-buttons">
-                        <button class="preset-btn active" data-preset="lula-bolsonaro">
-                            🇧🇷 LULA vs BOLSONARO
-                        </button>
-                        <button class="preset-btn" data-preset="renan-jhc">
-                            🌴 RENAN FILHO vs JHC
-                        </button>
-                        <button class="preset-btn" data-preset="lira-marina">
-                            🏛️ ARTHUR LIRA vs MARINA JHC
-                        </button>
-                        <button class="preset-btn" data-preset="alvinho-luciano">
-                            📋 ALVINHO LIRA vs LUCIANO AMARAL
-                        </button>
-                        <button class="preset-btn" data-preset="marcelo-bebeto">
-                            🏛️ MARCELO VICTOR vs CABO BEBETO
-                        </button>
-                    </div>
-                </div>
-
-                <!-- CANDIDATE SELECTION BAR -->
-                <div class="duel-selector-bar">
-                    <div class="selector-field">
-                        <label for="duel-select-cargo">CARGO EM DISPUTA:</label>
-                        <select id="duel-select-cargo" class="custom-select">
-                            <option value="pres">🇧🇷 Presidente da República (BR)</option>
-                            <option value="gov">🌴 Governador de Alagoas (AL)</option>
-                            <option value="sen">🏛️ Senador por Alagoas (AL)</option>
-                            <option value="dep">📋 Deputado Federal por Alagoas (AL)</option>
-                            <option value="est">🏛️ Deputado Estadual por Alagoas (AL)</option>
-                            <option value="all">🌐 Duelo Cruzado / Qualquer Cargo</option>
-                        </select>
-                    </div>
-
-                    <div class="selector-field cand-select-field">
-                        <label for="duel-select-cand-a">CANDIDATO "A":</label>
-                        <select id="duel-select-cand-a" class="custom-select select-cand">
-                            <!-- Populated dynamically via JS -->
-                        </select>
-                    </div>
-
-                    <button id="duel-btn-swap" class="btn-swap-cands" title="Inverter Candidatos (A ⇄ B)">
-                        <span class="swap-icon">⇄</span>
-                        <small>INVERTER</small>
-                    </button>
-
-                    <div class="selector-field cand-select-field">
-                        <label for="duel-select-cand-b">CANDIDATO "B":</label>
-                        <select id="duel-select-cand-b" class="custom-select select-cand">
-                            <!-- Populated dynamically via JS -->
-                        </select>
-                    </div>
-                </div>
-
-                <!-- HEAD-TO-HEAD DUEL ARENA -->
-                <div class="duel-arena">
-                    <!-- CARD CANDIDATE A -->
-                    <div class="duel-fighter-card fighter-a" id="duel-card-a">
-                        <div class="fighter-badge" id="fighter-badge-a">LÍDER DO CONFRONTO</div>
-                        <div class="fighter-avatar-wrap">
-                            <div class="fighter-avatar-box" id="fighter-avatar-a">
-                                <!-- Photo or icon injected via JS -->
-                            </div>
-                        </div>
-                        <div class="fighter-info">
-                            <h2 class="fighter-name" id="fighter-name-a">LULA</h2>
-                            <span class="fighter-meta" id="fighter-meta-a">PT &bull; Nº 13 &bull; LUIZ INÁCIO LULA DA SILVA</span>
-                            <span class="fighter-cargo-pill" id="fighter-cargo-a">PRESIDENTE DA REPÚBLICA</span>
-                        </div>
-                        <div class="fighter-stats">
-                            <div class="fighter-pct numeric text-cyan" id="fighter-pct-a">0.0000%</div>
-                            <div class="fighter-votes numeric" id="fighter-votes-a">0 VOTOS</div>
-                            <div class="progress-bar-wrap" style="height: 10px; margin-top: 10px;">
-                                <div class="progress-bar-fill bg-cyan" id="fighter-bar-a" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- VS CENTER HUD & DIFFERENTIAL -->
-                    <div class="vs-center-hud">
-                        <div class="vs-circle">VS</div>
-                        <div class="lead-diff-box">
-                            <span class="diff-title">VANTAGEM NOMINAL</span>
-                            <span class="diff-value numeric text-gold" id="duel-diff-votes">+0 VOTOS</span>
-                            <span class="diff-pct numeric text-white" id="duel-diff-pct">+0.00%</span>
-                        </div>
-
-                        <!-- BARRA RELATIVA DIRETA DE DOMÍNIO (100% ENTRE OS DOIS) -->
-                        <div class="relative-dominance-box">
-                            <div class="dominance-labels">
-                                <span id="dom-label-a" class="text-cyan numeric">50.0%</span>
-                                <span class="dom-mid">PROPORÇÃO DIRETA</span>
-                                <span id="dom-label-b" class="text-teal numeric">50.0%</span>
-                            </div>
-                            <div class="split-bar-track">
-                                <div class="split-fill-a bg-cyan" id="dom-bar-a" style="width: 50%;"></div>
-                                <div class="split-divider"></div>
-                                <div class="split-fill-b bg-teal" id="dom-bar-b" style="width: 50%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- PROJEÇÃO DE VIRADA / NECESSIDADE MATEMÁTICA -->
-                        <div class="projection-callout" id="duel-turnaround-box">
-                            <span class="proj-badge">PROJEÇÃO MATEMÁTICA</span>
-                            <p id="duel-turnaround-text">Calculando margem de apuração e quórum para virada...</p>
-                        </div>
-                    </div>
-
-                    <!-- CARD CANDIDATE B -->
-                    <div class="duel-fighter-card fighter-b" id="duel-card-b">
-                        <div class="fighter-badge" id="fighter-badge-b">SEGUNDO COLOCADO</div>
-                        <div class="fighter-avatar-wrap">
-                            <div class="fighter-avatar-box" id="fighter-avatar-b">
-                                <!-- Photo or icon injected via JS -->
-                            </div>
-                        </div>
-                        <div class="fighter-info">
-                            <h2 class="fighter-name" id="fighter-name-b">FLÁVIO BOLSONARO</h2>
-                            <span class="fighter-meta" id="fighter-meta-b">PL &bull; Nº 22 &bull; FLAVIO NANTES BOLSONARO</span>
-                            <span class="fighter-cargo-pill" id="fighter-cargo-b">PRESIDENTE DA REPÚBLICA</span>
-                        </div>
-                        <div class="fighter-stats">
-                            <div class="fighter-pct numeric text-teal" id="fighter-pct-b">0.0000%</div>
-                            <div class="fighter-votes numeric" id="fighter-votes-b">0 VOTOS</div>
-                            <div class="progress-bar-wrap" style="height: 10px; margin-top: 10px;">
-                                <div class="progress-bar-fill bg-teal" id="fighter-bar-b" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DETAILED METRIC BREAKDOWN MATRIX -->
-                <div class="duel-metrics-matrix">
-                    <div class="matrix-card">
-                        <span class="matrix-title">VOTOS VÁLIDOS (SHARE OFICIAL)</span>
-                        <div class="matrix-compare-row">
-                            <strong class="text-cyan numeric" id="mat-share-a">0.00%</strong>
-                            <span class="matrix-vs">vs</span>
-                            <strong class="text-teal numeric" id="mat-share-b">0.00%</strong>
-                        </div>
-                        <div class="matrix-sub" id="mat-share-sub">Diferença de 0 pontos percentuais</div>
-                    </div>
-
-                    <div class="matrix-card">
-                        <span class="matrix-title">TOTAL DE VOTOS NOMINAIS</span>
-                        <div class="matrix-compare-row">
-                            <strong class="text-cyan numeric" id="mat-votes-a">0</strong>
-                            <span class="matrix-vs">vs</span>
-                            <strong class="text-teal numeric" id="mat-votes-b">0</strong>
-                        </div>
-                        <div class="matrix-sub" id="mat-votes-sub">Total acumulado apurado nas urnas</div>
-                    </div>
-
-                    <div class="matrix-card">
-                        <span class="matrix-title">DOMÍNIO RELATIVO ENTRE OS DOIS</span>
-                        <div class="matrix-compare-row">
-                            <strong class="text-cyan numeric" id="mat-dom-a">50.0%</strong>
-                            <span class="matrix-vs">vs</span>
-                            <strong class="text-teal numeric" id="mat-dom-b">50.0%</strong>
-                        </div>
-                        <div class="matrix-sub">Considerando apenas a soma dos 2 concorrentes</div>
-                    </div>
-
-                    <div class="matrix-card">
-                        <span class="matrix-title">STATUS ELEITORAL NO CARGO</span>
-                        <div class="matrix-compare-row">
-                            <span class="cand-badge" id="mat-status-a">EM DISPUTA</span>
-                            <span class="matrix-vs">vs</span>
-                            <span class="cand-badge" id="mat-status-b">EM DISPUTA</span>
-                        </div>
-                        <div class="matrix-sub" id="mat-status-sub">Situação perante totalização oficial</div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================= VIEW: TELEMETRIA E LOGS DE MILISSEGUNDOS ================= -->
-        <section id="view-telemetry" class="view-panel">
-            <div class="telemetry-dashboard glass-panel">
-                <div class="telemetry-header">
-                    <h2>📡 FLUXO DE TRANSMISSÃO DE URNAS EM TEMPO REAL</h2>
-                    <span class="terminal-status">SOCKET PROTOCOL: BUFFER STREAM 1ms &bull; PORTA: SECURE BROADCAST</span>
-                </div>
+        <!-- ========================================== -->
+        <!-- ABA 2: SEGUNDO TURNO (25/10/2026) -->
+        <!-- ========================================== -->
+        <section id="view-segundo-turno" class="view-panel">
+            <div class="section-block">
                 
-                <div class="telemetry-columns">
-                    <div class="telemetry-col">
-                        <h3>LOG DE PACOTES DE URNAS ELETRÔNICAS (BUs PROCESSADOS)</h3>
-                        <div class="terminal-window" id="terminal-bus-log">
-                            <!-- Stream lines -->
+                <!-- CONTAGEM REGRESSIVA PARA 25/10/2026 -->
+                <div class="countdown-hero">
+                    <span class="countdown-badge">🗓️ CONTAGEM REGRESSIVA OFICIAL // SEGUNDO TURNO</span>
+                    <h2 class="section-title big">Lula 13 vs Flávio Bolsonaro 22</h2>
+                    <p class="section-desc">Eleição decisiva em 25 de Outubro de 2026 &bull; Meta da vitória: 50% + 1 voto (59.650.395 votos)</p>
+                    
+                    <div class="countdown-timer-grid">
+                        <div class="timer-box">
+                            <span class="timer-num" id="cd-days">00</span>
+                            <span class="timer-lbl">DIAS</span>
+                        </div>
+                        <div class="timer-box">
+                            <span class="timer-num" id="cd-hours">00</span>
+                            <span class="timer-lbl">HORAS</span>
+                        </div>
+                        <div class="timer-box">
+                            <span class="timer-num" id="cd-minutes">00</span>
+                            <span class="timer-lbl">MINUTOS</span>
+                        </div>
+                        <div class="timer-box">
+                            <span class="timer-num highlight" id="cd-seconds">00</span>
+                            <span class="timer-lbl">SEGUNDOS</span>
                         </div>
                     </div>
-                    <div class="telemetry-col">
-                        <h3>TELEMETRIA E ESTATÍSTICAS DA REDE ELEITORAL</h3>
-                        <div class="tech-specs-box">
-                            <div class="spec-row">
-                                <span>FREQUÊNCIA DE AMOSTRAGEM:</span>
-                                <strong class="text-green">1.000 Hz (1 atualiz./ms)</strong>
-                            </div>
-                            <div class="spec-row">
-                                <span>TAXA DE PROCESSAMENTO:</span>
-                                <strong class="text-cyan" id="spec-process-rate">~4.800 urnas/minuto</strong>
-                            </div>
-                            <div class="spec-row">
-                                <span>CHAVE DE AUTENTICAÇÃO TSE:</span>
-                                <strong class="text-gold">SHA-512 SECURE BROADCAST VERIFIED</strong>
-                            </div>
-                            <div class="spec-row">
-                                <span>URNAS DE ALAGOAS TRANSMITIDAS:</span>
-                                <strong class="text-white" id="spec-alagoas-count">0 / 7.218</strong>
-                            </div>
-                            <div class="spec-row">
-                                <span>ZONAS ELEITORAIS CONCLUÍDAS (AL):</span>
-                                <strong class="text-teal" id="spec-al-zonas">0 de 42 Zonas</strong>
-                            </div>
-                            <div class="spec-row">
-                                <span>STATUS DOS CIRCUITOS DE TRANSMISSÃO:</span>
-                                <strong class="text-green">100% OPERACIONAL / SATÉLITE + FIBRA</strong>
+                </div>
+
+                <!-- PLACAR PRINCIPAL DO SEGUNDO TURNO -->
+                <div class="round2-card">
+                    <div class="round2-cand pl-theme">
+                        <img src="fotos/pres_22.jpeg" alt="Bolsonaro" class="round2-avatar">
+                        <span class="round2-party">PL &bull; 22</span>
+                        <h3 class="round2-name">FLÁVIO BOLSONARO</h3>
+                        <div class="round2-score">
+                            <span class="round2-pct" id="r2-pct-bolso">47,03%</span>
+                            <span class="round2-votes" id="r2-votes-bolso">56.104.503 votos</span>
+                        </div>
+                        <div class="round2-target">
+                            <span>Faltam <strong id="r2-need-bolso">3.545.892</strong> votos para 50%+1</span>
+                        </div>
+                    </div>
+
+                    <div class="round2-center-gauge">
+                        <div class="gauge-flag">🇧🇷</div>
+                        <span class="gauge-label">META 50%</span>
+                        <div class="gauge-diff-box">
+                            <span class="diff-tag">VANTAGEM ATUAL</span>
+                            <strong class="diff-number" id="r2-diff-val">2.224.965</strong>
+                            <span class="diff-text">votos de frente</span>
+                        </div>
+                    </div>
+
+                    <div class="round2-cand pt-theme">
+                        <img src="fotos/pres_13.jpeg" alt="Lula" class="round2-avatar">
+                        <span class="round2-party">PT &bull; 13</span>
+                        <h3 class="round2-name">LULA</h3>
+                        <div class="round2-score">
+                            <span class="round2-pct" id="r2-pct-lula">45,17%</span>
+                            <span class="round2-votes" id="r2-votes-lula">53.879.538 votos</span>
+                        </div>
+                        <div class="round2-target">
+                            <span>Faltam <strong id="r2-need-lula">5.770.857</strong> votos para virar</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PISTA DE CORRIDA // LINHA DE CHEGADA 50% + 1 -->
+                <div class="race-track-card">
+                    <div class="race-header">
+                        <span class="race-title">🏁 LINHA DE CHEGADA // QUEM CRUZA 50% + 1 PRIMEIRO?</span>
+                        <span class="race-sub">Meta: 59.650.395 votos válidos</span>
+                    </div>
+
+                    <div class="race-track-wrapper">
+                        <!-- Raia Flávio Bolsonaro -->
+                        <div class="race-lane">
+                            <div class="race-runner pl-runner" id="runner-bolso" style="left: 47%;">
+                                <img src="fotos/pres_22.jpeg" alt="Bolso" class="runner-avatar">
+                                <span class="runner-tag pl-color">22 &bull; 47,0%</span>
                             </div>
                         </div>
 
-                        <div class="chart-box">
-                            <h4>CURVA DE VELOCIDADE DE APURAÇÃO (VOTOS/MS)</h4>
-                            <canvas id="telemetryCanvas" width="500" height="180"></canvas>
+                        <!-- Linha de chegada central 50% -->
+                        <div class="finish-line">
+                            <span class="finish-flag">🏁</span>
+                            <span class="finish-text">50% + 1</span>
                         </div>
+
+                        <!-- Raia Lula -->
+                        <div class="race-lane">
+                            <div class="race-runner pt-runner" id="runner-lula" style="left: 45.2%;">
+                                <img src="fotos/pres_13.jpeg" alt="Lula" class="runner-avatar">
+                                <span class="runner-tag pt-color">13 &bull; 45,2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="race-legend">
+                        <span class="pl-color">● Bolsonaro: 56,10M de votos (precisa de 3,55M)</span>
+                        <span class="pt-color">Lula: 53,88M de votos (precisa de 5,77M) ●</span>
+                    </div>
+                </div>
+
+                <!-- ENQUETE & BOLÃO AO VIVO DO 2º TURNO -->
+                <div class="poll-card">
+                    <div class="poll-header">
+                        <span class="poll-badge">🗳️ BOLÃO AO VIVO DA COMUNIDADE</span>
+                        <h3 class="poll-title">Na sua opinião, quem vence a eleição em 25 de Outubro?</h3>
+                        <span class="poll-meta" id="poll-total-users">Mais de 2.800 palpites registrados</span>
+                    </div>
+
+                    <div class="poll-actions-row">
+                        <button class="poll-btn poll-btn-lula" id="btn-poll-lula" onclick="window.voteInPoll('13')">
+                            <span class="poll-cand-icon">⭐</span>
+                            <div class="poll-cand-info">
+                                <span class="poll-cand-name">LULA 13</span>
+                                <span class="poll-cand-stat" id="poll-stat-lula">49,1% (1.421 votos)</span>
+                            </div>
+                        </button>
+
+                        <button class="poll-btn poll-btn-bolso" id="btn-poll-bolso" onclick="window.voteInPoll('22')">
+                            <span class="poll-cand-icon">🇧🇷</span>
+                            <div class="poll-cand-info">
+                                <span class="poll-cand-name">BOLSONARO 22</span>
+                                <span class="poll-cand-stat" id="poll-stat-bolso">50,9% (1.475 votos)</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="poll-bar-wrapper">
+                        <div class="poll-bar-lula" id="poll-bar-lula" style="width: 49.1%;"></div>
+                        <div class="poll-bar-bolso" id="poll-bar-bolso" style="width: 50.9%;"></div>
+                    </div>
+                    <div class="poll-voted-alert hidden" id="poll-voted-alert">✅ Seu voto no bolão foi registrado com sucesso!</div>
+                </div>
+
+                <!-- SIMULADOR DA VIRADA // CALCULADORA DE HERANÇA DE VOTOS -->
+                <div class="simulator-card">
+                    <div class="simulator-header">
+                        <span class="badge-tag">⚡ SIMULADOR DA VIRADA INTERATIVO</span>
+                        <h3 class="section-title">Para onde vão os 3,2 milhões de votos dos outros candidatos?</h3>
+                        <p class="section-desc">Arraste os controles ou escolha um cenário pronto para simular quem vence o Segundo Turno:</p>
+                    </div>
+
+                    <!-- BOTÕES DE CENÁRIOS RÁPIDOS EM 1 CLIQUE -->
+                    <div class="sim-presets-grid">
+                        <button class="sim-preset-btn" onclick="window.applySimPreset('direita')">
+                            <span>🔵</span>
+                            <div>
+                                <strong>Direita Unificada</strong>
+                                <small>Caiado + Zema 85% Bolsonaro</small>
+                            </div>
+                        </button>
+                        <button class="sim-preset-btn" onclick="window.applySimPreset('virada')">
+                            <span>🔴</span>
+                            <div>
+                                <strong>Virada da Frente Ampla</strong>
+                                <small>Cury + Samara + Nulos 75% Lula</small>
+                            </div>
+                        </button>
+                        <button class="sim-preset-btn" onclick="window.applySimPreset('divisao')">
+                            <span>⚖️</span>
+                            <div>
+                                <strong>Divisão Exata 50/50</strong>
+                                <small>Votos divididos ao meio</small>
+                            </div>
+                        </button>
+                        <button class="sim-preset-btn reset" onclick="window.resetSimulation()">
+                            <span>🔄</span>
+                            <div>
+                                <strong>Restaurar Posição</strong>
+                                <small>Dados originais do 1º Turno</small>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- SLIDERS MANUAIS DE HERANÇA -->
+                    <div class="sim-sliders-list">
+                        <!-- Augusto Cury -->
+                        <div class="sim-slider-row">
+                            <div class="sim-slider-info">
+                                <strong>Augusto Cury (70)</strong>
+                                <span>827.940 votos no 1º turno</span>
+                            </div>
+                            <div class="sim-slider-controls">
+                                <span class="slider-side-tag pt-color" id="lbl-cury-lula">Lula: 50%</span>
+                                <input type="range" min="0" max="100" value="50" class="sim-range" id="sim-cury" oninput="window.runSimulation()">
+                                <span class="slider-side-tag pl-color" id="lbl-cury-bolso">Bolsonaro: 50%</span>
+                            </div>
+                        </div>
+
+                        <!-- Ronaldo Caiado -->
+                        <div class="sim-slider-row">
+                            <div class="sim-slider-info">
+                                <strong>Ronaldo Caiado (55)</strong>
+                                <span>668.422 votos no 1º turno</span>
+                            </div>
+                            <div class="sim-slider-controls">
+                                <span class="slider-side-tag pt-color" id="lbl-caiado-lula">Lula: 50%</span>
+                                <input type="range" min="0" max="100" value="50" class="sim-range" id="sim-caiado" oninput="window.runSimulation()">
+                                <span class="slider-side-tag pl-color" id="lbl-caiado-bolso">Bolsonaro: 50%</span>
+                            </div>
+                        </div>
+
+                        <!-- Renan Santos (MBL) -->
+                        <div class="sim-slider-row">
+                            <div class="sim-slider-info">
+                                <strong>Renan Santos (14)</strong>
+                                <span>640.393 votos no 1º turno</span>
+                            </div>
+                            <div class="sim-slider-controls">
+                                <span class="slider-side-tag pt-color" id="lbl-renan-lula">Lula: 50%</span>
+                                <input type="range" min="0" max="100" value="50" class="sim-range" id="sim-renan" oninput="window.runSimulation()">
+                                <span class="slider-side-tag pl-color" id="lbl-renan-bolso">Bolsonaro: 50%</span>
+                            </div>
+                        </div>
+
+                        <!-- Outros Candidatos & Abstenções -->
+                        <div class="sim-slider-row">
+                            <div class="sim-slider-info">
+                                <strong>Zema, Samara & Nulos</strong>
+                                <span>1.135.000 votos redistribuídos</span>
+                            </div>
+                            <div class="sim-slider-controls">
+                                <span class="slider-side-tag pt-color" id="lbl-outros-lula">Lula: 50%</span>
+                                <input type="range" min="0" max="100" value="50" class="sim-range" id="sim-outros" oninput="window.runSimulation()">
+                                <span class="slider-side-tag pl-color" id="lbl-outros-bolso">Bolsonaro: 50%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RESULTADO DA SIMULAÇÃO EM TEMPO REAL -->
+                    <div class="sim-result-box" id="sim-result-box">
+                        <div class="sim-result-banner">
+                            <span class="sim-result-title">PLACAR SIMULADO DO SEGUNDO TURNO:</span>
+                            <div class="sim-result-score-row">
+                                <div class="sim-score-item pl-color">
+                                    <span class="sim-score-label">BOLSONARO</span>
+                                    <strong class="sim-score-val" id="sim-score-bolso">57.739.381</strong>
+                                    <span class="sim-score-pct" id="sim-pct-bolso">48,40%</span>
+                                </div>
+                                <div class="sim-score-vs">
+                                    <span class="sim-vs-icon">⚔️</span>
+                                    <span class="sim-winner-badge" id="sim-winner-badge">BOLSONARO NA FRENTE</span>
+                                </div>
+                                <div class="sim-score-item pt-color">
+                                    <span class="sim-score-label">LULA</span>
+                                    <strong class="sim-score-val" id="sim-score-lula">55.514.416</strong>
+                                    <span class="sim-score-pct" id="sim-pct-lula">46,53%</span>
+                                </div>
+                            </div>
+                            <div class="sim-progress-track">
+                                <div class="sim-track-pl" id="sim-track-pl" style="width: 51%;"></div>
+                                <div class="sim-track-pt" id="sim-track-pt" style="width: 49%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BATALHA REGIONAL DAS 5 REGIÕES DO BRASIL -->
+                <div class="regions-battle-card">
+                    <div class="section-header">
+                        <div>
+                            <span class="badge-tag">🗺️ GEOGRAFIA ELEITORAL</span>
+                            <h3 class="section-title">Batalha das 5 Regiões do Brasil</h3>
+                            <span class="section-sub">Onde cada candidato construiu sua força no 1º turno</span>
+                        </div>
+                    </div>
+
+                    <div class="regions-grid" id="regions-grid">
+                        <!-- Preenchido dinamicamente via JS com dados agregados -->
+                    </div>
+                </div>
+
+                <!-- SOUNDBOARD INTERATIVO E DIVERTIDO -->
+                <div class="soundboard-card">
+                    <h4 class="soundboard-title">🎙️ Soundboard da Rinha Eleitoral</h4>
+                    <div class="sound-buttons-grid">
+                        <button class="sound-btn" onclick="window.playCustomSound('urna')">
+                            <span>🗳️</span> <span>Barulho da Urna</span>
+                        </button>
+                        <button class="sound-btn" onclick="window.playCustomSound('cheer')">
+                            <span>🎉</span> <span>Comemoração</span>
+                        </button>
+                        <button class="sound-btn" onclick="window.playCustomSound('gong')">
+                            <span>🔔</span> <span>Gongo de Boxe</span>
+                        </button>
+                        <button class="sound-btn" onclick="window.playCustomSound('lula')">
+                            <span>⭐</span> <span>Lula 13</span>
+                        </button>
+                        <button class="sound-btn" onclick="window.playCustomSound('bolso')">
+                            <span>🇧🇷</span> <span>Capitão 22</span>
+                        </button>
+                        <button class="sound-btn" onclick="window.playCustomSound('picanha')">
+                            <span>🥩</span> <span>Chama Picanha</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- FOOTER RESPONSIVO MOBILE & PC -->
-        <footer class="app-footer">
-            <div class="footer-inner">
-                <div class="footer-left">
-                    <div class="footer-brand">⚡ TSE TOTALIZADOR PRO // ELEIÇÕES 2026</div>
-                    <div class="footer-sub">APURAÇÃO NACIONAL (BR) & ESTADO DE ALAGOAS (AL) &bull; 04/10/2026</div>
+
+        <!-- ========================================== -->
+        <!-- ABA 4: COMPARADOR X1 -->
+        <!-- ========================================== -->
+        <section id="view-comparador" class="view-panel">
+            <div class="section-block">
+                <div class="section-header center">
+                    <h2 class="section-title">Comparador Direto X1 ⚔️</h2>
+                    <p class="section-desc">Selecione quaisquer 2 candidatos para comparar votos e desempenho</p>
                 </div>
-                <div class="footer-center">
-                    <a href="https://github.com/sn00we" target="_blank" rel="noopener noreferrer" class="footer-github-badge">
-                        <span class="icon">🐙</span> <span>DESENVOLVIDO POR <strong>@sn00we</strong></span>
-                    </a>
+
+                <div class="compare-selectors">
+                    <div class="compare-select-group">
+                        <label>Candidato A</label>
+                        <select id="compare-select-a" class="clean-select" onchange="window.updateComparison()"></select>
+                    </div>
+                    <span class="compare-vs">VS</span>
+                    <div class="compare-select-group">
+                        <label>Candidato B</label>
+                        <select id="compare-select-b" class="clean-select" onchange="window.updateComparison()"></select>
+                    </div>
                 </div>
-                <div class="footer-right">
-                    <span class="footer-status-pill">
-                        <span class="live-dot-mini"></span> CDN OFICIAL TSE &bull; 1.000 Hz
-                    </span>
+
+                <div id="compare-result-card" class="compare-result-card">
+                    <!-- Preenchido dinamicamente -->
                 </div>
             </div>
-        </footer>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ABA PRINCIPAL: MAPA INTERATIVO & CIDADES -->
+        <!-- ========================================== -->
+        <section id="view-estados" class="view-panel active">
+            <div class="section-block">
+                <div class="section-header">
+                    <div>
+                        <span class="badge-tag">🗺️ GEOGRAFIA ELEITORAL COMPLETA</span>
+                        <h2 class="section-title">Mapa Interativo do Brasil & Explorador de Cidades</h2>
+                        <span class="section-sub">Apuração automatizada em tempo real com porcentagens oficiais, transição automática e busca cidade a cidade</span>
+                    </div>
+
+                    <!-- SELETOR DE ESTADO DROPDOWN RÁPIDO -->
+                    <div class="map-state-quick-select">
+                        <label for="select-map-uf">ESTADO SELECIONADO:</label>
+                        <select id="select-map-uf" class="clean-select" onchange="window.selectStateFromDropdown(this.value)">
+                            <!-- Gerado dinamicamente -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- PLACAR GERAL DOS ESTADOS // HUD DE DUELO NACIONAL -->
+                <div class="states-scoreboard-card">
+                    <div class="states-score-side pl-side">
+                        <div class="states-score-meta">
+                            <span class="states-score-party pl-color">PL &bull; FLÁVIO BOLSONARO</span>
+                            <div class="states-score-lead">
+                                <strong class="states-count pl-color" id="states-count-bolso">14</strong>
+                                <span class="states-unit">ESTADOS VENCIDOS</span>
+                            </div>
+                            <span class="states-votes-lead" id="states-votes-bolso">56.104.503 votos (47,03%)</span>
+                        </div>
+                        <div class="states-score-avatar">
+                            <img src="fotos/pres_22.jpeg" alt="Bolsonaro" class="mini-hud-photo pl-border">
+                        </div>
+                    </div>
+
+                    <div class="states-score-center">
+                        <span class="states-score-vs">VS</span>
+                        <div class="states-tug-bar">
+                            <div class="states-bar-fill-pl" id="states-bar-pl" style="width: 51.9%;"></div>
+                            <div class="states-bar-fill-pt" id="states-bar-pt" style="width: 48.1%;"></div>
+                        </div>
+                        <span class="states-score-sub" id="states-diff-sub">PL lidera em 14 de 27 estados</span>
+                    </div>
+
+                    <div class="states-score-side pt-side">
+                        <div class="states-score-avatar">
+                            <img src="fotos/pres_13.jpeg" alt="Lula" class="mini-hud-photo pt-border">
+                        </div>
+                        <div class="states-score-meta text-right">
+                            <span class="states-score-party pt-color">PT &bull; LULA</span>
+                            <div class="states-score-lead">
+                                <strong class="states-count pt-color" id="states-count-lula">13</strong>
+                                <span class="states-unit">ESTADOS + DF</span>
+                            </div>
+                            <span class="states-votes-lead" id="states-votes-lula">53.879.538 votos (45,17%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================================== -->
+                <!-- TERMÔMETRO DA GALERA // REAÇÕES AO VIVO DA TORCIDA -->
+                <!-- ======================================================== -->
+                <div class="audience-reaction-banner">
+                    <div class="reaction-banner-header">
+                        <div class="reaction-title-wrap">
+                            <span class="reaction-fire-icon">🔥</span>
+                            <div>
+                                <h3 class="reaction-title">Termômetro da Eleição // Reações da Torcida ao Vivo</h3>
+                                <span class="reaction-sub">Toque nos botões para reagir e agitar a apuração em tempo real com toda a comunidade!</span>
+                            </div>
+                        </div>
+                        <div class="reaction-live-indicator">
+                            <span class="pulse-indicator-red"></span>
+                            <span id="reaction-total-count">9.074 reações hoje</span>
+                        </div>
+                    </div>
+
+                    <!-- BOTÕES DE REAÇÃO INTERATIVOS -->
+                    <div class="reaction-buttons-grid">
+                        <button class="reaction-pill-btn btn-tenso" onclick="window.triggerReaction('tenso')" title="Clima de tensão total!">
+                            <span class="reaction-emoji">🔥</span>
+                            <div class="reaction-text-col">
+                                <strong class="reaction-label">Clima Tenso</strong>
+                                <span class="reaction-count" id="count-tenso">1.342</span>
+                            </div>
+                        </button>
+
+                        <button class="reaction-pill-btn btn-pipoca" onclick="window.triggerReaction('pipoca')" title="Comendo pipoca assistindo o circo pegar fogo!">
+                            <span class="reaction-emoji">🍿</span>
+                            <div class="reaction-text-col">
+                                <strong class="reaction-label">Só na Pipoca</strong>
+                                <span class="reaction-count" id="count-pipoca">985</span>
+                            </div>
+                        </button>
+
+                        <button class="reaction-pill-btn btn-picanha" onclick="window.triggerReaction('picanha')" title="Chama a picanha e a cerveja! Lula 13!">
+                            <span class="reaction-emoji">🥩</span>
+                            <div class="reaction-text-col">
+                                <strong class="reaction-label">Picanha (Lula 13)</strong>
+                                <span class="reaction-count" id="count-picanha">2.420</span>
+                            </div>
+                        </button>
+
+                        <button class="reaction-pill-btn btn-capitao" onclick="window.triggerReaction('capitao')" title="Acelera capitão! Flávio Bolsonaro 22!">
+                            <span class="reaction-emoji">🏍️</span>
+                            <div class="reaction-text-col">
+                                <strong class="reaction-label">Acelera (Bolso 22)</strong>
+                                <span class="reaction-count" id="count-capitao">2.490</span>
+                            </div>
+                        </button>
+
+                        <button class="reaction-pill-btn btn-virada" onclick="window.triggerReaction('virada')" title="Vai dar virada histórica?">
+                            <span class="reaction-emoji">⚡</span>
+                            <div class="reaction-text-col">
+                                <strong class="reaction-label">Vai Dar Virada?</strong>
+                                <span class="reaction-count" id="count-virada">1.835</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- BARRA TERMÔMETRO DE ENERGIA -->
+                    <div class="reaction-thermometer-bar">
+                        <div class="thermometer-fill pl" id="thermometer-pl" style="width: 50.7%;" title="Bolsonaro 22: 50.7%"></div>
+                        <div class="thermometer-fill pt" id="thermometer-pt" style="width: 49.3%;" title="Lula 13: 49.3%"></div>
+                    </div>
+                    <div class="thermometer-legend">
+                        <span class="pl-color">● Torcida Bolsonaro 22: <strong id="thermo-pct-bolso">50.7%</strong></span>
+                        <span class="pt-color"><strong id="thermo-pct-lula">49.3%</strong> :Torcida Lula 13 ●</span>
+                    </div>
+                </div>
+
+                <!-- BARRA DE ACESSO RÁPIDO AOS COLÉGIOS ELEITORAIS -->
+                <div class="quick-colleges-bar">
+                    <div class="quick-colleges-header">
+                        <span class="quick-colleges-badge">⚡ COLÉGIOS ELEITORAIS DECISIVOS:</span>
+                        <span class="quick-colleges-hint hide-mobile">Toque em qualquer estado para focar o mapa e carregar as cidades</span>
+                    </div>
+                    <div class="quick-colleges-scroll" id="quick-colleges-scroll">
+                        <!-- Gerado dinamicamente via JS -->
+                    </div>
+                </div>
+
+                <!-- BARRA DE CONTROLES: ROTAÇÃO AUTOMÁTICA, PORCENTAGENS E FILTROS -->
+                <div class="map-controls-bar">
+                    <div class="map-controls-left">
+                        <!-- BOTÃO DE ROTAÇÃO AUTOMÁTICA -->
+                        <button id="btn-auto-tour" class="auto-tour-toggle paused" onclick="window.toggleAutoTour()" title="Ativar transmissão automática pelos estados">
+                            <span id="auto-tour-icon">▶️</span>
+                            <span id="auto-tour-lbl">Transmissão Automática: <strong>DESLIGADA</strong></span>
+                            <span class="auto-tour-progress-wrap">
+                                <span id="auto-tour-progress-bar" class="auto-tour-progress-bar"></span>
+                            </span>
+                        </button>
+
+                        <!-- TOGGLE DE PORCENTAGENS NO MAPA -->
+                        <button id="btn-toggle-labels" class="map-feature-btn active" onclick="window.toggleMapLabels()" title="Exibir porcentagens diretamente sobre os estados no mapa">
+                            <span>🏷️ Porcentagens no Mapa: <strong id="lbl-labels-state">ATIVAS</strong></span>
+                        </button>
+                    </div>
+
+                    <!-- FILTROS RÁPIDOS DE ESTADO -->
+                    <div class="map-filters-pills">
+                        <button class="map-filter-pill active" data-filter="all" onclick="window.setMapFilter('all')">Todos (27)</button>
+                        <button class="map-filter-pill pl" data-filter="bolso" onclick="window.setMapFilter('bolso')">🔵 Bolsonaro (14)</button>
+                        <button class="map-filter-pill pt" data-filter="lula" onclick="window.setMapFilter('lula')">🔴 Lula (13)</button>
+                        <button class="map-filter-pill battle" data-filter="tight" onclick="window.setMapFilter('tight')">⚔️ Acirrados (&lt;5%)</button>
+                    </div>
+                </div>
+
+                <!-- LAYOUT SPLIT: MAPA SVG À ESQUERDA + DETALHES/CIDADES À DIREITA -->
+                <div class="map-explorer-layout">
+                    <!-- ÁREA DO MAPA DO BRASIL SVG & CANVAS SEUIMPOSTO -->
+                    <div class="map-visual-pane">
+                        <div class="map-svg-header">
+                            <div class="map-header-status">
+                                <span class="pulse-indicator"></span>
+                                <span id="map-header-title">MAPA SEUIMPOSTO &bull; 5.570 CIDADES EM TEMPO REAL</span>
+                            </div>
+                            <span class="map-header-tip" id="map-header-tip-text">Arraste para navegar &bull; Clique na cidade para ver detalhes</span>
+                        </div>
+
+                        <!-- TOGGLE DE MODO DE MAPA: 5.570 CIDADES (SEUIMPOSTO) VS 27 ESTADOS (MACRO) -->
+                        <div class="map-mode-toggle-group">
+                            <button class="map-mode-btn active" id="btn-mode-muni" onclick="window.setMapMode('muni')" title="Visualizar todas as 5.570 cidades do Brasil com o mapa oficial do SeuImposto">
+                                <span class="mode-icon">🏙️</span>
+                                <span class="mode-label">5.570 Cidades (SeuImposto)</span>
+                                <span class="mode-badge">OFICIAL</span>
+                            </button>
+                            <button class="map-mode-btn" id="btn-mode-macro" onclick="window.setMapMode('macro')" title="Visualizar visão macro por 27 estados">
+                                <span class="mode-icon">🗺️</span>
+                                <span class="mode-label">Visão Macro (27 Estados)</span>
+                            </button>
+                        </div>
+
+                        <div class="map-svg-container" id="map-svg-container">
+                            <!-- BARRA FLUTUANTE DE ZOOM E NAVEGAÇÃO -->
+                            <div class="map-zoom-toolbar">
+                                <button class="map-zoom-btn" onclick="window.zoomMap(0.35)" title="Aproximar / Mais Zoom (ou use a roda do mouse)">🔍+</button>
+                                <span class="map-zoom-badge" id="zoom-level-badge">100%</span>
+                                <button class="map-zoom-btn" onclick="window.zoomMap(-0.35)" title="Afastar / Menos Zoom">🔍&minus;</button>
+                                <button class="map-zoom-btn reset" onclick="window.resetMapZoom()" title="Redefinir Zoom">⟲ 100%</button>
+                            </div>
+
+                            <!-- MOTOR 1: CANVAS DE ALTA PERFORMANCE (5.570 CIDADES SEUIMPOSTO) -->
+                            <canvas id="seuimposto-canvas-map" class="seuimposto-canvas" width="900" height="850"></canvas>
+
+                            <!-- MOTOR 2: SVG DOS 27 ESTADOS (MACRO) -->
+                            <svg viewBox="0 0 750 750" id="brazil-svg" class="brazil-svg hidden">
+                                <defs>
+                                    <filter id="glow-gold" x="-30%" y="-30%" width="160%" height="160%">
+                                        <feGaussianBlur stdDeviation="4" result="blur" />
+                                        <feComponentTransfer>
+                                            <feFuncA type="linear" slope="0.9"/>
+                                        </feComponentTransfer>
+                                        <feMerge>
+                                            <feMergeNode/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <g id="map-viewport-group">
+                                    <!-- Paths dos 27 estados e grupos de labels inseridos dinamicamente -->
+                                </g>
+                            </svg>
+                            <!-- TOOLTIP FLUTUANTE DO MAPA -->
+                            <div id="map-tooltip" class="map-tooltip hidden"></div>
+                            <!-- CONTAINER DE PARTÍCULAS DE REAÇÃO FLUTUANTES -->
+                            <div id="reaction-particles-container" class="reaction-particles-container"></div>
+                        </div>
+
+                        <!-- GUIA INTERATIVO DE NAVEGAÇÃO DO MAPA -->
+                        <div class="map-interactive-hints">
+                            <span class="hint-pill">💡 Dica de Navegação</span>
+                            <span class="hint-text"><strong>Duplo-clique</strong> no estado para ampliar &bull; <strong>Arraste</strong> para mover &bull; Roda do mouse ou <strong>🔍+</strong> para zoom</span>
+                        </div>
+
+                        <!-- LEGENDA COMPLETA DO MAPA COM GRADUAÇÃO -->
+                        <div class="map-legend">
+                            <div class="legend-group">
+                                <span class="legend-group-title pl-color">FLÁVIO BOLSONARO (PL):</span>
+                                <div class="legend-item"><span class="legend-color pl-bg-deep"></span> &gt;60% Amplo</div>
+                                <div class="legend-item"><span class="legend-color pl-bg-mid"></span> 53-60%</div>
+                                <div class="legend-item"><span class="legend-color pl-bg-light"></span> 50-53% Voto a voto</div>
+                            </div>
+                            <div class="legend-group">
+                                <span class="legend-group-title pt-color">LULA (PT):</span>
+                                <div class="legend-item"><span class="legend-color pt-bg-deep"></span> &gt;60% Amplo</div>
+                                <div class="legend-item"><span class="legend-color pt-bg-mid"></span> 53-60%</div>
+                                <div class="legend-item"><span class="legend-color pt-bg-light"></span> 50-53% Voto a voto</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ÁREA DO EXPLORADOR DE CIDADES DO ESTADO -->
+                    <div class="state-cities-pane">
+                        <!-- CARD DO ESTADO ATUAL COM VISUAL PREMIUM -->
+                        <div class="selected-state-card" id="selected-state-card">
+                            <!-- Renderizado via JS: Nome do estado, votos, % apurado, duelo -->
+                        </div>
+
+                        <!-- BUSCA DE CIDADES DO ESTADO -->
+                        <div class="cities-search-bar">
+                            <span class="cities-search-icon">🔍</span>
+                            <input type="text" id="cities-filter-input" class="cities-filter-input" placeholder="Buscar cidade do estado (ex: Arapiraca, Campinas, Niterói)..." autocomplete="off" oninput="window.filterCities(this.value)">
+                        </div>
+
+                        <!-- LISTA DE CIDADES COM APURAÇÃO VOTO A VOTO -->
+                        <div class="cities-stream-wrapper">
+                            <div class="cities-stream-header">
+                                <span id="cities-count-label">Cidades do Estado:</span>
+                                <span id="cities-loading-tag" class="cities-loading-tag hidden">🔄 Puxando do TSE...</span>
+                            </div>
+                            <div class="cities-list" id="cities-list">
+                                <!-- Cards das cidades renderizados dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRID RÁPIDO DE TODAS AS 27 UFS (CARTÕES RESUMO) -->
+                <div class="all-ufs-overview" style="margin-top: 28px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <div class="section-header" style="margin-bottom: 12px;">
+                        <h4 class="section-title" style="font-size: 15px;">Resumo dos 27 Estados e DF:</h4>
+                        <span class="section-sub">Clique em qualquer cartão para focar no mapa e ver as cidades</span>
+                    </div>
+                    <div class="uf-cards-grid" id="uf-cards-grid">
+                        <!-- Cards de cada estado -->
+                    </div>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <!-- FLOATING TOAST ALERT FOR MAJOR EVENTS -->
-    <div id="breaking-toast" class="breaking-toast hidden">
-        <div class="toast-badge">URGENTE // TSE</div>
-        <div class="toast-text" id="toast-message">VIRADA HISTÓRICA DETECTADA!</div>
+    <!-- MODAL DE DETALHES DO ESTADO (UF) -->
+    <div id="uf-modal" class="modal-overlay hidden" onclick="window.closeUfModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title" id="uf-modal-title">Boletim do Estado</h3>
+                    <span class="modal-sub" id="uf-modal-sub">Apuração consolidada</span>
+                </div>
+                <button class="modal-close" onclick="window.closeUfModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="uf-modal-body"></div>
+        </div>
     </div>
 
-    <script src="app.js?v=20261004_mobile_pc"></script>
+    <!-- BOTAO FLUTUANTE DE CHAT -->
+    <button class="floating-chat-trigger" onclick="window.toggleChat()" title="Abrir Chat ao Vivo">
+        <span>💬</span>
+        <span class="floating-label">Chat</span>
+        <span id="floating-chat-badge" class="unread-badge hidden">0</span>
+    </button>
+
+    <!-- PAINEL LATERAL / DRAWER DE CHAT AO VIVO -->
+    <div id="chat-drawer" class="chat-drawer-overlay hidden" onclick="window.handleChatOverlay(event)">
+        <aside class="chat-drawer" onclick="event.stopPropagation()">
+            <div class="chat-header">
+                <div class="chat-header-title">
+                    <span class="chat-dot"></span>
+                    <div>
+                        <strong>Chat da Apuração</strong>
+                        <span class="chat-sub" id="chat-online-count">1 eleitor online</span>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="chat-hdr-btn" onclick="window.toggleChatSound()" title="Silenciar/Ativar som do chat">
+                        <span id="chat-sound-btn-icon">🔔</span>
+                    </button>
+                    <button class="chat-hdr-btn close" onclick="window.toggleChat()">&times;</button>
+                </div>
+            </div>
+
+            <!-- IDENTIDADE RÁPIDA -->
+            <div class="chat-id-box">
+                <div class="chat-id-row">
+                    <input type="text" id="chat-username-input" class="chat-mini-input" placeholder="Seu apelido..." maxlength="18">
+                    <select id="chat-badge-select" class="chat-mini-select">
+                        <option value="⭐ PT 13">⭐ PT 13</option>
+                        <option value="🇧🇷 PL 22">🇧🇷 PL 22</option>
+                        <option value="🌴 Alagoas">🌴 Alagoas</option>
+                        <option value="⚖️ Neutro" selected>⚖️ Neutro</option>
+                        <option value="🗳️ Mesário">🗳️ Mesário</option>
+                        <option value="🥩 Picanha">🥩 Picanha</option>
+                        <option value="🏍️ Moto">🏍️ Motociata</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- FEED DE MENSAGENS -->
+            <div class="chat-feed" id="chat-feed">
+                <!-- Mensagens em tempo real -->
+            </div>
+
+            <!-- EMOJIS RÁPIDOS -->
+            <div class="chat-emojis-bar">
+                <button type="button" onclick="window.sendEmoji('🥩')">🥩</button>
+                <button type="button" onclick="window.sendEmoji('🏍️')">🏍️</button>
+                <button type="button" onclick="window.sendEmoji('🗳️')">🗳️</button>
+                <button type="button" onclick="window.sendEmoji('🔥')">🔥</button>
+                <button type="button" onclick="window.sendEmoji('⭐')">⭐</button>
+                <button type="button" onclick="window.sendEmoji('🇧🇷')">🇧🇷</button>
+                <button type="button" onclick="window.sendEmoji('🍿')">🍿</button>
+                <button type="button" onclick="window.sendEmoji('🚀')">🚀</button>
+            </div>
+
+            <!-- FORMULÁRIO DE ENVIO -->
+            <form class="chat-form" onsubmit="window.submitChatMessage(event)">
+                <input type="text" id="chat-message-input" class="chat-text-inp" placeholder="Envie sua mensagem..." maxlength="200" autocomplete="off">
+                <button type="submit" class="chat-send-btn">Enviar</button>
+            </form>
+        </aside>
+    </div>
+
+    <!-- TOAST DE NOTIFICAÇÕES -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- DOCK FLUTUANTE MOBILE (ALTERNÂNCIA FÁCIL MAPA / CIDADES) -->
+    <div class="mobile-map-dock hidden" id="mobile-map-dock">
+        <button class="mobile-dock-btn" onclick="window.scrollToMap()">
+            <span>🗺️</span> <span>Ver Mapa</span>
+        </button>
+        <div class="mobile-dock-divider"></div>
+        <button class="mobile-dock-btn" onclick="window.scrollToCities()">
+            <span>🏙️</span> <span id="mobile-dock-cities-lbl">Ver Cidades</span>
+        </button>
+    </div>
+
+    <!-- BOTÃO FLUTUANTE: VOLTAR AO TOPO -->
+    <button id="btn-back-to-top" class="back-to-top-btn hidden" onclick="window.scrollToTop()" title="Voltar ao início">
+        <span>▲</span>
+        <span class="back-top-label">Topo</span>
+    </button>
+
+    <script src="mapa_brasil_seuimposto.js"></script>
+    <script src="app.js?v=20261025_v2"></script>
 </body>
 </html>

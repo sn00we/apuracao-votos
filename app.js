@@ -1,2554 +1,3259 @@
 /* ==========================================================================
-   TSE TOTALIZADOR PRO 2026 - DADOS OFICIAIS DO TSE EM TEMPO REAL
-   Target: Eleição 6257 (Presidente) e 6259 (Alagoas) de 04/10/2026
-   Atualização Contínua a 1.000 Hz / Zero Defasagem com CDN Oficial do TSE
+   APURAÇÃO ELEIÇÕES 2026 // JAVASCRIPT PRINCIPAL (CLEAN & INTUITIVO)
    ========================================================================== */
 
 (function () {
     'use strict';
 
-    // --- AUDIO SYNTHESIZER ---
-    class SoundFX {
+    // --- ESTADO GLOBAL DA APLICAÇÃO ---
+    const state = {
+        activeTab: 'view-estados',
+        alagoasCargo: 'gov',
+        audioEnabled: true,
+        chatSoundEnabled: true,
+        isChatOpen: false,
+        unreadChatCount: 0,
+        lastChatTime: 0,
+        seenChatIds: new Set(),
+        clientId: null,
+        userName: '',
+        userBadge: '⚖️ Neutro',
+
+        // Dados consolidados do TSE
+        data: null,
+        pres: null,
+        gov_al: null,
+        sen_al: null,
+        dep_al: null,
+        est_al: null,
+        uf_matrix: {},
+
+        // Mapa interativo e explorador de cidades
+        selectedState: 'SP',
+        brazilPaths: null,
+        stateCitiesList: [],
+        cityVotesMap: {},
+        focusedCityCd: null,
+
+        // Modo do mapa: 'muni' (5.570 Cidades SeuImposto) ou 'macro' (27 Estados SVG)
+        mapMode: 'muni',
+        muniFeedData: null,
+        selectedMuniIdx: null,
+        hoveredMuniIdx: null
+    };
+
+    // --- SÍNTESE DE ÁUDIO (WEB AUDIO API NATIVA) ---
+    class AudioManager {
         constructor() {
             this.ctx = null;
-            this.enabled = true;
         }
 
-        init() {
-            if (!this.ctx) {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                if (AudioCtx) this.ctx = new AudioCtx();
+        ensure() {
+            if (!state.audioEnabled) return false;
+            try {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioCtx) return false;
+                    this.ctx = new AudioCtx();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+                return true;
+            } catch (e) {
+                return false;
             }
         }
 
-        beep(freq = 880, duration = 0.04, type = 'sine', gainVal = 0.02) {
-            if (!this.enabled || !this.ctx) return;
+        beep(freq = 880, duration = 0.08, type = 'sine', gainVal = 0.2) {
+            if (!this.ensure()) return;
             try {
+                const now = this.ctx.currentTime;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = type;
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(gainVal, now);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + duration);
+                osc.start(now);
+                osc.stop(now + duration);
             } catch (e) {}
         }
 
-        click() {
-            this.beep(1200, 0.02, 'triangle', 0.015);
+        // Som de confirmação de voto da urna
+        urnaSound() {
+            if (!this.ensure()) return;
+            try {
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1400, now);
+                osc.frequency.setValueAtTime(1900, now + 0.12);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.75);
+            } catch (e) {}
         }
 
-        alarm() {
-            if (!this.enabled || !this.ctx) return;
-            this.beep(520, 0.1, 'sawtooth', 0.06);
-            setTimeout(() => this.beep(780, 0.15, 'sawtooth', 0.06), 100);
+        // Som de gongo de boxe
+        gongSound() {
+            if (!this.ensure()) return;
+            try {
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(260, now);
+                osc.frequency.exponentialRampToValueAtTime(180, now + 1.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 1.2);
+            } catch (e) {}
+        }
+
+        // Som de notificação do chat
+        chatPing() {
+            if (!state.chatSoundEnabled || !this.ensure()) return;
+            this.beep(1200, 0.08, 'sine', 0.2);
+            setTimeout(() => this.beep(1600, 0.08, 'sine', 0.16), 70);
+        }
+
+        // Sons de reação do público ao vivo
+        reactionSound(rid) {
+            if (!this.ensure()) return;
+            try {
+                const now = this.ctx.currentTime;
+                if (rid === 'tenso') {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(130, now);
+                    osc.frequency.exponentialRampToValueAtTime(45, now + 0.35);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (rid === 'pipoca') {
+                    this.beep(880, 0.04, 'triangle', 0.25);
+                    setTimeout(() => this.beep(1320, 0.04, 'triangle', 0.2), 65);
+                    setTimeout(() => this.beep(1760, 0.05, 'triangle', 0.15), 130);
+                } else if (rid === 'picanha') {
+                    this.beep(523.25, 0.08, 'sine', 0.22);
+                    setTimeout(() => this.beep(659.25, 0.08, 'sine', 0.22), 80);
+                    setTimeout(() => this.beep(783.99, 0.12, 'sine', 0.28), 160);
+                } else if (rid === 'capitao') {
+                    this.beep(440, 0.09, 'sawtooth', 0.2);
+                    setTimeout(() => this.beep(554.37, 0.09, 'sawtooth', 0.2), 85);
+                    setTimeout(() => this.beep(659.25, 0.14, 'sawtooth', 0.25), 170);
+                } else if (rid === 'virada') {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(260, now);
+                    osc.frequency.exponentialRampToValueAtTime(1400, now + 0.3);
+                    gain.gain.setValueAtTime(0.28, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch (e) {}
         }
     }
 
-    const sound = new SoundFX();
+    const audio = new AudioManager();
 
-    // --- STATE REPOSITÓRIO OFICIAL (ELEIÇÃO 6257 E 6259) ---
-    const state = {
-        isRunning: true,
-        viradaMode: false,
-        speedMultiplier: 1.0,
-        lastTickTime: performance.now(),
-        lastSecTick: performance.now(),
-        tseConnected: false,
-        tseLastTime: '04/10/2026 18:19:31',
+    // Síntese de voz rápida para narração
+    function speak(text) {
+        if (!state.audioEnabled || !('speechSynthesis' in window)) return;
+        try {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.05;
+            window.speechSynthesis.speak(utterance);
+        } catch (e) {}
+    }
 
-        // 1. PRESIDENTE NACIONAL (BR)
-        pres: {
-            secoesTotal: 499248,
-            secoesApuradasTarget: 109654,
-            secoesApuradasCurrent: 109654,
-            totalVotosTarget: 26315800,
-            totalVotosCurrent: 26315800,
-            validosTarget: 25289745,
-            validosCurrent: 25289745,
-            brancosTarget: 382410,
-            brancosCurrent: 382410,
-            nulosTarget: 643645,
-            nulosCurrent: 643645,
-            candidates: [
-                { id: '22', number: '22', name: 'FLÁVIO BOLSONARO', fullName: 'FLAVIO NANTES BOLSONARO', party: 'PL', targetVotes: 14344471, currentVotes: 14344471, targetShare: 0.5094, currentShare: 0.5094, photo: 'fotos/pres_22.jpeg' },
-                { id: '13', number: '13', name: 'LULA', fullName: 'LUIZ INÁCIO LULA DA SILVA', party: 'PT', targetVotes: 11536137, currentVotes: 11536137, targetShare: 0.4097, currentShare: 0.4097, photo: 'fotos/pres_13.jpeg' },
-                { id: '70', number: '70', name: 'ESCRITOR AUGUSTO CURY', fullName: 'AUGUSTO JORGE CURY', party: 'AVANTE', targetVotes: 827940, currentVotes: 827940, targetShare: 0.0294, currentShare: 0.0294, photo: 'fotos/pres_70.jpeg' },
-                { id: '55', number: '55', name: 'RONALDO CAIADO', fullName: 'RONALDO RAMOS CAIADO', party: 'PSD', targetVotes: 668422, currentVotes: 668422, targetShare: 0.0237, currentShare: 0.0237, photo: 'fotos/pres_55.jpeg' },
-                { id: '14', number: '14', name: 'RENAN SANTOS', fullName: 'RENAN ANTONIO FERREIRA DOS SANTOS', party: 'MISSÃO', targetVotes: 640393, currentVotes: 640393, targetShare: 0.0227, currentShare: 0.0227, photo: 'fotos/pres_14.jpeg' },
-                { id: '30', number: '30', name: 'ZEMA', fullName: 'ROMEU ZEMA NETO', party: 'NOVO', targetVotes: 80058, currentVotes: 80058, targetShare: 0.0028, currentShare: 0.0028, photo: 'fotos/pres_30.jpeg' },
-                { id: '80', number: '80', name: 'SAMARA', fullName: 'SAMARA MARTINS DA SILVA FEITOSA', party: 'UP', targetVotes: 28862, currentVotes: 28862, targetShare: 0.0010, currentShare: 0.0010, photo: 'fotos/pres_80.jpeg' },
-                { id: '27', number: '27', name: 'CLARIANA BARAO', fullName: 'CLARIANA ZACARKIM BARAO', party: 'DC', targetVotes: 10565, currentVotes: 10565, targetShare: 0.0004, currentShare: 0.0004, photo: 'fotos/pres_27.jpeg' },
-                { id: '16', number: '16', name: 'HERTZ DIAS', fullName: 'HERTZ DA CONCEICAO DIAS', party: 'PSTU', targetVotes: 9960, currentVotes: 9960, targetShare: 0.0004, currentShare: 0.0004, photo: 'fotos/pres_16.jpeg' },
-                { id: '21', number: '21', name: 'EDMILSON COSTA', fullName: 'EDMILSON SILVA COSTA', party: 'PCB', targetVotes: 5237, currentVotes: 5237, targetShare: 0.0002, currentShare: 0.0002, photo: 'fotos/pres_21.jpeg' },
-                { id: '35', number: '35', name: 'VET. WILSON GRASSI', fullName: 'WILSON GRASSI JUNIOR', party: 'DEMOCRATA', targetVotes: 4164, currentVotes: 4164, targetShare: 0.0001, currentShare: 0.0001, photo: 'fotos/pres_35.jpeg' },
-                { id: '29', number: '29', name: 'RUI COSTA PIMENTA', fullName: 'RUI COSTA PIMENTA', party: 'PCO', targetVotes: 3943, currentVotes: 3943, targetShare: 0.0001, currentShare: 0.0001, photo: 'fotos/pres_29.jpeg' }
-            ]
-        },
+    // --- FORMATAÇÃO AUXILIAR ---
+    function formatNumber(num) {
+        if (num === null || num === undefined) return '0';
+        return Number(num).toLocaleString('pt-BR');
+    }
 
-        // 2. GOVERNADOR DE ALAGOAS (AL)
-        gov: {
-            secoesTotal: 7101,
-            secoesApuradasTarget: 884,
-            secoesApuradasCurrent: 884,
-            totalVotosTarget: 205000,
-            totalVotosCurrent: 205000,
-            validosTarget: 184965,
-            validosCurrent: 184965,
-            brancosTarget: 5100,
-            brancosCurrent: 5100,
-            nulosTarget: 16800,
-            nulosCurrent: 16800,
-            candidates: [
-                { id: '15', number: '15', name: 'RENAN FILHO', fullName: 'JOSÉ RENAN VASCONCELOS CALHEIROS FILHO', party: 'MDB', targetVotes: 94954, currentVotes: 94954, targetShare: 0.5133, currentShare: 0.5133, photo: 'fotos/gov_15.jpeg' },
-                { id: '45', number: '45', name: 'JHC', fullName: 'JOÃO HENRIQUE HOLANDA CALDAS', party: 'PSDB', targetVotes: 89310, currentVotes: 89310, targetShare: 0.4828, currentShare: 0.4828, photo: 'fotos/gov_45.jpeg' },
-                { id: '80', number: '80', name: 'LENILDA LUNA', fullName: 'LENILDA LUNA DE ALMEIDA', party: 'UP', targetVotes: 630, currentVotes: 630, targetShare: 0.0034, currentShare: 0.0034, photo: 'fotos/gov_80.jpeg' },
-                { id: '35', number: '35', name: 'MÁRCIO JAMBO', fullName: 'MARCIO FERREIRA JAMBO SOBRINHO', party: 'DEMOCRATA', targetVotes: 82, currentVotes: 82, targetShare: 0.0004, currentShare: 0.0004, photo: 'fotos/gov_35.jpeg' }
-            ]
-        },
-
-        // 3. SENADOR POR ALAGOAS (2 VAGAS REAIS)
-        sen: {
-            secoesTotal: 7101,
-            secoesApuradasTarget: 884,
-            secoesApuradasCurrent: 884,
-            validosTarget: 356543,
-            validosCurrent: 356543,
-            candidates: [
-                { id: '111', number: '111', name: 'ARTHUR LIRA', party: 'PP', targetVotes: 111776, currentVotes: 111776, targetShare: 0.3135, currentShare: 0.3135, photo: 'fotos/sen_111.jpeg' },
-                { id: '456', number: '456', name: 'MARINA JHC', party: 'PSDB', targetVotes: 93556, currentVotes: 93556, targetShare: 0.2624, currentShare: 0.2624, photo: 'fotos/sen_456.jpeg' },
-                { id: '151', number: '151', name: 'RENAN CALHEIROS', party: 'MDB', targetVotes: 85920, currentVotes: 85920, targetShare: 0.2410, currentShare: 0.2410, photo: 'fotos/sen_151.jpeg' },
-                { id: '156', number: '156', name: 'DR. WANDERLEY', party: 'MDB', targetVotes: 36220, currentVotes: 36220, targetShare: 0.1016, currentShare: 0.1016, photo: 'fotos/sen_156.jpeg' },
-                { id: '100', number: '100', name: 'DAVI DAVINO FILHO', party: 'REPUBLICANOS', targetVotes: 26560, currentVotes: 26560, targetShare: 0.0745, currentShare: 0.0745, photo: 'fotos/sen_100.jpeg' },
-                { id: '800', number: '800', name: 'ALEXANDRE FLEMING', party: 'UP', targetVotes: 2310, currentVotes: 2310, targetShare: 0.0065, currentShare: 0.0065, photo: 'fotos/sen_800.jpeg' },
-                { id: '355', number: '355', name: 'MARIEDSON', party: 'DEMOCRATA', targetVotes: 205, currentVotes: 205, targetShare: 0.0006, currentShare: 0.0006, photo: 'fotos/sen_355.jpeg' }
-            ]
-        },
-
-        // 4. DEPUTADOS FEDERAIS POR ALAGOAS (9 VAGAS NA CÂMARA)
-        depFed: {
-            secoesTotal: 7101,
-            secoesApuradasTarget: 2763,
-            secoesApuradasCurrent: 2763,
-            totalVotosTarget: 645000,
-            totalVotosCurrent: 645000,
-            validosTarget: 589400,
-            validosCurrent: 589400,
-            vagas: 9,
-            candidates: []
-        },
-
-        // 5. DEPUTADOS ESTADUAIS POR ALAGOAS (27 VAGAS NA ALEAL)
-        depEst: {
-            secoesTotal: 7101,
-            secoesApuradasTarget: 2763,
-            secoesApuradasCurrent: 2763,
-            totalVotosTarget: 645000,
-            totalVotosCurrent: 645000,
-            validosTarget: 589400,
-            validosCurrent: 589400,
-            vagas: 27,
-            candidates: []
-        },
-
-        // Deputados legado para compatibilidade com outros módulos
-        get deputies() {
-            return this.depFed.candidates.slice(0, 9);
-        },
-
-        // 5. REGIONAL UF (ESTADOS)
-        ufs: [
-            { uf: 'AL', name: 'Alagoas', secoes: 7101, apuradas: 673, leader: 'LULA (PT)', leadShare: '54.8%' },
-            { uf: 'SP', name: 'São Paulo', secoes: 104520, apuradas: 24150, leader: 'FLÁVIO BOLSONARO (PL)', leadShare: '59.8%' },
-            { uf: 'MG', name: 'Minas Gerais', secoes: 49830, apuradas: 11420, leader: 'LULA (PT)', leadShare: '50.1%' },
-            { uf: 'RJ', name: 'Rio de Janeiro', secoes: 34210, apuradas: 8900, leader: 'FLÁVIO BOLSONARO (PL)', leadShare: '57.4%' },
-            { uf: 'BA', name: 'Bahia', secoes: 38240, apuradas: 9800, leader: 'LULA (PT)', leadShare: '70.8%' },
-            { uf: 'RS', name: 'Rio G. do Sul', secoes: 27980, apuradas: 6950, leader: 'FLÁVIO BOLSONARO (PL)', leadShare: '58.1%' }
-        ],
-
-        // 6. MUNICÍPIOS DE ALAGOAS
-        citiesAL: [
-            { name: 'Maceió', secoes: 1982, apuradas: 198, leader: 'JHC (PSDB)', leadShare: '58.2%' },
-            { name: 'Arapiraca', secoes: 542, apuradas: 59, leader: 'RENAN FILHO (MDB)', leadShare: '53.4%' },
-            { name: 'Rio Largo', secoes: 210, apuradas: 24, leader: 'JHC (PSDB)', leadShare: '52.7%' },
-            { name: 'Palmeira dos Índios', secoes: 185, apuradas: 21, leader: 'RENAN FILHO (MDB)', leadShare: '55.1%' },
-            { name: 'Penedo', secoes: 145, apuradas: 16, leader: 'RENAN FILHO (MDB)', leadShare: '57.0%' },
-            { name: 'União dos Palmares', secoes: 160, apuradas: 18, leader: 'RENAN FILHO (MDB)', leadShare: '58.2%' },
-            { name: 'Delmiro Gouveia', secoes: 128, apuradas: 15, leader: 'RENAN FILHO (MDB)', leadShare: '62.4%' },
-            { name: 'Santana do Ipanema', secoes: 110, apuradas: 13, leader: 'RENAN FILHO (MDB)', leadShare: '61.1%' }
-        ],
-
-        // 7. DUELO / CONFRONTO DIRETO (HEAD-TO-HEAD)
-        duel: {
-            cargo: 'pres', // 'pres', 'gov', 'sen', 'dep', 'est', 'all'
-            candAId: '13',
-            candBId: '22'
-        },
-
-        // 8. OMNI-SEARCH
-        omni: {
-            filterRace: 'all',
-            query: ''
+    function formatPct(val) {
+        if (typeof val === 'number') {
+            return (val * 100).toFixed(2).replace('.', ',') + '%';
         }
-    };
-
-    // --- DOM REFERENCES ---
-    const dom = {
-        clock: document.getElementById('telemetry-clock'),
-        ping: document.getElementById('telemetry-ping'),
-        rate: document.getElementById('telemetry-rate'),
-        btnAudio: document.getElementById('btn-audio'),
-        audioStatus: document.getElementById('audio-status'),
-        btnFullscreen: document.getElementById('btn-fullscreen'),
-        btnControls: document.getElementById('btn-controls'),
-        controlDrawer: document.getElementById('control-drawer'),
-        btnCloseDrawer: document.getElementById('btn-close-drawer'),
-
-        tabs: document.querySelectorAll('.nav-tab'),
-        panels: document.querySelectorAll('.view-panel'),
-
-        // Header Elements
-        btnForceRefresh: document.getElementById('btn-force-refresh'),
-        spinRefreshIcon: document.getElementById('spin-refresh-icon'),
-        lblRefresh: document.getElementById('lbl-refresh'),
-        btnLula13: document.getElementById('btn-lula-13'),
-        tseTimePill: document.getElementById('telemetry-tse-time'),
-
-        // Split Screen
-        presProgressBar: document.getElementById('pres-progress-bar'),
-        presSecPercent: document.getElementById('pres-sec-percent'),
-        presSecCount: document.getElementById('pres-sec-count'),
-        presTotalVotos: document.getElementById('pres-total-votos'),
-        presVotosValidos: document.getElementById('pres-votos-validos'),
-        presBrancosNulos: document.getElementById('pres-brancos-nulos'),
-        presCandidatesContainer: document.getElementById('pres-candidates-container'),
-        presMarginDiff: document.getElementById('pres-margin-diff'),
-        presMarginRate: document.getElementById('pres-margin-rate'),
-        presProjection: document.getElementById('pres-projection'),
-        presStatusBadge: document.getElementById('pres-status-badge'),
-
-        govProgressBar: document.getElementById('gov-progress-bar'),
-        govSecPercent: document.getElementById('gov-sec-percent'),
-        govSecCount: document.getElementById('gov-sec-count'),
-        govTotalVotos: document.getElementById('gov-total-votos'),
-        govVotosValidos: document.getElementById('gov-votos-validos'),
-        govMaceioPercent: document.getElementById('gov-maceio-percent'),
-        govCandidatesContainer: document.getElementById('gov-candidates-container'),
-        govMarginDiff: document.getElementById('gov-margin-diff'),
-        govActiveCity: document.getElementById('gov-active-city'),
-        govProjection: document.getElementById('gov-projection'),
-        govStatusBadge: document.getElementById('gov-status-badge'),
-
-        // Heroes
-        heroPresSecoes: document.getElementById('hero-pres-secoes'),
-        heroPresUrnasRatio: document.getElementById('hero-pres-urnas-ratio'),
-        heroPresEleitores: document.getElementById('hero-pres-eleitores'),
-        presDetailedGrid: document.getElementById('pres-detailed-grid'),
-        ufTelemetryRow: document.getElementById('uf-telemetry-row'),
-
-        heroGovSecoes: document.getElementById('hero-gov-secoes'),
-        heroGovUrnasRatio: document.getElementById('hero-gov-urnas-ratio'),
-        heroGovEleitores: document.getElementById('hero-gov-eleitores'),
-        govDetailedGrid: document.getElementById('gov-detailed-grid'),
-        alagoasCitiesGrid: document.getElementById('alagoas-cities-grid'),
-
-        // Senado & Deputados Legado
-        senSecPercent: document.getElementById('sen-sec-percent'),
-        senSecCount: document.getElementById('sen-sec-count'),
-        senProgressBar: document.getElementById('sen-progress-bar'),
-        senCandidatesContainer: document.getElementById('sen-candidates-container'),
-        depSecPercent: document.getElementById('dep-sec-percent'),
-        depTotalVotos: document.getElementById('dep-total-votos'),
-        depProgressBar: document.getElementById('dep-progress-bar'),
-        depCandidatesContainer: document.getElementById('dep-candidates-container'),
-
-        // Deputado Federal AL (Dedicado)
-        fedSecPercent: document.getElementById('fed-sec-percent'),
-        fedSecCount: document.getElementById('fed-sec-count'),
-        fedTotalVotos: document.getElementById('fed-total-votos'),
-        fedVotosValidos: document.getElementById('fed-votos-validos'),
-        fedProgressBar: document.getElementById('fed-progress-bar'),
-        fedProgressLabel: document.getElementById('fed-progress-label'),
-        fedCandidatesContainer: document.getElementById('fed-detailed-grid'),
-        filterFed: document.getElementById('filter-fed'),
-        fedCountPill: document.getElementById('fed-count-pill'),
-
-        // Deputado Estadual AL (Dedicado)
-        estSecPercent: document.getElementById('est-sec-percent'),
-        estSecCount: document.getElementById('est-sec-count'),
-        estTotalVotos: document.getElementById('est-total-votos'),
-        estVotosValidos: document.getElementById('est-votos-validos'),
-        estProgressBar: document.getElementById('est-progress-bar'),
-        estProgressLabel: document.getElementById('est-progress-label'),
-        estCandidatesContainer: document.getElementById('est-detailed-grid'),
-        filterEst: document.getElementById('filter-est'),
-        estCountPill: document.getElementById('est-count-pill'),
-
-        // Ticker & Logs
-        liveStreamTicker: document.getElementById('live-stream-ticker'),
-        terminalBusLog: document.getElementById('terminal-bus-log'),
-        specAlagoasCount: document.getElementById('spec-alagoas-count'),
-        specAlZonas: document.getElementById('spec-al-zonas'),
-        telemetryCanvas: document.getElementById('telemetryCanvas'),
-
-        breakingToast: document.getElementById('breaking-toast'),
-        toastMessage: document.getElementById('toast-message'),
-
-        // Drawer
-        speedButtons: document.querySelectorAll('.speed-btn'),
-        btnSyncNow: document.getElementById('btn-sync-now'),
-        btnPause: document.getElementById('btn-pause'),
-        btnVirada: document.getElementById('btn-virada'),
-        btnReset: document.getElementById('btn-reset'),
-        btnFinish: document.getElementById('btn-finish'),
-        btnApplyNames: document.getElementById('btn-apply-names'),
-        editP1Name: document.getElementById('edit-p1-name'),
-        editP1Party: document.getElementById('edit-p1-party'),
-        editP2Name: document.getElementById('edit-p2-name'),
-        editP2Party: document.getElementById('edit-p2-party'),
-        editAl1Name: document.getElementById('edit-al1-name'),
-        editAl1Party: document.getElementById('edit-al1-party'),
-        editAl2Name: document.getElementById('edit-al2-name'),
-        editAl2Party: document.getElementById('edit-al2-party'),
-
-        // Executive Navigation & Omni-Search Hub
-        mobileNavSelect: document.getElementById('mobile-nav-select'),
-        omniSearchInput: document.getElementById('omni-search-input'),
-        omniSearchClear: document.getElementById('omni-search-clear'),
-        omniFilterChips: document.querySelectorAll('.omni-filter-chips .chip'),
-        omniDropdownResults: document.getElementById('omni-dropdown-results'),
-        omniResultsCount: document.getElementById('omni-results-count'),
-        omniResultsList: document.getElementById('omni-results-list'),
-
-        // Confronto Direto (Head-to-Head / X1)
-        duelSelectCargo: document.getElementById('duel-select-cargo'),
-        duelSelectCandA: document.getElementById('duel-select-cand-a'),
-        duelSelectCandB: document.getElementById('duel-select-cand-b'),
-        duelBtnSwap: document.getElementById('duel-btn-swap'),
-        duelPresetButtons: document.querySelectorAll('.preset-btn'),
-
-        duelCardA: document.getElementById('duel-card-a'),
-        fighterBadgeA: document.getElementById('fighter-badge-a'),
-        fighterAvatarA: document.getElementById('fighter-avatar-a'),
-        fighterNameA: document.getElementById('fighter-name-a'),
-        fighterMetaA: document.getElementById('fighter-meta-a'),
-        fighterCargoA: document.getElementById('fighter-cargo-a'),
-        fighterPctA: document.getElementById('fighter-pct-a'),
-        fighterVotesA: document.getElementById('fighter-votes-a'),
-        fighterBarA: document.getElementById('fighter-bar-a'),
-
-        duelCardB: document.getElementById('duel-card-b'),
-        fighterBadgeB: document.getElementById('fighter-badge-b'),
-        fighterAvatarB: document.getElementById('fighter-avatar-b'),
-        fighterNameB: document.getElementById('fighter-name-b'),
-        fighterMetaB: document.getElementById('fighter-meta-b'),
-        fighterCargoB: document.getElementById('fighter-cargo-b'),
-        fighterPctB: document.getElementById('fighter-pct-b'),
-        fighterVotesB: document.getElementById('fighter-votes-b'),
-        fighterBarB: document.getElementById('fighter-bar-b'),
-
-        duelDiffVotes: document.getElementById('duel-diff-votes'),
-        duelDiffPct: document.getElementById('duel-diff-pct'),
-        domLabelA: document.getElementById('dom-label-a'),
-        domLabelB: document.getElementById('dom-label-b'),
-        domBarA: document.getElementById('dom-bar-a'),
-        domBarB: document.getElementById('dom-bar-b'),
-        duelTurnaroundText: document.getElementById('duel-turnaround-text'),
-
-        matShareA: document.getElementById('mat-share-a'),
-        matShareB: document.getElementById('mat-share-b'),
-        matShareSub: document.getElementById('mat-share-sub'),
-        matVotesA: document.getElementById('mat-votes-a'),
-        matVotesB: document.getElementById('mat-votes-b'),
-        matVotesSub: document.getElementById('mat-votes-sub'),
-        matDomA: document.getElementById('mat-dom-a'),
-        matDomB: document.getElementById('mat-dom-b'),
-        matStatusA: document.getElementById('mat-status-a'),
-        matStatusB: document.getElementById('mat-status-b'),
-        matStatusSub: document.getElementById('mat-status-sub')
-    };
-
-    // --- OSCILLOSCOPE CANVAS ---
-    const canvasCtx = dom.telemetryCanvas ? dom.telemetryCanvas.getContext('2d') : null;
-    const historyRates = new Array(80).fill(1.85);
-
-    function drawTelemetryWave(rate) {
-        if (!canvasCtx) return;
-        historyRates.push(rate);
-        if (historyRates.length > 80) historyRates.shift();
-
-        const w = dom.telemetryCanvas.width;
-        const h = dom.telemetryCanvas.height;
-        canvasCtx.clearRect(0, 0, w, h);
-
-        canvasCtx.strokeStyle = 'rgba(40, 60, 95, 0.4)';
-        canvasCtx.lineWidth = 1;
-        canvasCtx.beginPath();
-        for (let y = 30; y < h; y += 35) {
-            canvasCtx.moveTo(0, y);
-            canvasCtx.lineTo(w, y);
+        if (typeof val === 'string' && val.includes('%')) {
+            return val;
         }
-        canvasCtx.stroke();
-
-        canvasCtx.strokeStyle = '#00f0ff';
-        canvasCtx.lineWidth = 2;
-        canvasCtx.beginPath();
-        const stepX = w / (historyRates.length - 1);
-        const maxRate = 12.0;
-
-        for (let i = 0; i < historyRates.length; i++) {
-            const norm = Math.min(1, historyRates[i] / maxRate);
-            const y = h - (norm * (h - 20) + 10);
-            const x = i * stepX;
-            if (i === 0) canvasCtx.moveTo(x, y);
-            else canvasCtx.lineTo(x, y);
-        }
-        canvasCtx.stroke();
-
-        canvasCtx.lineTo(w, h);
-        canvasCtx.lineTo(0, h);
-        canvasCtx.fillStyle = 'rgba(0, 240, 255, 0.08)';
-        canvasCtx.fill();
+        return '0,00%';
     }
 
-    // --- UTILITIES ---
-    const intFormatter = new Intl.NumberFormat('pt-BR');
-    function formatInt(v) {
-        return intFormatter.format(Math.floor(v));
-    }
-
-    function formatPercent(pct, decimals = 4) {
-        return (pct * 100).toFixed(decimals) + '%';
-    }
-
-    function pad(n, len = 2) {
-        return String(n).padStart(len, '0');
-    }
-
-    function updateClock() {
-        const now = new Date();
-        const h = pad(now.getHours());
-        const m = pad(now.getMinutes());
-        const s = pad(now.getSeconds());
-        const ms = pad(now.getMilliseconds(), 3);
-        if (dom.clock) dom.clock.textContent = `${h}:${m}:${s}.${ms}`;
-    }
-
-    let toastTimeout = null;
     function showToast(msg) {
-        if (!dom.toastMessage || !dom.breakingToast) return;
-        dom.toastMessage.textContent = msg;
-        dom.breakingToast.classList.remove('hidden');
-        sound.alarm();
-        if (toastTimeout) clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => {
-            dom.breakingToast.classList.add('hidden');
-        }, 5500);
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3200);
     }
 
-    function addTickerItem(uf, city, secao, votesInBu) {
-        if (!dom.liveStreamTicker) return;
-        const item = document.createElement('span');
-        item.className = 'ticker-item';
-        item.innerHTML = `<span class="ticker-badge-uf">${uf}</span> ${city} (Seção ${secao}): +${votesInBu} votos computados`;
-        dom.liveStreamTicker.appendChild(item);
-        if (dom.liveStreamTicker.children.length > 25) {
-            dom.liveStreamTicker.removeChild(dom.liveStreamTicker.firstElementChild);
+    // --- NAVEGAÇÃO ENTRE ABAS ---
+    window.switchTab = function (tabId) {
+        state.activeTab = tabId;
+
+        // Atualiza botões
+        document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+            if (btn.dataset.target === tabId) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // Alterna painéis
+        document.querySelectorAll('.view-panel').forEach(panel => {
+            if (panel.id === tabId) {
+                panel.classList.add('active');
+            } else {
+                panel.classList.remove('active');
+            }
+        });
+
+        if (tabId === 'view-estados') {
+            renderEstadosView();
         }
-    }
 
-    function addTerminalLog(uf, city, zona, secao, votesInBu) {
-        if (!dom.terminalBusLog) return;
-        const line = document.createElement('div');
-        line.className = 'log-line';
-        const now = new Date();
-        const timeStr = `04/10/2026 ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}.${pad(now.getMilliseconds(), 3)}`;
-        const hash = Math.random().toString(16).substring(2, 10).toUpperCase();
-
-        const ufClass = uf === 'AL' ? 'log-uf-al' : 'log-uf-br';
-        line.innerHTML = `<span class="log-ts">[${timeStr}]</span> <span class="${ufClass}">[${uf}]</span> ${city.toUpperCase()} Z-${pad(zona, 3)} SEC-${pad(secao, 4)} &bull; ${votesInBu} VOTOS &bull; <span class="log-ok">BU VERIFICADO [HASH:${hash}]</span>`;
-        
-        dom.terminalBusLog.prepend(line);
-        if (dom.terminalBusLog.children.length > 50) {
-            dom.terminalBusLog.removeChild(dom.terminalBusLog.lastElementChild);
-        }
-    }
-
-    // --- FOTOS OFICIAIS DOS CANDIDATOS (TSE 2026) ---
-    const PHOTO_REGISTRY = {
-        'pres_22': 'fotos/pres_22.jpeg',
-        'pres_13': 'fotos/pres_13.jpeg',
-        'pres_70': 'fotos/pres_70.jpeg',
-        'pres_55': 'fotos/pres_55.jpeg',
-        'pres_14': 'fotos/pres_14.jpeg',
-        'pres_30': 'fotos/pres_30.jpeg',
-        'pres_80': 'fotos/pres_80.jpeg',
-        'pres_27': 'fotos/pres_27.jpeg',
-        'pres_16': 'fotos/pres_16.jpeg',
-        'pres_21': 'fotos/pres_21.jpeg',
-        'pres_35': 'fotos/pres_35.jpeg',
-        'pres_29': 'fotos/pres_29.jpeg',
-        'gov_15': 'fotos/gov_15.jpeg',
-        'gov_45': 'fotos/gov_45.jpeg',
-        'gov_80': 'fotos/gov_80.jpeg',
-        'gov_35': 'fotos/gov_35.jpeg',
-        'sen_111': 'fotos/sen_111.jpeg',
-        'sen_456': 'fotos/sen_456.jpeg',
-        'sen_151': 'fotos/sen_151.jpeg',
-        'sen_156': 'fotos/sen_156.jpeg',
-        'sen_100': 'fotos/sen_100.jpeg',
-        'sen_800': 'fotos/sen_800.jpeg',
-        'sen_355': 'fotos/sen_355.jpeg'
+        // Efeito sonoro sutil
+        audio.beep(750, 0.04, 'sine', 0.1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    function resolveCandidatePhoto(racePrefix, number, sqcand, currentPhoto) {
-        if (currentPhoto && (currentPhoto.startsWith('fotos/') || currentPhoto.startsWith('http'))) {
-            return currentPhoto;
+    // --- SUB-ABAS DE ALAGOAS ---
+    window.switchAlagoasCargo = function (cargoKey) {
+        state.alagoasCargo = cargoKey;
+        document.querySelectorAll('.sub-pill').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        if (event && event.target) {
+            event.target.classList.add('active');
         }
-        const key = `${racePrefix}_${number}`;
-        if (PHOTO_REGISTRY[key]) {
-            return PHOTO_REGISTRY[key];
+        renderAlagoasView();
+        audio.beep(650, 0.04, 'sine', 0.1);
+    };
+
+    // --- ÁUDIO GERAL ---
+    window.toggleAudio = function () {
+        state.audioEnabled = !state.audioEnabled;
+        const icon = document.getElementById('sound-icon');
+        if (icon) {
+            icon.textContent = state.audioEnabled ? '🔊' : '🔇';
         }
-        if (sqcand) {
-            const uf = racePrefix === 'pres' ? 'br' : 'al';
-            const ele = racePrefix === 'pres' ? '6257' : '6259';
-            return `https://resultados.tse.jus.br/oficial/ele2026/${ele}/fotos/${uf}/${sqcand}.jpeg`;
+        showToast(state.audioEnabled ? '🔊 Som ativado' : '🔇 Som desativado');
+        if (state.audioEnabled) audio.beep(880, 0.08);
+    };
+
+    window.toggleChatSound = function () {
+        state.chatSoundEnabled = !state.chatSoundEnabled;
+        const icon = document.getElementById('chat-sound-btn-icon');
+        if (icon) {
+            icon.textContent = state.chatSoundEnabled ? '🔔' : '🔕';
+        }
+        showToast(state.chatSoundEnabled ? '🔔 Notificações sonoras ativadas' : '🔕 Notificações sonoras silenciadas');
+    };
+
+    // Sons divertidos da Rinha
+    window.playCustomSound = function (type) {
+        audio.ensure();
+        if (type === 'urna') {
+            audio.urnaSound();
+            showToast('🗳️ Som oficial de confirmação da urna!');
+        } else if (type === 'cheer') {
+            audio.beep(523, 0.15, 'triangle', 0.3);
+            setTimeout(() => audio.beep(659, 0.15, 'triangle', 0.3), 120);
+            setTimeout(() => audio.beep(783, 0.3, 'triangle', 0.35), 240);
+            showToast('🎉 Comemoração da torcida!');
+        } else if (type === 'gong') {
+            audio.gongSound();
+            showToast('🔔 Gongo de boxe! Rinha pegando fogo!');
+        } else if (type === 'lula') {
+            audio.beep(800, 0.1);
+            speak('Companheiro, a democracia venceu e a picanha tá garantida!');
+            showToast('⭐ Lula 13: "A democracia venceu!"');
+        } else if (type === 'bolso') {
+            audio.beep(900, 0.1);
+            speak('Brasil acima de tudo, Deus acima de todos! Acelera capitão!');
+            showToast('🇧🇷 Capitão 22: "Brasil acima de tudo!"');
+        } else if (type === 'picanha') {
+            audio.beep(1000, 0.1);
+            speak('Churrasco com cervejinha pro trabalhador!');
+            showToast('🥩 "Chama na picanha!"');
+        }
+    };
+
+    // --- CARREGAMENTO E SINCRONIZAÇÃO DE DADOS ---
+    async function loadData() {
+        try {
+            // Tenta puxar do backend ativo ou do json estático
+            let res = await fetch('/api/tse-live');
+            if (!res.ok) {
+                res = await fetch('dados_tse_atual.json');
+            }
+            if (res.ok) {
+                const data = await res.json();
+                state.data = data;
+                state.pres = data.pres || null;
+                state.gov_al = data.gov_al || null;
+                state.sen_al = data.sen_al || null;
+                state.dep_al = data.dep_al || null;
+                state.est_al = data.est_al || null;
+                state.uf_matrix = data.uf_matrix || {};
+
+                renderAllViews();
+            }
+        } catch (e) {
+            console.warn('Erro ao carregar dados:', e);
+        }
+    }
+
+    window.manualRefresh = async function () {
+        const icon = document.getElementById('refresh-icon');
+        if (icon) icon.style.transform = 'rotate(360deg)';
+        await loadData();
+        showToast('🔄 Dados atualizados com o TSE!');
+        setTimeout(() => {
+            if (icon) icon.style.transform = 'none';
+        }, 500);
+    };
+
+    // --- RENDERIZAÇÃO DE TODAS AS TELAS ---
+    function renderAllViews() {
+        if (!state.data) return;
+
+        renderPresidenteView();
+        renderSegundoTurnoView();
+        renderComparadorView();
+
+        // Atualização contínua e suave do mapa
+        if (!mapInitialized) {
+            renderEstadosView();
+        } else {
+            updateMapColors();
+            updateStatesScoreboard();
+            renderQuickCollegePills();
+            if (state.selectedState) {
+                updateSelectedStateCard(state.selectedState);
+            }
+        }
+    }
+
+    // 1. Visão de Presidente
+    function renderPresidenteView() {
+        const pres = state.pres;
+        if (!pres) return;
+
+        // Cabeçalho de progresso
+        const pctSecoes = pres.pct_secoes || '100,00%';
+        const elPctSecoes = document.getElementById('pres-pct-secoes');
+        if (elPctSecoes) elPctSecoes.textContent = pctSecoes;
+
+        const elSecRatio = document.getElementById('pres-secoes-ratio');
+        if (elSecRatio) elSecRatio.textContent = `${formatNumber(pres.secoes_apuradas)} de ${formatNumber(pres.secoes_total)}`;
+
+        const elTotalVotos = document.getElementById('pres-total-votos');
+        if (elTotalVotos) elTotalVotos.textContent = formatNumber(pres.total_votos);
+
+        const elValidos = document.getElementById('pres-votos-validos');
+        if (elValidos) elValidos.textContent = formatNumber(pres.votos_validos);
+
+        const elHeaderStatus = document.getElementById('header-status-text');
+        if (elHeaderStatus) elHeaderStatus.textContent = `${pctSecoes} DAS SEÇÕES APURADAS`;
+
+        const elBarFill = document.getElementById('pres-bar-fill');
+        if (elBarFill) {
+            const rawPct = parseFloat((pctSecoes || '').replace(',', '.')) || 100;
+            elBarFill.style.width = `${rawPct}%`;
+        }
+
+        // Hero: Duelo 22 vs 13
+        const cands = pres.candidatos || [];
+        const bolso = cands.find(c => c.numero === '22') || cands[0];
+        const lula = cands.find(c => c.numero === '13') || cands[1];
+
+        if (bolso) {
+            const elPct = document.getElementById('hero-pct-22');
+            if (elPct) elPct.textContent = bolso.pct_str || formatPct(bolso.pct);
+            const elVotes = document.getElementById('hero-votes-22');
+            if (elVotes) elVotes.textContent = `${formatNumber(bolso.votos)} votos`;
+            const elFoto = document.getElementById('hero-foto-22');
+            if (elFoto && bolso.foto) elFoto.src = bolso.foto;
+        }
+
+        if (lula) {
+            const elPct = document.getElementById('hero-pct-13');
+            if (elPct) elPct.textContent = lula.pct_str || formatPct(lula.pct);
+            const elVotes = document.getElementById('hero-votes-13');
+            if (elVotes) elVotes.textContent = `${formatNumber(lula.votos)} votos`;
+            const elFoto = document.getElementById('hero-foto-13');
+            if (elFoto && lula.foto) elFoto.src = lula.foto;
+        }
+
+        // Diferença entre os dois
+        if (bolso && lula) {
+            const delta = Math.abs(bolso.votos - lula.votos);
+            const totalDupla = bolso.votos + lula.votos;
+            const pctDelta = totalDupla > 0 ? (delta / pres.votos_validos * 100).toFixed(2).replace('.', ',') : '0,00';
+
+            const elDelta = document.getElementById('hero-delta-votos');
+            if (elDelta) elDelta.textContent = formatNumber(delta);
+
+            const elDeltaPct = document.getElementById('hero-delta-pct');
+            if (elDeltaPct) {
+                const lider = bolso.votos > lula.votos ? 'Bolsonaro' : 'Lula';
+                elDeltaPct.textContent = `${pctDelta}% (${lider} à frente)`;
+            }
+
+            // Cabo de guerra
+            if (totalDupla > 0) {
+                const pctPl = (bolso.votos / totalDupla * 100).toFixed(1);
+                const pctPt = (lula.votos / totalDupla * 100).toFixed(1);
+                const elTugPl = document.getElementById('hero-tug-pl');
+                const elTugPt = document.getElementById('hero-tug-pt');
+                if (elTugPl) elTugPl.style.width = `${pctPl}%`;
+                if (elTugPt) elTugPt.style.width = `${pctPt}%`;
+            }
+        }
+
+        // Lista completa de candidatos ordenada
+        const listContainer = document.getElementById('pres-candidates-full-list');
+        if (!listContainer) return;
+
+        listContainer.innerHTML = '';
+        const sorted = [...cands].sort((a, b) => b.votos - a.votos);
+
+        sorted.forEach((c, idx) => {
+            const row = document.createElement('div');
+            row.className = 'cand-row-card';
+
+            const pos = idx + 1;
+            const posClass = pos === 1 ? 'top-1' : (pos === 2 ? 'top-2' : (pos === 3 ? 'top-3' : ''));
+            const pctStr = c.pct_str || formatPct(c.pct);
+            const rawPct = typeof c.pct === 'number' ? (c.pct * 100).toFixed(1) : parseFloat((pctStr || '').replace(',', '.')) || 0;
+
+            row.innerHTML = `
+                <div class="cand-pos ${posClass}">${pos}º</div>
+                <img src="${c.foto || 'fotos/pres_22.jpeg'}" alt="${c.nome}" class="cand-thumb" onerror="this.src='fotos/pres_22.jpeg'">
+                <div class="cand-info-col">
+                    <div class="cand-row-title-row">
+                        <strong class="cand-row-name">${c.nome}</strong>
+                        ${c.eleito ? '<span class="cand-elected-badge">ELEITO</span>' : ''}
+                    </div>
+                    <span class="cand-row-sub">${c.partido} &bull; ${c.numero} ${c.nome_completo ? `&bull; ${c.nome_completo}` : ''}</span>
+                </div>
+                <div class="cand-bar-col">
+                    <div class="cand-row-progress-bg">
+                        <div class="cand-row-progress-fill" style="width: ${Math.min(100, rawPct)}%;"></div>
+                    </div>
+                </div>
+                <div class="cand-row-score-col">
+                    <span class="cand-row-pct">${pctStr}</span>
+                    <span class="cand-row-votes">${formatNumber(c.votos)}</span>
+                </div>
+            `;
+            listContainer.appendChild(row);
+        });
+    }
+
+    // 2. Visão de Segundo Turno
+    function renderSegundoTurnoView() {
+        const pres = state.pres;
+        if (!pres) return;
+
+        const cands = pres.candidatos || [];
+        const bolso = cands.find(c => c.numero === '22');
+        const lula = cands.find(c => c.numero === '13');
+        if (!bolso || !lula) return;
+
+        const elPctBolso = document.getElementById('r2-pct-bolso');
+        const elVotesBolso = document.getElementById('r2-votes-bolso');
+        if (elPctBolso) elPctBolso.textContent = bolso.pct_str || formatPct(bolso.pct);
+        if (elVotesBolso) elVotesBolso.textContent = `${formatNumber(bolso.votos)} votos`;
+
+        const elPctLula = document.getElementById('r2-pct-lula');
+        const elVotesLula = document.getElementById('r2-votes-lula');
+        if (elPctLula) elPctLula.textContent = lula.pct_str || formatPct(lula.pct);
+        if (elVotesLula) elVotesLula.textContent = `${formatNumber(lula.votos)} votos`;
+
+        // Meta 50% + 1
+        const metaVotos = Math.floor(pres.votos_validos * 0.5) + 1;
+        const needBolso = Math.max(0, metaVotos - bolso.votos);
+        const needLula = Math.max(0, metaVotos - lula.votos);
+
+        const elNeedBolso = document.getElementById('r2-need-bolso');
+        if (elNeedBolso) elNeedBolso.textContent = formatNumber(needBolso);
+
+        const elNeedLula = document.getElementById('r2-need-lula');
+        if (elNeedLula) elNeedLula.textContent = formatNumber(needLula);
+
+        const diff = Math.abs(bolso.votos - lula.votos);
+        const elDiff = document.getElementById('r2-diff-val');
+        if (elDiff) elDiff.textContent = formatNumber(diff);
+
+        // Atualiza a pista de corrida // Linha de chegada 50% + 1
+        updateRaceTrack(bolso, lula, pres.votos_validos);
+
+        // Executa a simulação inicial
+        window.runSimulation();
+
+        // Renderiza a Batalha das 5 Regiões
+        renderRegionalBattle();
+    }
+
+    // Pista de corrida da linha de chegada 50% + 1
+    function updateRaceTrack(bolso, lula, validos) {
+        if (!validos) return;
+        const pctBolso = (bolso.votos / validos * 100);
+        const pctLula = (lula.votos / validos * 100);
+
+        // O centro 50% fica em 50% da largura. Mapeamos de 40% a 55% para visualização dramática
+        const runnerBolso = document.getElementById('runner-bolso');
+        const runnerLula = document.getElementById('runner-lula');
+
+        if (runnerBolso) {
+            // Mapeia proporção para posição no trilho (0 a 90%)
+            const pos = Math.min(88, Math.max(5, (pctBolso / 55) * 80));
+            runnerBolso.style.left = `${pos}%`;
+        }
+
+        if (runnerLula) {
+            const pos = Math.min(88, Math.max(5, (pctLula / 55) * 80));
+            runnerLula.style.left = `${pos}%`;
+        }
+    }
+
+    // Contagem Regressiva para 25 de Outubro de 2026 às 17:00
+    function updateCountdown() {
+        // Alvo: 25/10/2026 às 17:00 (Brasília)
+        const targetDate = new Date('2026-10-25T17:00:00-03:00').getTime();
+        const now = Date.now();
+        let diff = targetDate - now;
+
+        if (diff <= 0) {
+            // Se já for no dia ou pós, simula tempo restante de apuração
+            diff = Math.abs(diff);
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        const elDays = document.getElementById('cd-days');
+        const elHours = document.getElementById('cd-hours');
+        const elMin = document.getElementById('cd-minutes');
+        const elSec = document.getElementById('cd-seconds');
+
+        if (elDays) elDays.textContent = String(days).padStart(2, '0');
+        if (elHours) elHours.textContent = String(hours).padStart(2, '0');
+        if (elMin) elMin.textContent = String(minutes).padStart(2, '0');
+        if (elSec) elSec.textContent = String(seconds).padStart(2, '0');
+    }
+
+    // Enquete / Bolão ao Vivo do 2º Turno
+    async function fetchPollResults() {
+        try {
+            const res = await fetch('/api/poll/results');
+            if (res.ok) {
+                const data = await res.json();
+                updatePollUI(data);
+            }
+        } catch (e) {}
+    }
+
+    function updatePollUI(data) {
+        if (!data) return;
+        const statLula = document.getElementById('poll-stat-lula');
+        const statBolso = document.getElementById('poll-stat-bolso');
+        const barLula = document.getElementById('poll-bar-lula');
+        const barBolso = document.getElementById('poll-bar-bolso');
+        const totalUsers = document.getElementById('poll-total-users');
+
+        if (statLula) statLula.textContent = `${data.pct_lula}% (${formatNumber(data.lula)} votos)`;
+        if (statBolso) statBolso.textContent = `${data.pct_bolsonaro}% (${formatNumber(data.bolsonaro)} votos)`;
+        if (barLula) barLula.style.width = `${data.pct_lula}%`;
+        if (barBolso) barBolso.style.width = `${data.pct_bolsonaro}%`;
+        if (totalUsers) totalUsers.textContent = `${formatNumber(data.total_votes)} palpites registrados na comunidade`;
+    }
+
+    window.voteInPoll = async function (choice) {
+        audio.beep(880, 0.06);
+        const alertBox = document.getElementById('poll-voted-alert');
+        try {
+            const res = await fetch('/api/poll/vote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clientId: state.clientId, choice: choice })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                updatePollUI(data);
+                if (alertBox) {
+                    alertBox.classList.remove('hidden');
+                    alertBox.textContent = `✅ Voto registrado em ${choice === '13' ? 'Lula' : 'Bolsonaro'}!`;
+                }
+                showToast(`🗳️ Seu voto foi computado no bolão!`);
+            }
+        } catch (e) {
+            showToast('✅ Voto registrado!');
+        }
+    };
+
+    // Simulador da Virada // Calculadora de Herança de Votos
+    window.runSimulation = function () {
+        const pres = state.pres;
+        if (!pres || !pres.candidatos) return;
+
+        const bolso = pres.candidatos.find(c => c.numero === '22') || { votos: 56104503 };
+        const lula = pres.candidatos.find(c => c.numero === '13') || { votos: 53879538 };
+
+        // Votos de terceiros
+        const votesCury = 827940;
+        const votesCaiado = 668422;
+        const votesRenan = 640393;
+        const votesOutros = 1135000;
+
+        // Sliders (0 = 100% Lula, 100 = 100% Bolsonaro)
+        const valCury = parseInt(document.getElementById('sim-cury')?.value || '50');
+        const valCaiado = parseInt(document.getElementById('sim-caiado')?.value || '50');
+        const valRenan = parseInt(document.getElementById('sim-renan')?.value || '50');
+        const valOutros = parseInt(document.getElementById('sim-outros')?.value || '50');
+
+        // Atualiza labels dos sliders
+        updateSliderLabel('lbl-cury', valCury);
+        updateSliderLabel('lbl-caiado', valCaiado);
+        updateSliderLabel('lbl-renan', valRenan);
+        updateSliderLabel('lbl-outros', valOutros);
+
+        // Distribuição simulada
+        const bolsoGain = Math.round(
+            votesCury * (valCury / 100) +
+            votesCaiado * (valCaiado / 100) +
+            votesRenan * (valRenan / 100) +
+            votesOutros * (valOutros / 100)
+        );
+
+        const lulaGain = Math.round(
+            votesCury * ((100 - valCury) / 100) +
+            votesCaiado * ((100 - valCaiado) / 100) +
+            votesRenan * ((100 - valRenan) / 100) +
+            votesOutros * ((100 - valOutros) / 100)
+        );
+
+        const totalSimBolso = bolso.votos + bolsoGain;
+        const totalSimLula = lula.votos + lulaGain;
+        const totalSim = totalSimBolso + totalSimLula;
+
+        const pctBolso = (totalSimBolso / totalSim * 100).toFixed(2).replace('.', ',');
+        const pctLula = (totalSimLula / totalSim * 100).toFixed(2).replace('.', ',');
+
+        // Atualiza DOM
+        const elScoreBolso = document.getElementById('sim-score-bolso');
+        const elPctBolso = document.getElementById('sim-pct-bolso');
+        const elScoreLula = document.getElementById('sim-score-lula');
+        const elPctLula = document.getElementById('sim-pct-lula');
+        const trackPl = document.getElementById('sim-track-pl');
+        const trackPt = document.getElementById('sim-track-pt');
+        const winnerBadge = document.getElementById('sim-winner-badge');
+
+        if (elScoreBolso) elScoreBolso.textContent = formatNumber(totalSimBolso);
+        if (elPctBolso) elPctBolso.textContent = `${pctBolso}%`;
+        if (elScoreLula) elScoreLula.textContent = formatNumber(totalSimLula);
+        if (elPctLula) elPctLula.textContent = `${pctLula}%`;
+
+        const rawPctPl = (totalSimBolso / totalSim * 100).toFixed(1);
+        const rawPctPt = (totalSimLula / totalSim * 100).toFixed(1);
+        if (trackPl) trackPl.style.width = `${rawPctPl}%`;
+        if (trackPt) trackPt.style.width = `${rawPctPt}%`;
+
+        if (winnerBadge) {
+            if (totalSimBolso > totalSimLula) {
+                const diff = totalSimBolso - totalSimLula;
+                winnerBadge.textContent = `BOLSONARO +${formatNumber(diff)} VOTOS`;
+                winnerBadge.style.color = '#3b82f6';
+                winnerBadge.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+            } else {
+                const diff = totalSimLula - totalSimBolso;
+                winnerBadge.textContent = `VIRADA DO LULA +${formatNumber(diff)} VOTOS`;
+                winnerBadge.style.color = '#ef4444';
+                winnerBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            }
+        }
+    };
+
+    function updateSliderLabel(prefix, val) {
+        const lulaPct = 100 - val;
+        const bolsoPct = val;
+        const elLula = document.getElementById(`${prefix}-lula`);
+        const elBolso = document.getElementById(`${prefix}-bolso`);
+        if (elLula) elLula.textContent = `Lula: ${lulaPct}%`;
+        if (elBolso) elBolso.textContent = `Bolsonaro: ${bolsoPct}%`;
+    }
+
+    window.applySimPreset = function (preset) {
+        const sCury = document.getElementById('sim-cury');
+        const sCaiado = document.getElementById('sim-caiado');
+        const sRenan = document.getElementById('sim-renan');
+        const sOutros = document.getElementById('sim-outros');
+
+        if (preset === 'direita') {
+            if (sCury) sCury.value = 85;
+            if (sCaiado) sCaiado.value = 90;
+            if (sRenan) sRenan.value = 75;
+            if (sOutros) sOutros.value = 65;
+            showToast('🔵 Cenário Direita Unificada aplicado!');
+        } else if (preset === 'virada') {
+            if (sCury) sCury.value = 25;
+            if (sCaiado) sCaiado.value = 30;
+            if (sRenan) sRenan.value = 35;
+            if (sOutros) sOutros.value = 20;
+            showToast('🔴 Cenário Virada da Frente Ampla aplicado!');
+        } else if (preset === 'divisao') {
+            if (sCury) sCury.value = 50;
+            if (sCaiado) sCaiado.value = 50;
+            if (sRenan) sRenan.value = 50;
+            if (sOutros) sOutros.value = 50;
+            showToast('⚖️ Cenário Divisão 50/50 aplicado!');
+        }
+        audio.beep(750, 0.05);
+        window.runSimulation();
+    };
+
+    window.resetSimulation = function () {
+        window.applySimPreset('divisao');
+        showToast('🔄 Simulação restaurada');
+    };
+
+    // Batalha das 5 Regiões do Brasil
+    function renderRegionalBattle() {
+        const grid = document.getElementById('regions-grid');
+        if (!grid || !state.uf_matrix) return;
+
+        const regionsDef = {
+            'Nordeste': { ufs: ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE'], icon: '🌴' },
+            'Sudeste': { ufs: ['SP', 'MG', 'RJ', 'ES'], icon: '🏙️' },
+            'Sul': { ufs: ['PR', 'SC', 'RS'], icon: '🌾' },
+            'Centro-Oeste': { ufs: ['GO', 'MT', 'MS', 'DF'], icon: '🚜' },
+            'Norte': { ufs: ['AC', 'AM', 'AP', 'PA', 'RO', 'RR', 'TO'], icon: '🌳' }
+        };
+
+        grid.innerHTML = '';
+
+        Object.entries(regionsDef).forEach(([regName, info]) => {
+            let bolsoVotes = 0;
+            let lulaVotes = 0;
+
+            info.ufs.forEach(ufCode => {
+                const uf = state.uf_matrix[ufCode];
+                if (uf) {
+                    bolsoVotes += (uf.bolsonaro_votos || 0);
+                    lulaVotes += (uf.lula_votos || 0);
+                }
+            });
+
+            const total = bolsoVotes + lulaVotes;
+            const pctBolso = total > 0 ? (bolsoVotes / total * 100).toFixed(1) : '50.0';
+            const pctLula = total > 0 ? (lulaVotes / total * 100).toFixed(1) : '50.0';
+
+            const leadPL = bolsoVotes >= lulaVotes;
+            const diff = Math.abs(bolsoVotes - lulaVotes);
+            const leadLabel = leadPL ? `Bolsonaro +${formatNumber(diff)}` : `Lula +${formatNumber(diff)}`;
+            const leadClass = leadPL ? 'region-lead-pl' : 'region-lead-pt';
+
+            const box = document.createElement('div');
+            box.className = 'region-box';
+            box.innerHTML = `
+                <div class="region-box-header">
+                    <span class="region-name">${info.icon} ${regName}</span>
+                    <span class="region-lead-tag ${leadClass}">${leadLabel}</span>
+                </div>
+                <div class="region-bar">
+                    <div class="region-bar-pl" style="width: ${pctBolso}%;"></div>
+                    <div class="region-bar-pt" style="width: ${pctLula}%;"></div>
+                </div>
+                <div class="region-stats">
+                    <span class="pl-color">PL: ${pctBolso}% (${formatNumber(bolsoVotes)})</span>
+                    <span class="pt-color">PT: ${pctLula}% (${formatNumber(lulaVotes)})</span>
+                </div>
+            `;
+            grid.appendChild(box);
+        });
+    }
+
+    // 3. Visão de Alagoas
+    function renderAlagoasView() {
+        const container = document.getElementById('alagoas-cargo-content');
+        if (!container) return;
+
+        let cargoData = null;
+        let cargoTitle = 'Governador';
+
+        if (state.alagoasCargo === 'gov') {
+            cargoData = state.gov_al;
+            cargoTitle = 'Governador de Alagoas';
+        } else if (state.alagoasCargo === 'sen') {
+            cargoData = state.sen_al;
+            cargoTitle = 'Senador de Alagoas';
+        } else if (state.alagoasCargo === 'dep_fed') {
+            cargoData = state.dep_al;
+            cargoTitle = 'Deputados Federais de Alagoas';
+        } else if (state.alagoasCargo === 'dep_est') {
+            cargoData = state.est_al;
+            cargoTitle = 'Deputados Estaduais de Alagoas';
+        }
+
+        if (!cargoData || !cargoData.candidatos || cargoData.candidatos.length === 0) {
+            container.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-muted);">Carregando dados de ${cargoTitle}...</div>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        const sorted = [...cargoData.candidatos].sort((a, b) => b.votos - a.votos);
+
+        sorted.forEach((c, idx) => {
+            const row = document.createElement('div');
+            row.className = 'cand-row-card';
+
+            const pos = idx + 1;
+            const posClass = pos === 1 ? 'top-1' : (pos === 2 ? 'top-2' : (pos === 3 ? 'top-3' : ''));
+            const pctStr = c.pct_str || formatPct(c.pct);
+            const rawPct = typeof c.pct === 'number' ? (c.pct * 100).toFixed(1) : parseFloat((pctStr || '').replace(',', '.')) || 0;
+
+            row.innerHTML = `
+                <div class="cand-pos ${posClass}">${pos}º</div>
+                <img src="${c.foto || 'fotos/cand_45.jpeg'}" alt="${c.nome}" class="cand-thumb" onerror="this.src='fotos/cand_45.jpeg'">
+                <div class="cand-info-col">
+                    <div class="cand-row-title-row">
+                        <strong class="cand-row-name">${c.nome}</strong>
+                        ${c.eleito ? '<span class="cand-elected-badge">ELEITO</span>' : ''}
+                    </div>
+                    <span class="cand-row-sub">${c.partido} &bull; ${c.numero}</span>
+                </div>
+                <div class="cand-bar-col">
+                    <div class="cand-row-progress-bg">
+                        <div class="cand-row-progress-fill" style="width: ${Math.min(100, rawPct)}%;"></div>
+                    </div>
+                </div>
+                <div class="cand-row-score-col">
+                    <span class="cand-row-pct">${pctStr}</span>
+                    <span class="cand-row-votes">${formatNumber(c.votos)}</span>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    // 4. Visão de Comparador X1
+    function renderComparadorView() {
+        const pres = state.pres;
+        if (!pres || !pres.candidatos) return;
+
+        const selectA = document.getElementById('compare-select-a');
+        const selectB = document.getElementById('compare-select-b');
+        if (!selectA || !selectB) return;
+
+        // Popula selects se estiverem vazios
+        if (selectA.options.length === 0) {
+            pres.candidatos.forEach(c => {
+                const optA = new Option(`${c.nome} (${c.partido} ${c.numero})`, c.numero);
+                const optB = new Option(`${c.nome} (${c.partido} ${c.numero})`, c.numero);
+                selectA.add(optA);
+                selectB.add(optB);
+            });
+            selectA.value = '22'; // Bolsonaro default
+            selectB.value = '13'; // Lula default
+        }
+
+        window.updateComparison();
+    }
+
+    window.updateComparison = function () {
+        const pres = state.pres;
+        if (!pres || !pres.candidatos) return;
+
+        const selectA = document.getElementById('compare-select-a');
+        const selectB = document.getElementById('compare-select-b');
+        const resultCard = document.getElementById('compare-result-card');
+        if (!selectA || !selectB || !resultCard) return;
+
+        const candA = pres.candidatos.find(c => c.numero === selectA.value) || pres.candidatos[0];
+        const candB = pres.candidatos.find(c => c.numero === selectB.value) || pres.candidatos[1];
+
+        const delta = Math.abs(candA.votos - candB.votos);
+        const lider = candA.votos >= candB.votos ? candA.nome : candB.nome;
+
+        const totalPair = candA.votos + candB.votos;
+        const pctA = totalPair > 0 ? (candA.votos / totalPair * 100).toFixed(1) : '50.0';
+        const pctB = totalPair > 0 ? (candB.votos / totalPair * 100).toFixed(1) : '50.0';
+
+        resultCard.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; text-align: center;">
+                <div>
+                    <img src="${candA.foto || 'fotos/pres_22.jpeg'}" alt="${candA.nome}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-cyan);">
+                    <h4 style="margin-top: 8px; font-size: 16px; color: #ffffff;">${candA.nome}</h4>
+                    <span style="font-size: 12px; color: var(--text-secondary);">${candA.partido} &bull; ${candA.numero}</span>
+                    <div style="font-size: 26px; font-weight: 800; font-family: var(--font-mono); margin-top: 6px; color: var(--accent-cyan);">${candA.pct_str || formatPct(candA.pct)}</div>
+                    <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">${formatNumber(candA.votos)} votos</div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 12px 18px; border-radius: var(--radius-md);">
+                    <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">DIFERENÇA DIRETA</span>
+                    <div style="font-size: 20px; font-weight: 800; font-family: var(--font-mono); color: #ffffff;">${formatNumber(delta)}</div>
+                    <span style="font-size: 11px; color: var(--accent-green);">${lider} na frente</span>
+                </div>
+
+                <div>
+                    <img src="${candB.foto || 'fotos/pres_13.jpeg'}" alt="${candB.nome}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid var(--pt-red);">
+                    <h4 style="margin-top: 8px; font-size: 16px; color: #ffffff;">${candB.nome}</h4>
+                    <span style="font-size: 12px; color: var(--text-secondary);">${candB.partido} &bull; ${candB.numero}</span>
+                    <div style="font-size: 26px; font-weight: 800; font-family: var(--font-mono); margin-top: 6px; color: var(--pt-red);">${candB.pct_str || formatPct(candB.pct)}</div>
+                    <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">${formatNumber(candB.votos)} votos</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <div style="height: 10px; background: var(--bg-surface); border-radius: var(--radius-full); overflow: hidden; display: flex;">
+                    <div style="width: ${pctA}%; background: var(--accent-cyan);"></div>
+                    <div style="width: ${pctB}%; background: var(--pt-red);"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: var(--font-mono); margin-top: 4px; color: var(--text-secondary);">
+                    <span>${candA.nome}: ${pctA}%</span>
+                    <span>${candB.nome}: ${pctB}%</span>
+                </div>
+            </div>
+        `;
+    };
+
+    // -------------------------------------------------------------
+    // 5. VISÃO DE ESTADOS, MAPA INTERATIVO VETORIAL & AUTO-TOUR
+    // -------------------------------------------------------------
+    const STATE_CENTROIDS = {
+        "AC": { x: 82.8, y: 282.0 },
+        "AL": { x: 672.0, y: 298.0 },
+        "AM": { x: 174.3, y: 184.8 },
+        "AP": { x: 388.9, y: 86.8 },
+        "BA": { x: 566.4, y: 360.4 },
+        "CE": { x: 611.4, y: 212.6 },
+        "DF": { x: 476.0, y: 414.0 },
+        "ES": { x: 592.0, y: 474.0 },
+        "GO": { x: 436.6, y: 406.0 },
+        "MA": { x: 510.3, y: 218.7 },
+        "MG": { x: 507.1, y: 453.8 },
+        "MS": { x: 351.9, y: 491.0 },
+        "MT": { x: 328.2, y: 346.9 },
+        "PA": { x: 387.1, y: 181.9 },
+        "PB": { x: 674.0, y: 242.0 },
+        "PE": { x: 642.0, y: 260.0 },
+        "PI": { x: 545.8, y: 240.1 },
+        "PR": { x: 406.9, y: 563.7 },
+        "RJ": { x: 562.0, y: 520.0 },
+        "RN": { x: 664.0, y: 214.0 },
+        "RO": { x: 202.6, y: 313.0 },
+        "RR": { x: 227.1, y: 82.3 },
+        "RS": { x: 366.8, y: 669.4 },
+        "SC": { x: 410.8, y: 619.0 },
+        "SE": { x: 654.0, y: 318.0 },
+        "SP": { x: 452.8, y: 526.1 },
+        "TO": { x: 459.9, y: 285.2 }
+    };
+
+    const TOUR_UF_SEQUENCE = [
+        'SP', 'MG', 'RJ', 'BA', 'RS', 'PR', 'PE', 'CE', 'PA', 'SC',
+        'GO', 'MA', 'PB', 'ES', 'AM', 'RN', 'AL', 'PI', 'MT', 'MS',
+        'DF', 'RO', 'TO', 'SE', 'AC', 'AP', 'RR'
+    ];
+
+    state.autoTourEnabled = false; // Inicia pausado para controle total do usuário
+    state.showMapLabels = true;
+    state.mapFilter = 'all'; // 'all', 'bolso', 'lula', 'tight'
+    state.loadedStateUf = null;
+    let autoTourTimer = null;
+    let autoTourProgressTimer = null;
+    let autoTourStartTime = Date.now();
+    const AUTO_TOUR_INTERVAL = 6500; // 6.5 segundos por estado na transmissão
+
+    async function renderEstadosView() {
+        populateMapDropdown();
+        await initBrazilMap();
+        updateMapColors();
+        updateStatesScoreboard();
+        renderQuickCollegePills();
+        if (!state.selectedState) {
+            window.selectState('SP', false);
+        } else {
+            updateSelectedStateCard(state.selectedState);
+        }
+        renderBottomUfCards();
+        initAutoTour();
+    }
+
+    function populateMapDropdown() {
+        const select = document.getElementById('select-map-uf');
+        if (!select || select.options.length > 0) return;
+
+        const ufs = Object.values(state.uf_matrix || {}).sort((a, b) => (a.nome || a.uf).localeCompare(b.nome || b.uf));
+        ufs.forEach(u => {
+            const opt = new Option(`${u.nome || u.uf} (${u.uf})`, u.uf);
+            select.add(opt);
+        });
+        select.value = state.selectedState || 'SP';
+    }
+
+    window.selectStateFromDropdown = function (uf) {
+        pauseAutoTourUserAction();
+        window.selectState(uf, true);
+        audio.beep(800, 0.04);
+    };
+
+    // Controle de Rotação Automática
+    window.toggleAutoTour = function () {
+        state.autoTourEnabled = !state.autoTourEnabled;
+        updateAutoTourButtonUI();
+        if (state.autoTourEnabled) {
+            autoTourStartTime = Date.now();
+            showToast('▶️ Transmissão automática ativada!');
+        } else {
+            showToast('⏸️ Transmissão pausada. Você está no controle manual.');
+        }
+    };
+
+    function pauseAutoTourUserAction() {
+        if (state.autoTourEnabled) {
+            state.autoTourEnabled = false;
+            updateAutoTourButtonUI();
+            showToast('⏸️ Transmissão pausada para explorar o estado');
+        }
+    }
+
+    function updateAutoTourButtonUI() {
+        const btn = document.getElementById('btn-auto-tour');
+        const icon = document.getElementById('auto-tour-icon');
+        const lbl = document.getElementById('auto-tour-lbl');
+        if (!btn || !icon || !lbl) return;
+
+        if (state.autoTourEnabled) {
+            btn.classList.remove('paused');
+            btn.classList.add('active');
+            icon.textContent = '⏸️';
+            lbl.innerHTML = 'Transmissão Automática: <strong>LIGADA</strong>';
+        } else {
+            btn.classList.remove('active');
+            btn.classList.add('paused');
+            icon.textContent = '▶️';
+            lbl.innerHTML = 'Transmissão Automática: <strong>DESLIGADA</strong>';
+            const bar = document.getElementById('auto-tour-progress-bar');
+            if (bar) bar.style.width = '0%';
+        }
+    }
+
+    // Toggle de Porcentagens no Mapa
+    window.toggleMapLabels = function () {
+        state.showMapLabels = !state.showMapLabels;
+        const btn = document.getElementById('btn-toggle-labels');
+        const lbl = document.getElementById('lbl-labels-state');
+        if (btn) btn.classList.toggle('active', state.showMapLabels);
+        if (lbl) lbl.textContent = state.showMapLabels ? 'ATIVAS' : 'OCULTAS';
+
+        const labelsG = document.getElementById('map-labels-container');
+        if (labelsG) {
+            labelsG.style.display = state.showMapLabels ? 'block' : 'none';
+        }
+        showToast(state.showMapLabels ? '🏷️ Porcentagens visíveis no mapa' : '🏷️ Porcentagens ocultadas');
+    };
+
+    // Filtros Rápidos (Todos, Bolsonaro, Lula, Acirrados)
+    window.setMapFilter = function (filterKey) {
+        state.mapFilter = filterKey;
+        document.querySelectorAll('.map-filter-pill').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.filter === filterKey);
+        });
+        updateMapColors();
+        requestCanvasRender();
+        audio.beep(750, 0.04);
+        showToast(`Filtro aplicado: ${filterKey.toUpperCase()}`);
+    };
+
+    function initAutoTour() {
+        if (autoTourTimer) return; // já inicializado
+
+        autoTourStartTime = Date.now();
+
+        autoTourProgressTimer = setInterval(() => {
+            if (!state.autoTourEnabled) return;
+            const now = Date.now();
+            const elapsed = Math.max(0, (now - autoTourStartTime) % AUTO_TOUR_INTERVAL);
+            const pct = Math.min(100, (elapsed / AUTO_TOUR_INTERVAL * 100)).toFixed(1);
+            const bar = document.getElementById('auto-tour-progress-bar');
+            if (bar) bar.style.width = `${pct}%`;
+        }, 100);
+
+        autoTourTimer = setInterval(() => {
+            if (!state.autoTourEnabled) return;
+            if (state.activeTab && state.activeTab !== 'view-estados') return;
+
+            let seq = TOUR_UF_SEQUENCE;
+            if (state.mapFilter === 'bolso') {
+                seq = TOUR_UF_SEQUENCE.filter(uf => state.uf_matrix[uf] && state.uf_matrix[uf].lider === '22');
+            } else if (state.mapFilter === 'lula') {
+                seq = TOUR_UF_SEQUENCE.filter(uf => state.uf_matrix[uf] && state.uf_matrix[uf].lider === '13');
+            } else if (state.mapFilter === 'tight') {
+                seq = TOUR_UF_SEQUENCE.filter(uf => {
+                    const u = state.uf_matrix[uf];
+                    if (!u) return false;
+                    const p1 = parseFloat((u.bolsonaro_pct || '0').replace('%', '').replace(',', '.'));
+                    const p2 = parseFloat((u.lula_pct || '0').replace('%', '').replace(',', '.'));
+                    return Math.abs(p1 - p2) < 5.0;
+                });
+            }
+            if (!seq || seq.length === 0) seq = TOUR_UF_SEQUENCE;
+
+            const currentIndex = seq.indexOf(state.selectedState);
+            const nextIndex = (currentIndex + 1) % seq.length;
+            const nextUf = seq[nextIndex];
+
+            autoTourStartTime = Date.now();
+            window.selectState(nextUf, false);
+        }, AUTO_TOUR_INTERVAL);
+    }
+
+    let mapInitialized = false;
+    async function initBrazilMap() {
+        if (mapInitialized) return;
+        const svg = document.getElementById('brazil-svg');
+        if (!svg) return;
+
+        try {
+            if (!state.brazilPaths) {
+                let res = await fetch('/api/tse/brazil-map-paths');
+                if (!res.ok) res = await fetch('brazil_paths.json');
+                if (res.ok) {
+                    state.brazilPaths = await res.json();
+                }
+            }
+        } catch (e) {
+            console.warn('Erro ao carregar mapa:', e);
+        }
+
+        if (!state.brazilPaths) return;
+
+        // Limpa e preserva defs
+        const defs = svg.querySelector('defs');
+        svg.innerHTML = '';
+        if (defs) svg.appendChild(defs);
+
+        // Container de visualização com Zoom e Pan
+        let viewportGroup = svg.querySelector('#map-viewport-group');
+        if (!viewportGroup) {
+            viewportGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            viewportGroup.setAttribute('id', 'map-viewport-group');
+            svg.appendChild(viewportGroup);
+        }
+        viewportGroup.innerHTML = '';
+
+        // 1. Container de Paths dos Estados
+        const pathsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        pathsGroup.setAttribute('id', 'map-paths-container');
+
+        Object.entries(state.brazilPaths).forEach(([ufCode, dPath]) => {
+            const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathEl.setAttribute('d', dPath);
+            pathEl.setAttribute('id', `state-path-${ufCode}`);
+            pathEl.setAttribute('class', 'state-path');
+            pathEl.setAttribute('data-uf', ufCode);
+
+            pathEl.addEventListener('mouseenter', (e) => showMapTooltip(e, ufCode));
+            pathEl.addEventListener('mousemove', (e) => moveMapTooltip(e));
+            pathEl.addEventListener('mouseleave', () => hideMapTooltip());
+
+            // Clique seleciona e fixa o estado
+            pathEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                pauseAutoTourUserAction();
+                window.selectState(ufCode, true);
+                audio.beep(850, 0.05);
+            });
+
+            // Duplo clique foca e amplia no estado
+            pathEl.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                const pos = STATE_CENTROIDS[ufCode];
+                if (pos) {
+                    mapZoom = 2.4;
+                    mapPanX = (375 - pos.x) * 1.4;
+                    mapPanY = (375 - pos.y) * 1.4;
+                    applyMapTransform();
+                    showToast(`🔍 Zoom ampliado em ${ufCode} (240%)`);
+                }
+            });
+
+            pathsGroup.appendChild(pathEl);
+        });
+        viewportGroup.appendChild(pathsGroup);
+
+        // 2. Container de Rótulos e Porcentagens Flutuantes sobre cada Estado
+        const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        labelsGroup.setAttribute('id', 'map-labels-container');
+
+        Object.entries(STATE_CENTROIDS).forEach(([ufCode, pos]) => {
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('class', 'map-state-label');
+            g.setAttribute('id', `state-label-${ufCode}`);
+            g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+            g.setAttribute('data-uf', ufCode);
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('class', 'map-label-rect');
+            rect.setAttribute('id', `map-label-rect-${ufCode}`);
+            rect.setAttribute('x', '-21');
+            rect.setAttribute('y', '-11');
+            rect.setAttribute('width', '42');
+            rect.setAttribute('height', '22');
+            rect.setAttribute('rx', '4');
+
+            const textUf = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textUf.setAttribute('class', 'map-label-text-uf');
+            textUf.setAttribute('y', '-2');
+            textUf.textContent = ufCode;
+
+            const textPct = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textPct.setAttribute('class', 'map-label-text-pct');
+            textPct.setAttribute('id', `map-label-pct-${ufCode}`);
+            textPct.setAttribute('y', '6');
+            textPct.textContent = '...';
+
+            g.appendChild(rect);
+            g.appendChild(textUf);
+            g.appendChild(textPct);
+
+            labelsGroup.appendChild(g);
+        });
+        viewportGroup.appendChild(labelsGroup);
+
+        // Inicializa o motor de Zoom e Pan interativo
+        setupMapZoomAndPan();
+
+        mapInitialized = true;
+    }
+
+    // --- MOTOR UNIFICADO DE ZOOM, PAN E NAVEGAÇÃO DO MAPA ---
+    let mapZoom = 1.0;
+    let mapPanX = 0;
+    let mapPanY = 0;
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+
+    // Estado do Mapa Canvas SeuImposto (5.570 Cidades)
+    let seuImpostoGeo = null;
+    let seuImpostoCanvas = null;
+    let seuImpostoCtx = null;
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+    let canvasScale = 1.0;
+    let canvasPanX = 0;
+    let canvasPanY = 0;
+    let baseScale = 1.0;
+    let baseOffsetX = 0;
+    let baseOffsetY = 0;
+    let isCanvasDragging = false;
+    let canvasDragStartX = 0;
+    let canvasDragStartY = 0;
+    let canvasDragDist = 0;
+    let renderRequested = false;
+
+    function requestCanvasRender() {
+        if (renderRequested) return;
+        renderRequested = true;
+        requestAnimationFrame(() => {
+            renderRequested = false;
+            renderSeuImpostoMap();
+        });
+    }
+
+    // Inicialização do Motor Geo TopoJSON do SeuImposto
+    function initSeuImpostoGeo() {
+        if (seuImpostoGeo) return seuImpostoGeo;
+        if (!window.BRASIL) return null;
+        try {
+            const At = window.BRASIL,
+                  [zt, L] = At.transform.scale,
+                  [et, R] = At.transform.translate,
+                  Gt = At.objects.municipios.geometries,
+                  xe = At.arcs.map(x => {
+                      let mt = 0, Et = 0;
+                      return x.map(([Zt, ke]) => (mt += Zt, Et += ke, [(mt * zt + et) / 1e3, -(Et * L + R) / 1e3]));
+                  });
+
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            for (const x of xe) {
+                for (const [mt, Et] of x) {
+                    if (mt < minX) minX = mt;
+                    if (Et < minY) minY = Et;
+                    if (mt > maxX) maxX = mt;
+                    if (Et > maxY) maxY = Et;
+                }
+            }
+            for (const x of xe) {
+                for (const mt of x) {
+                    mt[0] -= minX;
+                    mt[1] -= minY;
+                }
+            }
+            const le = maxX - minX,
+                  Nn = maxY - minY,
+                  vn = x => {
+                      const mt = [];
+                      for (const Et of x) {
+                          const Zt = Et < 0 ? xe[~Et].slice().reverse() : xe[Et];
+                          for (let ke = mt.length ? 1 : 0; ke < Zt.length; ke++) mt.push(Zt[ke]);
+                      }
+                      return mt;
+                  },
+                  On = x => x.type === 'Polygon' ? [x.arcs] : x.type === 'MultiPolygon' ? x.arcs : [],
+                  pt = x => {
+                      let mt = 0;
+                      for (let Et = 0, Zt = x.length - 1; Et < x.length; Zt = Et++)
+                          mt += (x[Zt][0] + x[Et][0]) * (x[Zt][1] - x[Et][1]);
+                      return mt / 2;
+                  },
+                  he = x => {
+                      let mt = 0, Et = 0, Zt = 0;
+                      for (let ke = 0, Ot = x.length - 1; ke < x.length; Ot = ke++) {
+                          const It = x[Ot][0] * x[ke][1] - x[ke][0] * x[Ot][1];
+                          mt += It;
+                          Et += (x[Ot][0] + x[ke][0]) * It;
+                          Zt += (x[Ot][1] + x[ke][1]) * It;
+                      }
+                      return mt ? [Et / (3 * mt), Zt / (3 * mt)] : x[0];
+                  },
+                  fn = xe.map(() => []),
+                  ve = Gt.map((x, mt) => {
+                      const Et = new Path2D();
+                      let Zt = null, ke = 0, Ot = 0, It = Infinity, ct = Infinity, Vt = -Infinity, ee = -Infinity;
+                      for (const de of On(x)) {
+                          de.forEach((Ht, fe) => {
+                              const pe = vn(Ht);
+                              Et.moveTo(pe[0][0], pe[0][1]);
+                              for (let Se = 1; Se < pe.length; Se++) Et.lineTo(pe[Se][0], pe[Se][1]);
+                              Et.closePath();
+                              for (const [Se, se] of pe) {
+                                  if (Se < It) It = Se;
+                                  if (se < ct) ct = se;
+                                  if (Se > Vt) Vt = Se;
+                                  if (se > ee) ee = se;
+                              }
+                              if (fe === 0) {
+                                  const Se = Math.abs(pt(pe));
+                                  Ot += Se;
+                                  if (Se > ke) { ke = Se; Zt = pe; }
+                              }
+                              for (const Se of Ht) fn[Se < 0 ? ~Se : Se].push(mt);
+                          });
+                      }
+                      const Le = x.properties;
+                      return {
+                          i: mt,
+                          id: Le.id,
+                          name: Le.n,
+                          uf: Le.uf,
+                          pop: Le.p,
+                          path: Et,
+                          c: Zt ? he(Zt) : [0, 0],
+                          km2: Ot,
+                          box: [It, ct, Vt, ee]
+                      };
+                  }),
+                  nn = { edge: new Path2D(), uf: new Path2D(), muni: new Path2D() },
+                  te = {};
+
+            xe.forEach((x, mt) => {
+                const Et = [...new Set(fn[mt])],
+                      Zt = Et.length < 2 ? 'edge' : ve[Et[0]].uf !== ve[Et[1]].uf ? 'uf' : 'muni',
+                      ke = Ot => {
+                          Ot.moveTo(x[0][0], x[0][1]);
+                          for (let It = 1; It < x.length; It++) Ot.lineTo(x[It][0], x[It][1]);
+                      };
+                if (ke(nn[Zt]), Zt !== 'muni') {
+                    for (const Ot of Et) {
+                        const It = ve[Ot].uf;
+                        ke(te[It] || (te[It] = new Path2D()));
+                    }
+                }
+            });
+
+            const Ne = {},
+                  Ns = new Set(['2605459']), // Fernando de Noronha
+                  pn = [Infinity, Infinity, -Infinity, -Infinity];
+
+            for (const x of ve) {
+                const mt = Ne[x.uf] || (Ne[x.uf] = { uf: x.uf, munis: [], pop: 0, box: [Infinity, Infinity, -Infinity, -Infinity], cx: 0, cy: 0, km2: 0 });
+                mt.munis.push(x.i);
+                mt.pop += x.pop;
+                mt.km2 += x.km2;
+                if (!Ns.has(String(x.id))) {
+                    for (const Et of [mt.box, pn]) {
+                        Et[0] = Math.min(Et[0], x.box[0]);
+                        Et[1] = Math.min(Et[1], x.box[1]);
+                        Et[2] = Math.max(Et[2], x.box[2]);
+                        Et[3] = Math.max(Et[3], x.box[3]);
+                    }
+                }
+                mt.cx += x.c[0] * x.km2;
+                mt.cy += x.c[1] * x.km2;
+            }
+
+            for (const x of Object.values(Ne)) {
+                x.c = [x.cx / x.km2, x.cy / x.km2];
+                x.outline = te[x.uf];
+            }
+
+            seuImpostoGeo = {
+                W: le,
+                H: Nn,
+                box: pn,
+                munis: ve,
+                lines: nn,
+                ufs: Ne,
+                arcs: xe
+            };
+            return seuImpostoGeo;
+        } catch (e) {
+            console.error('Falha ao inicializar Geo SeuImposto:', e);
+            return null;
+        }
+    }
+
+    // Inicializa o Canvas e Listeners do SeuImposto
+    function initSeuImpostoCanvasMap() {
+        seuImpostoCanvas = document.getElementById('seuimposto-canvas-map');
+        if (!seuImpostoCanvas) return;
+        seuImpostoCtx = seuImpostoCanvas.getContext('2d');
+        if (!seuImpostoCtx) return;
+
+        initSeuImpostoGeo();
+        resizeCanvas();
+
+        window.addEventListener('resize', () => {
+            if (state.mapMode === 'muni') {
+                resizeCanvas();
+            }
+        });
+
+        // Eventos do Canvas
+        seuImpostoCanvas.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            isCanvasDragging = true;
+            canvasDragDist = 0;
+            canvasDragStartX = e.clientX - canvasPanX;
+            canvasDragStartY = e.clientY - canvasPanY;
+            seuImpostoCanvas.classList.add('is-panning');
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isCanvasDragging) {
+                const newPanX = e.clientX - canvasDragStartX;
+                const newPanY = e.clientY - canvasDragStartY;
+                canvasDragDist += Math.abs(newPanX - canvasPanX) + Math.abs(newPanY - canvasPanY);
+                canvasPanX = newPanX;
+                canvasPanY = newPanY;
+                requestCanvasRender();
+            } else if (state.mapMode === 'muni') {
+                handleCanvasMouseMove(e);
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isCanvasDragging) {
+                isCanvasDragging = false;
+                if (seuImpostoCanvas) seuImpostoCanvas.classList.remove('is-panning');
+            }
+        });
+
+        seuImpostoCanvas.addEventListener('click', (e) => {
+            if (canvasDragDist > 8) return; // Foi arrasto, não clique
+            handleCanvasClick(e);
+        });
+
+        seuImpostoCanvas.addEventListener('mouseleave', () => {
+            if (state.hoveredMuniIdx !== null) {
+                state.hoveredMuniIdx = null;
+                requestCanvasRender();
+                hideMapTooltip();
+            }
+        });
+
+        // Zoom via roda no Canvas
+        seuImpostoCanvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = seuImpostoCanvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const delta = e.deltaY < 0 ? 0.35 : -0.35;
+            window.zoomMap(delta, mouseX, mouseY);
+        }, { passive: false });
+
+        // Touch no Canvas (Pan e Pinch Zoom)
+        let touchStartDist = 0;
+        let touchStartScale = 1.0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        seuImpostoCanvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isCanvasDragging = true;
+                canvasDragDist = 0;
+                touchStartX = e.touches[0].clientX - canvasPanX;
+                touchStartY = e.touches[0].clientY - canvasPanY;
+            } else if (e.touches.length === 2) {
+                isCanvasDragging = false;
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                touchStartDist = Math.hypot(dx, dy);
+                touchStartScale = canvasScale;
+            }
+        }, { passive: true });
+
+        seuImpostoCanvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1 && isCanvasDragging) {
+                const newPanX = e.touches[0].clientX - touchStartX;
+                const newPanY = e.touches[0].clientY - touchStartY;
+                canvasDragDist += Math.abs(newPanX - canvasPanX) + Math.abs(newPanY - canvasPanY);
+                canvasPanX = newPanX;
+                canvasPanY = newPanY;
+                requestCanvasRender();
+            } else if (e.touches.length === 2 && touchStartDist > 0) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const dist = Math.hypot(dx, dy);
+                const factor = dist / touchStartDist;
+                canvasScale = Math.max(0.85, Math.min(10.0, touchStartScale * factor));
+                const badge = document.getElementById('zoom-level-badge');
+                if (badge) badge.textContent = `${Math.round(canvasScale * 100)}%`;
+                requestCanvasRender();
+            }
+        }, { passive: true });
+
+        seuImpostoCanvas.addEventListener('touchend', (e) => {
+            if (e.touches.length === 0) {
+                if (isCanvasDragging && canvasDragDist < 8 && e.changedTouches.length === 1) {
+                    const t = e.changedTouches[0];
+                    handleCanvasClick({ clientX: t.clientX, clientY: t.clientY });
+                }
+                isCanvasDragging = false;
+            }
+        });
+    }
+
+    function resizeCanvas() {
+        if (!seuImpostoCanvas) return;
+        const rect = seuImpostoCanvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = rect.width || 800;
+        const h = rect.height || 650;
+        seuImpostoCanvas.width = Math.round(w * dpr);
+        seuImpostoCanvas.height = Math.round(h * dpr);
+        canvasWidth = w;
+        canvasHeight = h;
+
+        if (seuImpostoGeo) {
+            baseScale = Math.min((canvasWidth - 32) / seuImpostoGeo.W, (canvasHeight - 32) / seuImpostoGeo.H);
+            baseOffsetX = (canvasWidth - seuImpostoGeo.W * baseScale) / 2;
+            baseOffsetY = (canvasHeight - seuImpostoGeo.H * baseScale) / 2;
+        }
+        requestCanvasRender();
+    }
+
+    function renderSeuImpostoMap() {
+        if (!seuImpostoCtx || !seuImpostoGeo) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const ctx = seuImpostoCtx;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, seuImpostoCanvas.width, seuImpostoCanvas.height);
+
+        // Fundo radial sutil
+        const bgGrad = ctx.createRadialGradient(
+            seuImpostoCanvas.width / 2, seuImpostoCanvas.height / 2, 40 * dpr,
+            seuImpostoCanvas.width / 2, seuImpostoCanvas.height / 2, seuImpostoCanvas.width / 1.3
+        );
+        bgGrad.addColorStop(0, '#0c1527');
+        bgGrad.addColorStop(1, '#050811');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, seuImpostoCanvas.width, seuImpostoCanvas.height);
+
+        // Transformação de Visualização
+        ctx.setTransform(
+            dpr * canvasScale * baseScale, 0,
+            0, dpr * canvasScale * baseScale,
+            dpr * (canvasPanX + baseOffsetX * canvasScale),
+            dpr * (canvasPanY + baseOffsetY * canvasScale)
+        );
+
+        const muniData = state.muniFeedData && state.muniFeedData.br;
+        const filter = state.mapFilter;
+        const selUf = state.selectedState;
+        const munis = seuImpostoGeo.munis;
+        const total = munis.length;
+
+        // 1. Renderiza cada um dos 5.570 municípios
+        for (let i = 0; i < total; i++) {
+            const m = munis[i];
+            let leader = muniData ? muniData.l[i] : (i % 2 === 0 ? 22 : 13);
+            let margin = muniData ? muniData.m[i] : 200;
+            let isDimmed = false;
+
+            if (filter === 'bolso' && leader !== 22) isDimmed = true;
+            if (filter === 'lula' && leader !== 13) isDimmed = true;
+            if (filter === 'tight' && margin >= 50) isDimmed = true;
+
+            if (isDimmed) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            } else if (leader === 22) {
+                // Bolsonaro (PL 22 - tons de azul com graduação por margem)
+                if (margin >= 300) ctx.fillStyle = '#1d4ed8'; // >30%
+                else if (margin >= 150) ctx.fillStyle = '#2563eb'; // 15-30%
+                else if (margin >= 60) ctx.fillStyle = '#3b82f6'; // 6-15%
+                else ctx.fillStyle = '#60a5fa'; // <6% voto a voto
+            } else if (leader === 13) {
+                // Lula (PT 13 - tons de vermelho com graduação por margem)
+                if (margin >= 300) ctx.fillStyle = '#b91c1c'; // >30%
+                else if (margin >= 150) ctx.fillStyle = '#dc2626'; // 15-30%
+                else if (margin >= 60) ctx.fillStyle = '#ef4444'; // 6-15%
+                else ctx.fillStyle = '#f87171'; // <6% voto a voto
+            } else {
+                ctx.fillStyle = '#334155';
+            }
+
+            ctx.fill(m.path);
+        }
+
+        // 2. Linhas de fronteira municipal
+        if (canvasScale > 1.35) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+            ctx.lineWidth = 0.5 / (canvasScale * baseScale);
+            ctx.stroke(seuImpostoGeo.lines.muni);
+        }
+
+        // 3. Linhas de estados (UFs)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = 1.0 / (canvasScale * baseScale);
+        ctx.stroke(seuImpostoGeo.lines.uf);
+
+        // 4. Contorno nacional
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.lineWidth = 1.4 / (canvasScale * baseScale);
+        ctx.stroke(seuImpostoGeo.lines.edge);
+
+        // 5. Contorno do estado focado
+        if (selUf && seuImpostoGeo.ufs[selUf]) {
+            ctx.save();
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 2.2 / (canvasScale * baseScale);
+            ctx.shadowColor = 'rgba(251, 191, 36, 0.6)';
+            ctx.shadowBlur = 8 * dpr;
+            ctx.stroke(seuImpostoGeo.ufs[selUf].outline);
+            ctx.restore();
+        }
+
+        // 6. Município sob hover
+        if (state.hoveredMuniIdx !== null && munis[state.hoveredMuniIdx]) {
+            const hm = munis[state.hoveredMuniIdx];
+            ctx.save();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2.5 / (canvasScale * baseScale);
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur = 10 * dpr;
+            ctx.stroke(hm.path);
+            ctx.restore();
+        }
+
+        // 7. Município selecionado
+        if (state.selectedMuniIdx !== null && munis[state.selectedMuniIdx]) {
+            const sm = munis[state.selectedMuniIdx];
+            ctx.save();
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 3.2 / (canvasScale * baseScale);
+            ctx.shadowColor = 'rgba(251, 191, 36, 0.9)';
+            ctx.shadowBlur = 14 * dpr;
+            ctx.stroke(sm.path);
+            ctx.restore();
+        }
+    }
+
+    function getMuniAtScreenCoords(sx, sy) {
+        if (!seuImpostoGeo || !seuImpostoCtx) return null;
+        const wx = (sx - canvasPanX - baseOffsetX * canvasScale) / (canvasScale * baseScale);
+        const wy = (sy - canvasPanY - baseOffsetY * canvasScale) / (canvasScale * baseScale);
+
+        const munis = seuImpostoGeo.munis;
+        for (let i = 0; i < munis.length; i++) {
+            const m = munis[i];
+            const b = m.box;
+            if (wx >= b[0] && wy >= b[1] && wx <= b[2] && wy <= b[3]) {
+                seuImpostoCtx.setTransform(1, 0, 0, 1, 0, 0);
+                if (seuImpostoCtx.isPointInPath(m.path, wx, wy)) {
+                    return m;
+                }
+            }
         }
         return null;
     }
 
-    function renderAvatar(photoUrl, name, fallbackEmoji = '👤') {
-        if (photoUrl && (photoUrl.startsWith('fotos/') || photoUrl.startsWith('http'))) {
-            return `<img src="${photoUrl}" alt="${name}" loading="lazy" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"><span style="display:none; font-size: 26px;">${fallbackEmoji}</span>`;
-        }
-        return `<span style="font-size: 26px;">${fallbackEmoji}</span>`;
-    }
+    function handleCanvasMouseMove(e) {
+        if (isCanvasDragging) return;
+        const rect = seuImpostoCanvas.getBoundingClientRect();
+        const sx = e.clientX - rect.left;
+        const sy = e.clientY - rect.top;
 
-    function escapeHtml(str) {
-        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    // --- AGREGADOR UNIVERSAL DE CANDIDATOS (TODOS OS 5 CARGOS) ---
-    function getAllCandidates() {
-        const list = [];
-        if (state.pres && state.pres.candidates) {
-            state.pres.candidates.forEach((c, idx) => {
-                list.push({
-                    ...c,
-                    race: 'pres',
-                    raceLabel: 'PRESIDENTE (BR)',
-                    raceColor: 'blue',
-                    rank: idx + 1,
-                    cargoNome: 'Presidente da República'
-                });
-            });
-        }
-        if (state.gov && state.gov.candidates) {
-            state.gov.candidates.forEach((c, idx) => {
-                list.push({
-                    ...c,
-                    race: 'gov',
-                    raceLabel: 'GOVERNADOR (AL)',
-                    raceColor: 'teal',
-                    rank: idx + 1,
-                    cargoNome: 'Governador de Alagoas'
-                });
-            });
-        }
-        if (state.sen && state.sen.candidates) {
-            state.sen.candidates.forEach((c, idx) => {
-                list.push({
-                    ...c,
-                    race: 'sen',
-                    raceLabel: 'SENADOR (AL)',
-                    raceColor: 'gold',
-                    rank: idx + 1,
-                    cargoNome: 'Senador por Alagoas'
-                });
-            });
-        }
-        if (state.depFed && state.depFed.candidates) {
-            state.depFed.candidates.forEach((c, idx) => {
-                list.push({
-                    ...c,
-                    race: 'dep',
-                    raceLabel: 'DEP. FEDERAL (AL)',
-                    raceColor: 'purple',
-                    rank: idx + 1,
-                    cargoNome: 'Deputado Federal por Alagoas'
-                });
-            });
-        }
-        if (state.depEst && state.depEst.candidates) {
-            state.depEst.candidates.forEach((c, idx) => {
-                list.push({
-                    ...c,
-                    race: 'est',
-                    raceLabel: 'DEP. ESTADUAL (AL)',
-                    raceColor: 'teal',
-                    rank: idx + 1,
-                    cargoNome: 'Deputado Estadual por Alagoas'
-                });
-            });
-        }
-        return list;
-    }
-
-    function getCandidatesByRace(race) {
-        if (!race || race === 'all') return getAllCandidates();
-        return getAllCandidates().filter(c => c.race === race);
-    }
-
-    function findCandidate(id, race) {
-        const all = getAllCandidates();
-        if (race && race !== 'all') {
-            const found = all.find(c => String(c.id) === String(id) && c.race === race);
-            if (found) return found;
-        }
-        return all.find(c => String(c.id) === String(id));
-    }
-
-    // --- CONTROLE DE NAVEGAÇÃO UNIFICADO (DESKTOP + MOBILE) ---
-    function switchTab(targetId) {
-        sound.init();
-        sound.click();
-        dom.tabs.forEach(t => {
-            t.classList.toggle('active', t.dataset.target === targetId);
-        });
-        dom.panels.forEach(p => {
-            p.classList.toggle('active', p.id === targetId);
-        });
-        if (dom.mobileNavSelect && dom.mobileNavSelect.value !== targetId) {
-            dom.mobileNavSelect.value = targetId;
-        }
-        if (targetId === 'view-comparador') {
-            populateDuelCandidateSelects();
-            updateDuelDisplay();
-        }
-    }
-
-    // --- OMNI-SEARCH ENGINE (BUSCA CENTRAL EXECUTIVA) ---
-    function renderOmniSearchResults(query, raceFilter = 'all') {
-        if (!dom.omniDropdownResults || !dom.omniResultsList) return;
-        const q = (query || '').trim().toLowerCase();
-
-        if (!q) {
-            dom.omniDropdownResults.classList.add('hidden');
-            if (dom.omniSearchClear) dom.omniSearchClear.classList.add('hidden');
-            return;
-        }
-
-        if (dom.omniSearchClear) dom.omniSearchClear.classList.remove('hidden');
-
-        const all = getAllCandidates();
-        const filtered = all.filter(c => {
-            if (raceFilter !== 'all' && c.race !== raceFilter) return false;
-            const nameMatch = c.name && c.name.toLowerCase().includes(q);
-            const fullMatch = c.fullName && c.fullName.toLowerCase().includes(q);
-            const partyMatch = c.party && c.party.toLowerCase().includes(q);
-            const numMatch = c.number && String(c.number).includes(q);
-            const cargoMatch = c.cargoNome && c.cargoNome.toLowerCase().includes(q);
-            return nameMatch || fullMatch || partyMatch || numMatch || cargoMatch;
-        });
-
-        filtered.sort((a, b) => (b.targetVotes || b.currentVotes || 0) - (a.targetVotes || a.currentVotes || 0));
-
-        if (dom.omniResultsCount) {
-            dom.omniResultsCount.textContent = `${filtered.length} candidato(s) encontrado(s)`;
-        }
-
-        dom.omniResultsList.innerHTML = '';
-        if (filtered.length === 0) {
-            dom.omniResultsList.innerHTML = `
-                <div style="padding: 24px; text-align: center; color: var(--text-dim); font-size: 12px;">
-                    Nenhum candidato encontrado para "<strong>${escapeHtml(q)}</strong>". Tente buscar por número (ex: 13, 22, 1111) ou partido (PT, PL, MDB).
-                </div>
-            `;
-            dom.omniDropdownResults.classList.remove('hidden');
-            return;
-        }
-
-        filtered.slice(0, 16).forEach(cand => {
-            const item = document.createElement('div');
-            item.className = 'omni-result-item';
-            const votes = cand.currentVotes !== undefined ? cand.currentVotes : (cand.targetVotes || 0);
-            const share = cand.currentShare !== undefined ? cand.currentShare : (cand.targetShare || 0);
-            const photoSrc = resolveCandidatePhoto(cand.race, cand.number, cand.sqcand, cand.photo);
-
-            item.innerHTML = `
-                <div class="omni-cand-left">
-                    <div class="omni-cand-avatar">${renderAvatar(photoSrc, cand.name, '👤')}</div>
-                    <div class="omni-cand-meta">
-                        <div class="omni-cand-name">${cand.rank ? cand.rank + 'º ' : ''}${cand.name}</div>
-                        <div class="omni-cand-sub">
-                            <span class="cargo-tag ${cand.race}">${cand.raceLabel}</span>
-                            <span>${cand.party} • Nº ${cand.number}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="omni-cand-right">
-                    <div class="omni-votes-box">
-                        <div class="omni-votes-pct">${cand.pct_str || formatPercent(share, 2)}</div>
-                        <div class="omni-votes-total">${formatInt(votes)} votos</div>
-                    </div>
-                    <div class="omni-actions">
-                        <button class="btn-omni-act" data-action="goto" title="Ver Apuração Oficial">👁️ Ver</button>
-                        <button class="btn-omni-act btn-omni-duel" data-action="duel" title="Comparar no Confronto Direto (X1)">⚔️ X1</button>
-                    </div>
-                </div>
-            `;
-
-            item.querySelector('[data-action="goto"]').addEventListener('click', (e) => {
-                e.stopPropagation();
-                dom.omniDropdownResults.classList.add('hidden');
-                let targetTab = 'view-presidente';
-                if (cand.race === 'gov') targetTab = 'view-alagoas';
-                else if (cand.race === 'sen') targetTab = 'view-senado-al';
-                else if (cand.race === 'dep') targetTab = 'view-deputado-federal';
-                else if (cand.race === 'est') targetTab = 'view-deputado-estadual';
-                switchTab(targetTab);
-                showToast(`📍 Visualizando apuração de ${cand.cargoNome || cand.raceLabel}`);
-            });
-
-            item.querySelector('[data-action="duel"]').addEventListener('click', (e) => {
-                e.stopPropagation();
-                dom.omniDropdownResults.classList.add('hidden');
-                window.startDuelWith(cand.id, cand.race);
-            });
-
-            item.addEventListener('click', () => {
-                dom.omniDropdownResults.classList.add('hidden');
-                window.startDuelWith(cand.id, cand.race);
-            });
-
-            dom.omniResultsList.appendChild(item);
-        });
-
-        dom.omniDropdownResults.classList.remove('hidden');
-    }
-
-    // --- CONFRONTO DIRETO // HEAD-TO-HEAD DUEL ENGINE (X1) ---
-    const DUEL_PRESETS = {
-        'lula-bolsonaro': { cargo: 'pres', candA: { race: 'pres', id: '13' }, candB: { race: 'pres', id: '22' } },
-        'renan-jhc': { cargo: 'gov', candA: { race: 'gov', id: '15' }, candB: { race: 'gov', id: '45' } },
-        'lira-marina': { cargo: 'sen', candA: { race: 'sen', id: '111' }, candB: { race: 'sen', id: '456' } },
-        'alvinho-luciano': { cargo: 'dep', candA: { race: 'dep', id: '1111' }, candB: { race: 'dep', id: '5555' } },
-        'marcelo-bebeto': { cargo: 'est', candA: { race: 'est', id: '15789' }, candB: { race: 'est', id: '22222' } }
-    };
-
-    function setDuelPreset(presetKey) {
-        const p = DUEL_PRESETS[presetKey];
-        if (!p) return;
-        state.duel.cargo = p.cargo;
-        state.duel.candAId = p.candA.id;
-        state.duel.candACargo = p.candA.race;
-        state.duel.candBId = p.candB.id;
-        state.duel.candBCargo = p.candB.race;
-
-        if (dom.duelSelectCargo) dom.duelSelectCargo.value = p.cargo;
-        populateDuelCandidateSelects();
-        updateDuelDisplay();
-
-        if (dom.duelPresetButtons) {
-            dom.duelPresetButtons.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.preset === presetKey);
-            });
-        }
-        showToast(`⚔️ DUELO CARREGADO: ${presetKey.toUpperCase().replace('-', ' VS ')}`);
-    }
-
-    function populateDuelCandidateSelects() {
-        if (!dom.duelSelectCandA || !dom.duelSelectCandB) return;
-        const cargo = state.duel.cargo || 'pres';
-        const candidates = getCandidatesByRace(cargo);
-
-        dom.duelSelectCandA.innerHTML = '';
-        dom.duelSelectCandB.innerHTML = '';
-
-        candidates.forEach(cand => {
-            const optA = document.createElement('option');
-            optA.value = `${cand.race}:${cand.id}`;
-            optA.textContent = `${cand.name} (${cand.party} ${cand.number}) — ${cand.raceLabel}`;
-
-            const optB = document.createElement('option');
-            optB.value = `${cand.race}:${cand.id}`;
-            optB.textContent = `${cand.name} (${cand.party} ${cand.number}) — ${cand.raceLabel}`;
-
-            dom.duelSelectCandA.appendChild(optA);
-            dom.duelSelectCandB.appendChild(optB);
-        });
-
-        const keyA = `${state.duel.candACargo || (cargo === 'all' ? 'pres' : cargo)}:${state.duel.candAId}`;
-        const keyB = `${state.duel.candBCargo || (cargo === 'all' ? 'pres' : cargo)}:${state.duel.candBId}`;
-
-        if (Array.from(dom.duelSelectCandA.options).some(o => o.value === keyA)) {
-            dom.duelSelectCandA.value = keyA;
-        } else if (dom.duelSelectCandA.options.length > 0) {
-            dom.duelSelectCandA.selectedIndex = 0;
-            const parts = dom.duelSelectCandA.value.split(':');
-            state.duel.candACargo = parts[0];
-            state.duel.candAId = parts[1];
-        }
-
-        if (Array.from(dom.duelSelectCandB.options).some(o => o.value === keyB)) {
-            dom.duelSelectCandB.value = keyB;
-        } else if (dom.duelSelectCandB.options.length > 1) {
-            dom.duelSelectCandB.selectedIndex = 1;
-            const parts = dom.duelSelectCandB.value.split(':');
-            state.duel.candBCargo = parts[0];
-            state.duel.candBId = parts[1];
-        } else if (dom.duelSelectCandB.options.length > 0) {
-            dom.duelSelectCandB.selectedIndex = 0;
-            const parts = dom.duelSelectCandB.value.split(':');
-            state.duel.candBCargo = parts[0];
-            state.duel.candBId = parts[1];
-        }
-    }
-
-    function updateDuelDisplay() {
-        if (!dom.duelCardA || !dom.duelCardB) return;
-
-        const candA = findCandidate(state.duel.candAId, state.duel.candACargo);
-        const candB = findCandidate(state.duel.candBId, state.duel.candBCargo);
-
-        if (!candA || !candB) return;
-
-        const votesA = candA.currentVotes !== undefined ? candA.currentVotes : (candA.targetVotes || 0);
-        const votesB = candB.currentVotes !== undefined ? candB.currentVotes : (candB.targetVotes || 0);
-        const shareA = candA.currentShare !== undefined ? candA.currentShare : (candA.targetShare || 0);
-        const shareB = candB.currentShare !== undefined ? candB.currentShare : (candB.targetShare || 0);
-
-        const diffVotes = Math.abs(votesA - votesB);
-        const diffShare = Math.abs(shareA - shareB);
-        const isLeaderA = votesA >= votesB;
-        const leaderName = isLeaderA ? candA.name : candB.name;
-
-        // Fighter A
-        if (dom.fighterBadgeA) {
-            dom.fighterBadgeA.textContent = isLeaderA ? `👑 LÍDER (+${formatInt(diffVotes)})` : 'SEGUNDO COLOCADO';
-        }
-        if (dom.fighterAvatarA) dom.fighterAvatarA.innerHTML = renderAvatar(candA.photo, candA.name, '👤');
-        if (dom.fighterNameA) dom.fighterNameA.textContent = candA.name;
-        if (dom.fighterMetaA) dom.fighterMetaA.textContent = `${candA.party} • Nº ${candA.number} • ${candA.fullName || candA.name}`;
-        if (dom.fighterCargoA) dom.fighterCargoA.textContent = candA.cargoNome || candA.raceLabel;
-        if (dom.fighterPctA) dom.fighterPctA.textContent = candA.pct_str || formatPercent(shareA, 4);
-        if (dom.fighterVotesA) dom.fighterVotesA.textContent = `${formatInt(votesA)} VOTOS`;
-        if (dom.fighterBarA) dom.fighterBarA.style.width = `${Math.min(100, shareA * 100)}%`;
-        if (dom.duelCardA) {
-            dom.duelCardA.classList.toggle('leader-a', isLeaderA);
-        }
-
-        // Fighter B
-        if (dom.fighterBadgeB) {
-            dom.fighterBadgeB.textContent = !isLeaderA ? `👑 LÍDER (+${formatInt(diffVotes)})` : 'SEGUNDO COLOCADO';
-        }
-        if (dom.fighterAvatarB) dom.fighterAvatarB.innerHTML = renderAvatar(candB.photo, candB.name, '👤');
-        if (dom.fighterNameB) dom.fighterNameB.textContent = candB.name;
-        if (dom.fighterMetaB) dom.fighterMetaB.textContent = `${candB.party} • Nº ${candB.number} • ${candB.fullName || candB.name}`;
-        if (dom.fighterCargoB) dom.fighterCargoB.textContent = candB.cargoNome || candB.raceLabel;
-        if (dom.fighterPctB) dom.fighterPctB.textContent = candB.pct_str || formatPercent(shareB, 4);
-        if (dom.fighterVotesB) dom.fighterVotesB.textContent = `${formatInt(votesB)} VOTOS`;
-        if (dom.fighterBarB) dom.fighterBarB.style.width = `${Math.min(100, shareB * 100)}%`;
-        if (dom.duelCardB) {
-            dom.duelCardB.classList.toggle('leader-b', !isLeaderA);
-        }
-
-        // Center VS HUD
-        if (dom.duelDiffVotes) dom.duelDiffVotes.textContent = `+${formatInt(diffVotes)} VOTOS`;
-        if (dom.duelDiffPct) dom.duelDiffPct.textContent = `+${(diffShare * 100).toFixed(2)}% (${(diffShare * 100).toFixed(4)} pts)`;
-
-        const sumTwo = votesA + votesB;
-        const domA = sumTwo > 0 ? (votesA / sumTwo) * 100 : 50;
-        const domB = sumTwo > 0 ? (votesB / sumTwo) * 100 : 50;
-
-        if (dom.domLabelA) dom.domLabelA.textContent = `${domA.toFixed(1)}%`;
-        if (dom.domLabelB) dom.domLabelB.textContent = `${domB.toFixed(1)}%`;
-        if (dom.domBarA) dom.domBarA.style.width = `${domA}%`;
-        if (dom.domBarB) dom.domBarB.style.width = `${domB}%`;
-
-        // Projeção Matemática
-        if (dom.duelTurnaroundText) {
-            const trailingName = isLeaderA ? candB.name : candA.name;
-            const leadingName = isLeaderA ? candA.name : candB.name;
-            const raceKey = candA.race === 'dep' ? 'depFed' : (candA.race === 'est' ? 'depEst' : candA.race);
-            const raceObj = state[raceKey] || state.pres;
-            const secoesTotal = raceObj.secoesTotal || 1000;
-            const secoesDone = raceObj.secoesApuradasCurrent || 0;
-            const secoesRestantes = Math.max(0, secoesTotal - secoesDone);
-            const pctDone = secoesTotal > 0 ? (secoesDone / secoesTotal) * 100 : 0;
-
-            if (diffVotes === 0) {
-                dom.duelTurnaroundText.textContent = `Empate técnico exato entre ${candA.name} e ${candB.name} com ${formatInt(votesA)} votos cada!`;
-            } else if (secoesRestantes === 0 || pctDone >= 99.9) {
-                dom.duelTurnaroundText.textContent = `Apuração praticamente concluída (${pctDone.toFixed(2)}%). Vantagem matemática consolidada para ${leadingName} com ${formatInt(diffVotes)} votos à frente.`;
+        const muni = getMuniAtScreenCoords(sx, sy);
+        if (muni) {
+            if (state.hoveredMuniIdx !== muni.i) {
+                state.hoveredMuniIdx = muni.i;
+                requestCanvasRender();
+                showMuniTooltip(e, muni);
             } else {
-                const totalTarget = raceObj.validosTarget || (raceObj.totalVotosTarget || 100000);
-                const validosRestantes = Math.max(0, totalTarget - (raceObj.validosCurrent || 0));
-                if (validosRestantes > 0 && diffVotes <= validosRestantes) {
-                    const pctNeeded = Math.min(100, Math.max(0, (((validosRestantes + diffVotes) / 2) / validosRestantes) * 100));
-                    dom.duelTurnaroundText.textContent = `Para igualar o confronto nas ${formatInt(secoesRestantes)} urnas restantes (${(100 - pctDone).toFixed(2)}% por apurar), ${trailingName} precisa conquistar aproximadamente ${pctNeeded.toFixed(1)}% dos votos remanescentes.`;
-                } else {
-                    dom.duelTurnaroundText.textContent = `${leadingName} mantém vantagem consolidada de ${formatInt(diffVotes)} votos sobre ${trailingName} com ${pctDone.toFixed(2)}% das urnas apuradas.`;
-                }
+                moveMapTooltip(e);
             }
-        }
-
-        // Metrics Matrix
-        if (dom.matShareA) dom.matShareA.textContent = candA.pct_str || formatPercent(shareA, 4);
-        if (dom.matShareB) dom.matShareB.textContent = candB.pct_str || formatPercent(shareB, 4);
-        if (dom.matShareSub) dom.matShareSub.textContent = `Diferença de ${(diffShare * 100).toFixed(4)} pontos percentuais`;
-
-        if (dom.matVotesA) dom.matVotesA.textContent = formatInt(votesA);
-        if (dom.matVotesB) dom.matVotesB.textContent = formatInt(votesB);
-        if (dom.matVotesSub) dom.matVotesSub.textContent = `Diferença absoluta: ${formatInt(diffVotes)} votos apurados`;
-
-        if (dom.matDomA) dom.matDomA.textContent = `${domA.toFixed(2)}%`;
-        if (dom.matDomB) dom.matDomB.textContent = `${domB.toFixed(2)}%`;
-
-        if (dom.matStatusA) {
-            dom.matStatusA.textContent = isLeaderA ? '👑 LÍDER' : 'SEGUNDO';
-            dom.matStatusA.className = `cand-badge ${isLeaderA ? 'eleito' : ''}`;
-        }
-        if (dom.matStatusB) {
-            dom.matStatusB.textContent = !isLeaderA ? '👑 LÍDER' : 'SEGUNDO';
-            dom.matStatusB.className = `cand-badge ${!isLeaderA ? 'eleito' : ''}`;
-        }
-        if (dom.matStatusSub) {
-            dom.matStatusSub.textContent = `Liderança isolada de ${leaderName}`;
+        } else {
+            if (state.hoveredMuniIdx !== null) {
+                state.hoveredMuniIdx = null;
+                requestCanvasRender();
+                hideMapTooltip();
+            }
         }
     }
 
-    // Inicia confronto com um candidato a partir de qualquer ponto da interface
-    window.startDuelWith = function(candId, race) {
-        sound.init();
-        sound.beep(950, 0.06, 'sine', 0.04);
-        const cand = findCandidate(candId, race);
-        if (!cand) return;
+    function showMuniTooltip(e, muni) {
+        const tooltip = document.getElementById('map-tooltip');
+        if (!tooltip) return;
 
-        state.duel.cargo = race || cand.race || 'pres';
-        state.duel.candAId = String(cand.id);
-        state.duel.candACargo = cand.race;
+        const mData = state.muniFeedData && state.muniFeedData.br;
+        const leader = mData ? mData.l[muni.i] : 22;
+        const marginPerMil = mData ? mData.m[muni.i] : 200;
+        const marginPct = (marginPerMil / 10).toFixed(1);
+        const validVotes = mData ? mData.v[muni.i] : 10000;
 
-        const peers = getCandidatesByRace(cand.race).filter(c => String(c.id) !== String(cand.id));
-        if (peers.length > 0) {
-            state.duel.candBId = String(peers[0].id);
-            state.duel.candBCargo = peers[0].race;
+        const isBolso = leader === 22;
+        const leaderName = isBolso ? 'Flávio Bolsonaro' : 'Lula';
+        const partyName = isBolso ? 'PL • 22' : 'PT • 13';
+        const partyColor = isBolso ? '#3b82f6' : '#ef4444';
+        const photo = isBolso ? 'fotos/pres_22.jpeg' : 'fotos/pres_13.jpeg';
+
+        tooltip.innerHTML = `
+            <div class="map-tooltip-card">
+                <div class="map-tooltip-header">
+                    <strong class="map-tooltip-uf">${muni.name} (${muni.uf})</strong>
+                    <span class="map-tooltip-status">🏙️ Pop: ${formatNumber(muni.pop || 0)}</span>
+                </div>
+                <div class="map-tooltip-duel" style="display:flex; align-items:center; gap:10px; margin: 8px 0;">
+                    <img src="${photo}" alt="${leaderName}" style="width:38px; height:38px; border-radius:50%; border:2px solid ${partyColor}; object-fit:cover;">
+                    <div>
+                        <strong style="color: ${partyColor}; font-size:13px; display:block;">${leaderName}</strong>
+                        <span style="font-size:11px; color:var(--text-secondary);">${partyName} &bull; Vantagem: <strong>+${marginPct}%</strong></span>
+                    </div>
+                </div>
+                <div class="map-tooltip-stats" style="font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between; border-top:1px solid var(--border-color); padding-top:6px;">
+                    <span>Votos válidos: <strong>${formatNumber(validVotes)}</strong></span>
+                    <span style="color:#fbbf24; font-weight:700;">Toque para abrir</span>
+                </div>
+            </div>
+        `;
+        tooltip.classList.remove('hidden');
+        moveMapTooltip(e);
+    }
+
+    async function handleCanvasClick(e) {
+        if (isCanvasDragging) return;
+        const rect = seuImpostoCanvas.getBoundingClientRect();
+        const sx = e.clientX - rect.left;
+        const sy = e.clientY - rect.top;
+
+        const muni = getMuniAtScreenCoords(sx, sy);
+        if (muni) {
+            state.selectedMuniIdx = muni.i;
+            requestCanvasRender();
+            audio.beep(880, 0.05);
+
+            showToast(`📍 ${muni.name} (${muni.uf}) selecionada`);
+
+            if (window.selectCityResult) {
+                window.selectCityResult(muni.uf, muni.id, muni.name);
+            } else {
+                window.selectState(muni.uf, true);
+            }
         }
+    }
 
-        if (dom.duelSelectCargo) dom.duelSelectCargo.value = state.duel.cargo;
-        populateDuelCandidateSelects();
-        updateDuelDisplay();
-        switchTab('view-comparador');
-        showToast(`⚔️ CONFRONTO CARREGADO: ${cand.name} vs ${peers.length > 0 ? peers[0].name : 'OPONENTE'}`);
+    // Controle de Modo de Mapa (5.570 Cidades vs Macro 27 Estados)
+    window.setMapMode = function (mode) {
+        state.mapMode = mode;
+        const btnMuni = document.getElementById('btn-mode-muni');
+        const btnMacro = document.getElementById('btn-mode-macro');
+        const canvasEl = document.getElementById('seuimposto-canvas-map');
+        const svgEl = document.getElementById('brazil-svg');
+        const headerTitle = document.getElementById('map-header-title');
+        const headerTip = document.getElementById('map-header-tip-text');
+
+        if (mode === 'muni') {
+            if (btnMuni) btnMuni.classList.add('active');
+            if (btnMacro) btnMacro.classList.remove('active');
+            if (canvasEl) canvasEl.classList.remove('hidden');
+            if (svgEl) svgEl.classList.add('hidden');
+            if (headerTitle) headerTitle.textContent = 'MAPA SEUIMPOSTO • 5.570 CIDADES EM TEMPO REAL';
+            if (headerTip) headerTip.textContent = 'Arraste para navegar • Clique na cidade para ver detalhes';
+            resizeCanvas();
+            showToast('🏙️ Modo Mapa SeuImposto ativado (5.570 cidades)');
+        } else {
+            if (btnMuni) btnMuni.classList.remove('active');
+            if (btnMacro) btnMacro.classList.add('active');
+            if (canvasEl) canvasEl.classList.add('hidden');
+            if (svgEl) svgEl.classList.remove('hidden');
+            if (headerTitle) headerTitle.textContent = 'MAPA MACRO // 27 ESTADOS E DF';
+            if (headerTip) headerTip.textContent = 'Toque em qualquer estado para fixar';
+            applyMapTransform();
+            showToast('🗺️ Modo Visão Macro ativado (27 estados)');
+        }
+        audio.beep(750, 0.04);
     };
 
-    // --- PARSER DAS ESTRUTURAS DO TSE (NORMALIZADO OU RAW CDN) ---
-    function parseTsePayload(payload, instantSnap = false) {
-        if (!payload) return;
-
-        let dataChanged = false;
-
-        // FORMATO 1: RESPOSTA NORMALIZADA DE ALTA PERFORMANCE (server.py / dados_tse_atual.json)
-        if (payload.pres && payload.pres.secoes_apuradas !== undefined) {
-            const p = payload.pres;
-            state.pres.secoesTotal = p.secoes_total || 499248;
-            state.pres.secoesApuradasTarget = p.secoes_apuradas;
-            state.pres.totalVotosTarget = p.total_votos || state.pres.totalVotosTarget;
-            state.pres.validosTarget = p.votos_validos || state.pres.validosTarget;
-            state.pres.brancosTarget = p.brancos || state.pres.brancosTarget;
-            state.pres.nulosTarget = p.nulos || state.pres.nulosTarget;
-
-            if (Array.isArray(p.candidatos) && p.candidatos.length > 0) {
-                // Atualiza candidatos presidenciais mantendo avatares
-                p.candidatos.forEach(c => {
-                    const idStr = String(c.id || c.numero);
-                    let candObj = state.pres.candidates.find(item => item.id === idStr);
-                    const photoPath = c.foto || resolveCandidatePhoto('pres', idStr, c.sqcand, candObj ? candObj.photo : null);
-                    if (candObj) {
-                        candObj.targetVotes = c.votos;
-                        candObj.targetShare = c.pct;
-                        candObj.name = c.nome;
-                        candObj.fullName = c.nome_completo || candObj.fullName;
-                        candObj.party = c.partido;
-                        if (photoPath) candObj.photo = photoPath;
-                        if (instantSnap) {
-                            candObj.currentVotes = c.votos;
-                            candObj.currentShare = c.pct;
-                        }
-                    } else {
-                        state.pres.candidates.push({
-                            id: idStr,
-                            number: idStr,
-                            name: c.nome,
-                            fullName: c.nome_completo || c.nome,
-                            party: c.partido,
-                            targetVotes: c.votos,
-                            currentVotes: c.votos,
-                            targetShare: c.pct,
-                            currentShare: c.pct,
-                            photo: photoPath || 'fotos/pres_' + idStr + '.jpeg'
-                        });
-                        dataChanged = true;
-                    }
-                });
+    // Zoom Unificado
+    window.zoomMap = function (delta, focusX = null, focusY = null) {
+        if (state.mapMode === 'muni') {
+            const prevScale = canvasScale;
+            canvasScale = Math.max(0.85, Math.min(8.0, Number((canvasScale + delta * 0.7).toFixed(2))));
+            if (canvasScale <= 1.05) {
+                canvasScale = 1.0;
+                canvasPanX = 0;
+                canvasPanY = 0;
+            } else if (focusX !== null && focusY !== null) {
+                const ratio = canvasScale / prevScale;
+                canvasPanX = focusX - ratio * (focusX - canvasPanX);
+                canvasPanY = focusY - ratio * (focusY - canvasPanY);
             }
+            const badge = document.getElementById('zoom-level-badge');
+            if (badge) badge.textContent = `${Math.round(canvasScale * 100)}%`;
+            requestCanvasRender();
+            audio.beep(650 + canvasScale * 70, 0.03);
+        } else {
+            const prevZoom = mapZoom;
+            mapZoom = Math.max(1.0, Math.min(3.8, Number((mapZoom + delta).toFixed(2))));
+            if (mapZoom <= 1.05) {
+                mapZoom = 1.0;
+                mapPanX = 0;
+                mapPanY = 0;
+            } else if (focusX !== null && focusY !== null) {
+                const ratio = mapZoom / prevZoom;
+                mapPanX = focusX - ratio * (focusX - mapPanX);
+                mapPanY = focusY - ratio * (focusY - mapPanY);
+            }
+            applyMapTransform();
+            audio.beep(650 + mapZoom * 120, 0.03);
+        }
+    };
 
-            if (payload.gov_al && payload.gov_al.secoes_apuradas !== undefined) {
-                const g = payload.gov_al;
-                state.gov.secoesTotal = g.secoes_total || 7101;
-                state.gov.secoesApuradasTarget = g.secoes_apuradas;
-                state.gov.totalVotosTarget = g.total_votos || state.gov.totalVotosTarget;
-                state.gov.validosTarget = g.votos_validos || state.gov.validosTarget;
-                state.gov.brancosTarget = g.brancos || state.gov.brancosTarget;
-                state.gov.nulosTarget = g.nulos || state.gov.nulosTarget;
+    window.resetMapZoom = function () {
+        if (state.mapMode === 'muni') {
+            canvasScale = 1.0;
+            canvasPanX = 0;
+            canvasPanY = 0;
+            const badge = document.getElementById('zoom-level-badge');
+            if (badge) badge.textContent = '100%';
+            requestCanvasRender();
+        } else {
+            mapZoom = 1.0;
+            mapPanX = 0;
+            mapPanY = 0;
+            applyMapTransform();
+        }
+        audio.beep(600, 0.04);
+        showToast('⟲ Zoom do mapa redefinido para 100%');
+    };
 
-                if (Array.isArray(g.candidatos) && g.candidatos.length > 0) {
-                    g.candidatos.forEach(c => {
-                        const idStr = String(c.id || c.numero);
-                        let candObj = state.gov.candidates.find(item => item.id === idStr);
-                        const photoPath = c.foto || resolveCandidatePhoto('gov', idStr, c.sqcand, candObj ? candObj.photo : null);
-                        if (candObj) {
-                            candObj.targetVotes = c.votos;
-                            candObj.targetShare = c.pct;
-                            candObj.name = c.nome;
-                            candObj.party = c.partido;
-                            if (photoPath) candObj.photo = photoPath;
-                            if (instantSnap) {
-                                candObj.currentVotes = c.votos;
-                                candObj.currentShare = c.pct;
-                            }
-                        } else {
-                            state.gov.candidates.push({
-                                id: idStr,
-                                number: idStr,
-                                name: c.nome,
-                                fullName: c.nome_completo || c.nome,
-                                party: c.partido,
-                                targetVotes: c.votos,
-                                currentVotes: c.votos,
-                                targetShare: c.pct,
-                                currentShare: c.pct,
-                                photo: photoPath || 'fotos/gov_' + idStr + '.jpeg'
-                            });
-                            dataChanged = true;
-                        }
+    function applyMapTransform() {
+        const group = document.getElementById('map-viewport-group');
+        const badge = document.getElementById('zoom-level-badge');
+        const container = document.getElementById('map-svg-container');
+
+        if (badge) badge.textContent = `${Math.round(mapZoom * 100)}%`;
+
+        if (container) {
+            container.classList.toggle('can-pan', mapZoom > 1.05);
+        }
+
+        if (group) {
+            const maxPan = 320 * (mapZoom - 1);
+            mapPanX = Math.max(-maxPan, Math.min(maxPan, mapPanX));
+            mapPanY = Math.max(-maxPan, Math.min(maxPan, mapPanY));
+            group.style.transform = `translate(${mapPanX}px, ${mapPanY}px) scale(${mapZoom})`;
+        }
+    }
+
+    function setupMapZoomAndPan() {
+        const container = document.getElementById('map-svg-container');
+        if (!container || container.dataset.zoomReady) return;
+        container.dataset.zoomReady = 'true';
+
+        // Zoom por Roda do Mouse na visão macro
+        container.addEventListener('wheel', (e) => {
+            if (state.mapMode === 'muni') return; // Canvas lida com seu próprio wheel
+            e.preventDefault();
+            const rect = container.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left - rect.width / 2;
+            const mouseY = e.clientY - rect.top - rect.height / 2;
+            const delta = e.deltaY < 0 ? 0.3 : -0.3;
+            window.zoomMap(delta, mouseX, mouseY);
+        }, { passive: false });
+
+        // Pan por Arrastar com Mouse na visão macro
+        container.addEventListener('mousedown', (e) => {
+            if (state.mapMode === 'muni' || mapZoom <= 1.05 || e.button !== 0) return;
+            isPanning = true;
+            panStartX = e.clientX - mapPanX;
+            panStartY = e.clientY - mapPanY;
+            container.classList.add('is-panning');
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isPanning || state.mapMode === 'muni') return;
+            mapPanX = e.clientX - panStartX;
+            mapPanY = e.clientY - panStartY;
+            applyMapTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isPanning) {
+                isPanning = false;
+                container.classList.remove('is-panning');
+            }
+        });
+    }
+
+    // --- REAÇÕES AO VIVO // TERMÔMETRO DA GALERA ---
+    window.triggerReaction = async function (rid) {
+        audio.reactionSound(rid);
+
+        const emojiMap = {
+            tenso: '🔥',
+            pipoca: '🍿',
+            picanha: '🥩',
+            capitao: '🏍️',
+            virada: '⚡'
+        };
+        const emoji = emojiMap[rid] || '🔥';
+
+        const btn = document.querySelector(`.reaction-pill-btn.btn-${rid}`);
+        spawnFloatingReactionEmoji(btn, emoji);
+
+        // Incrementa localmente
+        const countEl = document.getElementById(`count-${rid}`);
+        if (countEl) {
+            const current = parseInt(countEl.textContent.replace(/\./g, ''), 10) || 0;
+            countEl.textContent = formatNumber(current + 1);
+        }
+
+        updateThermometerUI();
+
+        // Envia ao servidor
+        try {
+            await fetch('/api/reactions/click', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: rid })
+            });
+        } catch (e) {}
+    };
+
+    function spawnFloatingReactionEmoji(btnEl, emoji) {
+        const container = document.getElementById('reaction-particles-container') || document.body;
+        let startX = window.innerWidth / 2;
+        let startY = window.innerHeight * 0.7;
+
+        if (btnEl) {
+            const rect = btnEl.getBoundingClientRect();
+            startX = rect.left + rect.width / 2;
+            startY = rect.top;
+        }
+
+        const particleCount = 8;
+        for (let i = 0; i < particleCount; i++) {
+            const p = document.createElement('div');
+            p.className = 'floating-reaction-emoji';
+            p.textContent = emoji;
+
+            const driftX = (Math.random() - 0.5) * 180;
+            const rot = (Math.random() - 0.5) * 70;
+            const delay = i * 45;
+
+            p.style.setProperty('--drift-x', `${driftX}px`);
+            p.style.setProperty('--rot', `${rot}deg`);
+            p.style.left = `${startX + (Math.random() - 0.5) * 50}px`;
+            p.style.top = `${startY + (Math.random() - 0.5) * 20}px`;
+            p.style.animationDelay = `${delay}ms`;
+
+            container.appendChild(p);
+            setTimeout(() => {
+                if (p.parentNode) p.parentNode.removeChild(p);
+            }, 2400 + delay);
+        }
+    }
+
+    async function syncReactions() {
+        try {
+            const res = await fetch('/api/reactions');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.counts) {
+                    Object.entries(data.counts).forEach(([k, v]) => {
+                        const el = document.getElementById(`count-${k}`);
+                        if (el) el.textContent = formatNumber(v);
                     });
+                    const totalEl = document.getElementById('reaction-total-count');
+                    if (totalEl) totalEl.textContent = `${formatNumber(data.total)} reações hoje`;
+                    updateThermometerUI(data.counts);
                 }
             }
-
-            if (payload.sen_al && payload.sen_al.candidatos) {
-                const s = payload.sen_al;
-                state.sen.secoesTotal = s.secoes_total || 7101;
-                state.sen.secoesApuradasTarget = s.secoes_apuradas || state.gov.secoesApuradasTarget;
-                state.sen.validosTarget = s.votos_validos || state.sen.validosTarget;
-
-                s.candidatos.forEach(c => {
-                    const idStr = String(c.id || c.numero);
-                    let candObj = state.sen.candidates.find(item => item.id === idStr);
-                    const photoPath = c.foto || resolveCandidatePhoto('sen', idStr, c.sqcand, candObj ? candObj.photo : null);
-                    if (candObj) {
-                        candObj.targetVotes = c.votos;
-                        candObj.targetShare = c.pct;
-                        candObj.name = c.nome;
-                        candObj.party = c.partido;
-                        if (photoPath) candObj.photo = photoPath;
-                        if (instantSnap) {
-                            candObj.currentVotes = c.votos;
-                            candObj.currentShare = c.pct;
-                        }
-                    } else {
-                        state.sen.candidates.push({
-                            id: idStr,
-                            number: idStr,
-                            name: c.nome,
-                            party: c.partido,
-                            targetVotes: c.votos,
-                            currentVotes: c.votos,
-                            targetShare: c.pct,
-                            currentShare: c.pct,
-                            photo: photoPath || 'fotos/sen_' + idStr + '.jpeg'
-                        });
-                        dataChanged = true;
-                    }
-                });
-            }
-
-            // 4. DEPUTADOS FEDERAIS POR ALAGOAS (NORMALIZADO)
-            if (payload.dep_al && payload.dep_al.candidatos) {
-                const df = payload.dep_al;
-                state.depFed.secoesTotal = df.secoes_total || 7101;
-                state.depFed.secoesApuradasTarget = df.secoes_apuradas !== undefined ? df.secoes_apuradas : state.depFed.secoesApuradasTarget;
-                state.depFed.totalVotosTarget = df.total_votos || state.depFed.totalVotosTarget;
-                state.depFed.validosTarget = df.votos_validos || state.depFed.validosTarget;
-                state.depFed.vagas = df.vagas || 9;
-
-                df.candidatos.forEach(c => {
-                    const idStr = String(c.id || c.numero);
-                    let candObj = state.depFed.candidates.find(item => item.id === idStr);
-                    const photoPath = c.foto || resolveCandidatePhoto('dep', idStr, c.sqcand, candObj ? candObj.photo : null);
-                    if (candObj) {
-                        candObj.targetVotes = c.votos;
-                        candObj.targetShare = c.pct;
-                        candObj.name = c.nome;
-                        candObj.fullName = c.nome_completo || candObj.fullName;
-                        candObj.party = c.partido;
-                        candObj.pct_str = c.pct_str || candObj.pct_str;
-                        candObj.eleito = !!c.eleito;
-                        if (photoPath) candObj.photo = photoPath;
-                        if (instantSnap) {
-                            candObj.currentVotes = c.votos;
-                            candObj.currentShare = c.pct;
-                        }
-                    } else {
-                        state.depFed.candidates.push({
-                            id: idStr,
-                            number: idStr,
-                            sqcand: c.sqcand || '',
-                            name: c.nome,
-                            fullName: c.nome_completo || c.nome,
-                            party: c.partido,
-                            targetVotes: c.votos,
-                            currentVotes: c.votos,
-                            targetShare: c.pct,
-                            currentShare: c.pct,
-                            pct_str: c.pct_str || `${(c.pct * 100).toFixed(2)}%`,
-                            eleito: !!c.eleito,
-                            photo: photoPath || 'fotos/dep_' + idStr + '.jpeg'
-                        });
-                        dataChanged = true;
-                    }
-                });
-            }
-
-            // 5. DEPUTADOS ESTADUAIS POR ALAGOAS (NORMALIZADO)
-            if (payload.est_al && payload.est_al.candidatos) {
-                const de = payload.est_al;
-                state.depEst.secoesTotal = de.secoes_total || 7101;
-                state.depEst.secoesApuradasTarget = de.secoes_apuradas !== undefined ? de.secoes_apuradas : state.depEst.secoesApuradasTarget;
-                state.depEst.totalVotosTarget = de.total_votos || state.depEst.totalVotosTarget;
-                state.depEst.validosTarget = de.votos_validos || state.depEst.validosTarget;
-                state.depEst.vagas = de.vagas || 27;
-
-                de.candidatos.forEach(c => {
-                    const idStr = String(c.id || c.numero);
-                    let candObj = state.depEst.candidates.find(item => item.id === idStr);
-                    const photoPath = c.foto || resolveCandidatePhoto('est', idStr, c.sqcand, candObj ? candObj.photo : null);
-                    if (candObj) {
-                        candObj.targetVotes = c.votos;
-                        candObj.targetShare = c.pct;
-                        candObj.name = c.nome;
-                        candObj.fullName = c.nome_completo || candObj.fullName;
-                        candObj.party = c.partido;
-                        candObj.pct_str = c.pct_str || candObj.pct_str;
-                        candObj.eleito = !!c.eleito;
-                        if (photoPath) candObj.photo = photoPath;
-                        if (instantSnap) {
-                            candObj.currentVotes = c.votos;
-                            candObj.currentShare = c.pct;
-                        }
-                    } else {
-                        state.depEst.candidates.push({
-                            id: idStr,
-                            number: idStr,
-                            sqcand: c.sqcand || '',
-                            name: c.nome,
-                            fullName: c.nome_completo || c.nome,
-                            party: c.partido,
-                            targetVotes: c.votos,
-                            currentVotes: c.votos,
-                            targetShare: c.pct,
-                            currentShare: c.pct,
-                            pct_str: c.pct_str || `${(c.pct * 100).toFixed(2)}%`,
-                            eleito: !!c.eleito,
-                            photo: photoPath || 'fotos/est_' + idStr + '.jpeg'
-                        });
-                        dataChanged = true;
-                    }
-                });
-            }
-
-            if (payload.tse_horario) {
-                state.tseLastTime = payload.tse_horario;
-                if (dom.tseTimePill) dom.tseTimePill.textContent = payload.tse_horario;
-            }
-        }
-
-        // FORMATO 2: FALLBACK PARA DADOS DIRETOS/CRUS DA CDN DO TSE
-        const rawPres = payload.pres_br || (payload.data && payload.data.pres_br) || (payload.raw && payload.raw.pres_br);
-        if (rawPres && rawPres.s) {
-            state.pres.secoesTotal = parseInt(rawPres.s.ts, 10) || state.pres.secoesTotal;
-            state.pres.secoesApuradasTarget = parseInt(rawPres.s.st, 10) || state.pres.secoesApuradasTarget;
-            state.pres.totalVotosTarget = parseInt(rawPres.v.tv, 10) || state.pres.totalVotosTarget;
-            state.pres.validosTarget = parseInt(rawPres.v.vv, 10) || state.pres.validosTarget;
-            state.pres.brancosTarget = parseInt(rawPres.v.vb, 10) || state.pres.brancosTarget;
-            state.pres.nulosTarget = parseInt(rawPres.v.tvn, 10) || state.pres.nulosTarget;
-
-            for (const cg of (rawPres.carg || [])) {
-                for (const agr of (cg.agr || [])) {
-                    for (const p of (agr.par || [])) {
-                        for (const c of (p.cand || [])) {
-                            const cId = String(c.n);
-                            let candObj = state.pres.candidates.find(item => item.id === cId);
-                            const votes = parseInt(c.vap, 10) || 0;
-                            const share = parseFloat(String(c.pvap || '0').replace(',', '.')) / 100;
-                            const photoPath = resolveCandidatePhoto('pres', cId, c.sqcand, candObj ? candObj.photo : null);
-                            if (candObj) {
-                                candObj.targetVotes = votes;
-                                candObj.targetShare = share;
-                                candObj.name = c.nmu || c.nm;
-                                candObj.fullName = c.nm;
-                                candObj.party = p.sg || candObj.party;
-                                if (photoPath) candObj.photo = photoPath;
-                                if (instantSnap) {
-                                    candObj.currentVotes = votes;
-                                    candObj.currentShare = share;
-                                }
-                            } else {
-                                state.pres.candidates.push({
-                                    id: cId,
-                                    number: cId,
-                                    name: c.nmu || c.nm,
-                                    fullName: c.nm,
-                                    party: p.sg || '',
-                                    targetVotes: votes,
-                                    currentVotes: votes,
-                                    targetShare: share,
-                                    currentShare: share,
-                                    photo: photoPath || 'fotos/pres_' + cId + '.jpeg'
-                                });
-                                dataChanged = true;
-                            }
-                        }
-                    }
-                }
-            }
-            if (rawPres.hg) {
-                state.tseLastTime = rawPres.hg;
-                if (dom.tseTimePill) dom.tseTimePill.textContent = rawPres.hg;
-            }
-        }
-
-        const rawGov = payload.gov_al || (payload.data && payload.data.gov_al) || (payload.raw && payload.raw.gov_al);
-        if (rawGov && rawGov.s) {
-            state.gov.secoesTotal = parseInt(rawGov.s.ts, 10) || state.gov.secoesTotal;
-            state.gov.secoesApuradasTarget = parseInt(rawGov.s.st, 10) || state.gov.secoesApuradasTarget;
-            state.gov.totalVotosTarget = parseInt(rawGov.v.tv, 10) || state.gov.totalVotosTarget;
-            state.gov.validosTarget = parseInt(rawGov.v.vv, 10) || state.gov.validosTarget;
-            state.gov.brancosTarget = parseInt(rawGov.v.vb, 10) || state.gov.brancosTarget;
-            state.gov.nulosTarget = parseInt(rawGov.v.tvn, 10) || state.gov.nulosTarget;
-
-            for (const cg of (rawGov.carg || [])) {
-                for (const agr of (cg.agr || [])) {
-                    for (const p of (agr.par || [])) {
-                        for (const c of (p.cand || [])) {
-                            const cId = String(c.n);
-                            let candObj = state.gov.candidates.find(item => item.id === cId);
-                            const votes = parseInt(c.vap, 10) || 0;
-                            const share = parseFloat(String(c.pvap || '0').replace(',', '.')) / 100;
-                            const photoPath = resolveCandidatePhoto('gov', cId, c.sqcand, candObj ? candObj.photo : null);
-                            if (candObj) {
-                                candObj.targetVotes = votes;
-                                candObj.targetShare = share;
-                                candObj.name = c.nmu || c.nm;
-                                candObj.party = p.sg || candObj.party;
-                                if (photoPath) candObj.photo = photoPath;
-                                if (instantSnap) {
-                                    candObj.currentVotes = votes;
-                                    candObj.currentShare = share;
-                                }
-                            } else {
-                                state.gov.candidates.push({
-                                    id: cId,
-                                    number: cId,
-                                    name: c.nmu || c.nm,
-                                    fullName: c.nm,
-                                    party: p.sg || '',
-                                    targetVotes: votes,
-                                    currentVotes: votes,
-                                    targetShare: share,
-                                    currentShare: share,
-                                    photo: photoPath || 'fotos/gov_' + cId + '.jpeg'
-                                });
-                                dataChanged = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        const rawSen = payload.sen_al || (payload.data && payload.data.sen_al) || (payload.raw && payload.raw.sen_al);
-        if (rawSen && rawSen.s) {
-            for (const cg of (rawSen.carg || [])) {
-                for (const agr of (cg.agr || [])) {
-                    for (const p of (agr.par || [])) {
-                        for (const c of (p.cand || [])) {
-                            const cId = String(c.n);
-                            let candObj = state.sen.candidates.find(item => item.id === cId);
-                            const votes = parseInt(c.vap, 10) || 0;
-                            const share = parseFloat(String(c.pvap || '0').replace(',', '.')) / 100;
-                            const photoPath = resolveCandidatePhoto('sen', cId, c.sqcand, candObj ? candObj.photo : null);
-                            if (candObj) {
-                                candObj.targetVotes = votes;
-                                candObj.targetShare = share;
-                                if (photoPath) candObj.photo = photoPath;
-                                if (instantSnap) {
-                                    candObj.currentVotes = votes;
-                                    candObj.currentShare = share;
-                                }
-                            } else {
-                                state.sen.candidates.push({
-                                    id: cId,
-                                    number: cId,
-                                    name: c.nmu || c.nm,
-                                    party: p.sg || '',
-                                    targetVotes: votes,
-                                    currentVotes: votes,
-                                    targetShare: share,
-                                    currentShare: share,
-                                    photo: photoPath || 'fotos/sen_' + cId + '.jpeg'
-                                });
-                                dataChanged = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // FALLBACK: Deputados Federais AL (dados diretos da CDN do TSE)
-        const rawDep = payload.dep_al || (payload.data && payload.data.dep_al) || (payload.raw && payload.raw.dep_al);
-        if (rawDep && rawDep.s && (!payload.dep_al || !payload.dep_al.candidatos)) {
-            state.depFed.secoesTotal = parseInt(rawDep.s.ts, 10) || state.depFed.secoesTotal;
-            state.depFed.secoesApuradasTarget = parseInt(rawDep.s.st, 10) || state.depFed.secoesApuradasTarget;
-            state.depFed.totalVotosTarget = parseInt(rawDep.v.tv, 10) || state.depFed.totalVotosTarget;
-            state.depFed.validosTarget = parseInt(rawDep.v.vv, 10) || state.depFed.validosTarget;
-
-            for (const cg of (rawDep.carg || [])) {
-                for (const agr of (cg.agr || [])) {
-                    for (const p of (agr.par || [])) {
-                        for (const c of (p.cand || [])) {
-                            const cId = String(c.n);
-                            let candObj = state.depFed.candidates.find(item => item.id === cId);
-                            const votes = parseInt(c.vap, 10) || 0;
-                            const share = parseFloat(String(c.pvap || '0').replace(',', '.')) / 100;
-                            const photoPath = resolveCandidatePhoto('dep', cId, c.sqcand, candObj ? candObj.photo : null);
-                            const elected = c.e === 's' || c.dstit === 'Eleito' || c.dstit === 'Eleito por QP' || c.dstit === 'Eleito por média';
-                            if (candObj) {
-                                candObj.targetVotes = votes;
-                                candObj.targetShare = share;
-                                candObj.name = c.nmu || c.nm;
-                                candObj.fullName = c.nm;
-                                candObj.party = p.sg || candObj.party;
-                                candObj.pct_str = (share * 100).toFixed(2) + '%';
-                                candObj.eleito = elected;
-                                if (photoPath) candObj.photo = photoPath;
-                                if (instantSnap) {
-                                    candObj.currentVotes = votes;
-                                    candObj.currentShare = share;
-                                }
-                            } else {
-                                state.depFed.candidates.push({
-                                    id: cId,
-                                    number: cId,
-                                    sqcand: c.sqcand || '',
-                                    name: c.nmu || c.nm,
-                                    fullName: c.nm,
-                                    party: p.sg || '',
-                                    targetVotes: votes,
-                                    currentVotes: votes,
-                                    targetShare: share,
-                                    currentShare: share,
-                                    pct_str: (share * 100).toFixed(2) + '%',
-                                    eleito: elected,
-                                    photo: photoPath || 'fotos/dep_' + cId + '.jpeg'
-                                });
-                                dataChanged = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // FALLBACK: Deputados Estaduais AL (dados diretos da CDN do TSE)
-        const rawEst = payload.est_al || (payload.data && payload.data.est_al) || (payload.raw && payload.raw.est_al);
-        if (rawEst && rawEst.s && (!payload.est_al || !payload.est_al.candidatos)) {
-            state.depEst.secoesTotal = parseInt(rawEst.s.ts, 10) || state.depEst.secoesTotal;
-            state.depEst.secoesApuradasTarget = parseInt(rawEst.s.st, 10) || state.depEst.secoesApuradasTarget;
-            state.depEst.totalVotosTarget = parseInt(rawEst.v.tv, 10) || state.depEst.totalVotosTarget;
-            state.depEst.validosTarget = parseInt(rawEst.v.vv, 10) || state.depEst.validosTarget;
-
-            for (const cg of (rawEst.carg || [])) {
-                for (const agr of (cg.agr || [])) {
-                    for (const p of (agr.par || [])) {
-                        for (const c of (p.cand || [])) {
-                            const cId = String(c.n);
-                            let candObj = state.depEst.candidates.find(item => item.id === cId);
-                            const votes = parseInt(c.vap, 10) || 0;
-                            const share = parseFloat(String(c.pvap || '0').replace(',', '.')) / 100;
-                            const photoPath = resolveCandidatePhoto('est', cId, c.sqcand, candObj ? candObj.photo : null);
-                            const elected = c.e === 's' || c.dstit === 'Eleito' || c.dstit === 'Eleito por QP' || c.dstit === 'Eleito por média';
-                            if (candObj) {
-                                candObj.targetVotes = votes;
-                                candObj.targetShare = share;
-                                candObj.name = c.nmu || c.nm;
-                                candObj.fullName = c.nm;
-                                candObj.party = p.sg || candObj.party;
-                                candObj.pct_str = (share * 100).toFixed(2) + '%';
-                                candObj.eleito = elected;
-                                if (photoPath) candObj.photo = photoPath;
-                                if (instantSnap) {
-                                    candObj.currentVotes = votes;
-                                    candObj.currentShare = share;
-                                }
-                            } else {
-                                state.depEst.candidates.push({
-                                    id: cId,
-                                    number: cId,
-                                    sqcand: c.sqcand || '',
-                                    name: c.nmu || c.nm,
-                                    fullName: c.nm,
-                                    party: p.sg || '',
-                                    targetVotes: votes,
-                                    currentVotes: votes,
-                                    targetShare: share,
-                                    currentShare: share,
-                                    pct_str: (share * 100).toFixed(2) + '%',
-                                    eleito: elected,
-                                    photo: photoPath || 'fotos/est_' + cId + '.jpeg'
-                                });
-                                dataChanged = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        state.tseConnected = true;
-
-        // Se instantSnap estiver ativo, converge imediatamente os números para o valor exato
-        if (instantSnap) {
-            state.pres.secoesApuradasCurrent = state.pres.secoesApuradasTarget;
-            state.pres.totalVotosCurrent = state.pres.totalVotosTarget;
-            state.pres.validosCurrent = state.pres.validosTarget;
-            state.pres.brancosCurrent = state.pres.brancosTarget;
-            state.pres.nulosCurrent = state.pres.nulosTarget;
-
-            state.gov.secoesApuradasCurrent = state.gov.secoesApuradasTarget;
-            state.gov.totalVotosCurrent = state.gov.totalVotosTarget;
-            state.gov.validosCurrent = state.gov.validosTarget;
-            state.gov.brancosCurrent = state.gov.brancosTarget;
-            state.gov.nulosCurrent = state.gov.nulosTarget;
-
-            state.pres.candidates.forEach(c => {
-                c.currentVotes = c.targetVotes;
-                c.currentShare = c.targetShare;
-            });
-            state.gov.candidates.forEach(c => {
-                c.currentVotes = c.targetVotes;
-                c.currentShare = c.targetShare;
-            });
-            state.sen.candidates.forEach(c => {
-                c.currentVotes = c.targetVotes;
-                c.currentShare = c.targetShare;
-            });
-
-            state.depFed.secoesApuradasCurrent = state.depFed.secoesApuradasTarget;
-            state.depFed.totalVotosCurrent = state.depFed.totalVotosTarget;
-            state.depFed.validosCurrent = state.depFed.validosTarget;
-            state.depFed.candidates.forEach(c => {
-                c.currentVotes = c.targetVotes;
-                c.currentShare = c.targetShare;
-            });
-
-            state.depEst.secoesApuradasCurrent = state.depEst.secoesApuradasTarget;
-            state.depEst.totalVotosCurrent = state.depEst.totalVotosTarget;
-            state.depEst.validosCurrent = state.depEst.validosTarget;
-            state.depEst.candidates.forEach(c => {
-                c.currentVotes = c.targetVotes;
-                c.currentShare = c.targetShare;
-            });
-        }
-
-        // Se novos candidatos entraram, reconstrói os containers
-        if (dataChanged) {
-            renderCandidateItems();
-        }
-
-        updateUI();
+        } catch (e) {}
     }
 
-    // --- BUSCA MULTI-CANAL RESILIENTE NA API / TSE ---
-    async function fetchLiveTse(force = false, instantSnap = false) {
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-        const queryParams = `?t=${Date.now()}${force ? '&force=1' : ''}`;
-        let loaded = false;
+    function updateThermometerUI(counts) {
+        const cPicanha = counts ? counts.picanha : parseInt((document.getElementById('count-picanha') || {}).textContent?.replace(/\./g, '') || '2420', 10);
+        const cCapitao = counts ? counts.capitao : parseInt((document.getElementById('count-capitao') || {}).textContent?.replace(/\./g, '') || '2490', 10);
+        const duelTotal = cPicanha + cCapitao;
+        if (duelTotal > 0) {
+            const pctBolso = (cCapitao / duelTotal * 100).toFixed(1);
+            const pctLula = (cPicanha / duelTotal * 100).toFixed(1);
+            const thermoBolso = document.getElementById('thermometer-pl');
+            const thermoLula = document.getElementById('thermometer-pt');
+            const lblBolso = document.getElementById('thermo-pct-bolso');
+            const lblLula = document.getElementById('thermo-pct-lula');
 
-        // Se estiver rodando localmente, prioriza o server.py local de 1ms
-        if (isLocal) {
-            const endpoints = [
-                `/api/tse-live${queryParams}`,
-                `http://127.0.0.1:8080/api/tse-live${queryParams}`,
-                `./dados_tse_atual.json?t=${Date.now()}`
-            ];
-
-            for (const ep of endpoints) {
-                try {
-                    const res = await fetch(ep, { cache: 'no-store' });
-                    if (res.ok) {
-                        const json = await res.json();
-                        if (json) {
-                            parseTsePayload(json, instantSnap);
-                            loaded = true;
-                            break;
-                        }
-                    }
-                } catch (err) {}
-            }
+            if (thermoBolso) thermoBolso.style.width = `${pctBolso}%`;
+            if (thermoLula) thermoLula.style.width = `${pctLula}%`;
+            if (lblBolso) lblBolso.textContent = `${pctBolso}%`;
+            if (lblLula) lblLula.textContent = `${pctLula}%`;
         }
-
-        // Em hospedagens gratuitas na nuvem (Netlify, Vercel, GitHub Pages),
-        // consulta diretamente a CDN oficial do TSE via requisições paralelas ultra-rápidas:
-        if (!loaded) {
-            try {
-                const [resBr, resAl, resSen, resDep, resEst] = await Promise.all([
-                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6257/dados/br/br-c0001-e006257-u.json?t=${Date.now()}`, { cache: 'no-store' }),
-                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0003-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' }),
-                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0005-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' }),
-                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0006-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' }),
-                    fetch(`https://resultados.tse.jus.br/oficial/ele2026/6259/dados/al/al-c0007-e006259-u.json?t=${Date.now()}`, { cache: 'no-store' })
-                ]);
-
-                if (resBr.ok && resAl.ok) {
-                    const dBr = await resBr.json();
-                    const dAl = await resAl.json();
-                    const dSen = resSen.ok ? await resSen.json() : null;
-                    const dDep = resDep.ok ? await resDep.json() : null;
-                    const dEst = resEst.ok ? await resEst.json() : null;
-                    parseTsePayload({ pres_br: dBr, gov_al: dAl, sen_al: dSen, dep_al: dDep, est_al: dEst }, instantSnap);
-                    loaded = true;
-                }
-            } catch (err) {}
-        }
-
-        return loaded;
     }
 
-    // --- RENDER CANDIDATES IN DOM ---
-    function renderCandidateItems() {
-        // Ordena candidatos decrescente por votos para renderizar
-        const sortedPres = [...state.pres.candidates].sort((a, b) => (b.targetVotes || b.currentVotes) - (a.targetVotes || a.currentVotes));
-        const sortedGov = [...state.gov.candidates].sort((a, b) => (b.targetVotes || b.currentVotes) - (a.targetVotes || a.currentVotes));
-        const sortedSen = [...state.sen.candidates].sort((a, b) => (b.targetVotes || b.currentVotes) - (a.targetVotes || a.currentVotes));
+    async function loadMuniMapData() {
+        try {
+            let res = await fetch('/api/tse/municipios-map-data');
+            if (!res.ok) res = await fetch('seuimposto_municipios.json');
+            if (res.ok) {
+                state.muniFeedData = await res.json();
+                requestCanvasRender();
+            }
+        } catch (e) {
+            console.warn('Erro ao buscar dados dos municípios:', e);
+        }
+    }
 
-        // 1. President Split
-        if (dom.presCandidatesContainer) {
-            dom.presCandidatesContainer.innerHTML = '';
-            sortedPres.forEach((cand, idx) => {
-                const div = document.createElement('div');
-                div.className = `cand-item ${idx === 0 ? 'leading' : ''}`;
-                div.id = `cand-row-pres-${cand.id}`;
-                div.dataset.candId = cand.id;
-                div.innerHTML = `
-                    <div class="cand-rank">${idx + 1}º</div>
-                    <div class="cand-avatar">${renderAvatar(cand.photo, cand.name, '🇧🇷')}</div>
-                    <div class="cand-info">
-                        <div class="cand-name-row">
-                            <span class="cand-name">${cand.name}</span>
-                            ${idx === 0 ? '<span class="cand-badge">LÍDER NACIONAL</span>' : ''}
-                        </div>
-                        <div class="cand-meta">
-                            <span class="cand-party">${cand.party}</span> &bull; 
-                            <span class="cand-num">Nº ${cand.number}</span>
-                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'pres')" title="Comparar no Confronto Direto (X1)">⚔️ X1</button>
-                        </div>
-                    </div>
-                    <div class="cand-stats">
-                        <span class="cand-pct numeric" id="pct-pres-${cand.id}">0.0000%</span>
-                        <span class="cand-votes-raw numeric" id="votes-pres-${cand.id}">0 votos</span>
-                    </div>
-                    <div class="cand-microbar" id="bar-pres-${cand.id}" style="width: 0%;"></div>
-                `;
-                dom.presCandidatesContainer.appendChild(div);
-            });
+    // Atualiza Cores Graduadas e Porcentagens nos Selos do Mapa
+    function updateMapColors() {
+        if (!state.uf_matrix) return;
+
+        Object.entries(state.uf_matrix).forEach(([ufCode, data]) => {
+            const pathEl = document.getElementById(`state-path-${ufCode}`);
+            const labelRect = document.getElementById(`map-label-rect-${ufCode}`);
+            const labelPct = document.getElementById(`map-label-pct-${ufCode}`);
+            const labelG = document.getElementById(`state-label-${ufCode}`);
+
+            const bolsoPctNum = parseFloat((data.bolsonaro_pct || '0').replace('%', '').replace(',', '.'));
+            const lulaPctNum = parseFloat((data.lula_pct || '0').replace('%', '').replace(',', '.'));
+            const deltaPct = Math.abs(bolsoPctNum - lulaPctNum);
+
+            // Verifica filtro ativo
+            let isDimmed = false;
+            if (state.mapFilter === 'bolso' && data.lider !== '22') isDimmed = true;
+            if (state.mapFilter === 'lula' && data.lider !== '13') isDimmed = true;
+            if (state.mapFilter === 'tight' && deltaPct >= 5.0) isDimmed = true;
+
+            if (pathEl) {
+                pathEl.className.baseVal = 'state-path';
+                if (isDimmed) pathEl.classList.add('dimmed');
+
+                if (data.lider === '22') {
+                    pathEl.classList.add('pl-win');
+                    if (bolsoPctNum >= 60) pathEl.classList.add('pl-bg-deep');
+                    else if (bolsoPctNum >= 53) pathEl.classList.add('pl-bg-mid');
+                    else pathEl.classList.add('pl-bg-light');
+                } else if (data.lider === '13') {
+                    pathEl.classList.add('pt-win');
+                    if (lulaPctNum >= 60) pathEl.classList.add('pt-bg-deep');
+                    else if (lulaPctNum >= 53) pathEl.classList.add('pt-bg-mid');
+                    else pathEl.classList.add('pt-bg-light');
+                }
+
+                if (state.selectedState === ufCode) {
+                    pathEl.classList.add('active');
+                }
+            }
+
+            // Atualiza Label e Porcentagem
+            if (labelRect && labelPct) {
+                labelRect.className.baseVal = 'map-label-rect';
+                labelPct.className.baseVal = 'map-label-text-pct';
+
+                if (data.lider === '22') {
+                    labelRect.classList.add('pl');
+                    labelPct.classList.add('pl');
+                    labelPct.textContent = data.bolsonaro_pct || '0%';
+                } else {
+                    labelRect.classList.add('pt');
+                    labelPct.classList.add('pt');
+                    labelPct.textContent = data.lula_pct || '0%';
+                }
+            }
+
+            if (labelG) {
+                labelG.classList.toggle('active', state.selectedState === ufCode);
+                labelG.style.opacity = isDimmed ? '0.2' : '1';
+            }
+        });
+    }
+
+    // Atualiza Placar Geral dos Estados (HUD)
+    function updateStatesScoreboard() {
+        if (!state.uf_matrix) return;
+        let bolsoWins = 0;
+        let lulaWins = 0;
+        let bolsoVotes = 0;
+        let lulaVotes = 0;
+
+        Object.values(state.uf_matrix).forEach(uf => {
+            bolsoVotes += (uf.bolsonaro_votos || 0);
+            lulaVotes += (uf.lula_votos || 0);
+            if (uf.lider === '22') bolsoWins++;
+            else if (uf.lider === '13') lulaWins++;
+        });
+
+        const elCountBolso = document.getElementById('states-count-bolso');
+        const elCountLula = document.getElementById('states-count-lula');
+        const elVotesBolso = document.getElementById('states-votes-bolso');
+        const elVotesLula = document.getElementById('states-votes-lula');
+        const elBarPl = document.getElementById('states-bar-pl');
+        const elBarPt = document.getElementById('states-bar-pt');
+        const elDiffSub = document.getElementById('states-diff-sub');
+
+        if (elCountBolso) elCountBolso.textContent = bolsoWins;
+        if (elCountLula) elCountLula.textContent = lulaWins;
+        if (elVotesBolso) elVotesBolso.textContent = `${formatNumber(bolsoVotes)} votos (47,0%)`;
+        if (elVotesLula) elVotesLula.textContent = `${formatNumber(lulaVotes)} votos (45,2%)`;
+
+        const totalWins = bolsoWins + lulaWins;
+        if (totalWins > 0) {
+            const pctPl = (bolsoWins / totalWins * 100).toFixed(1);
+            const pctPt = (lulaWins / totalWins * 100).toFixed(1);
+            if (elBarPl) elBarPl.style.width = `${pctPl}%`;
+            if (elBarPt) elBarPt.style.width = `${pctPt}%`;
         }
 
-        // 2. Governor Split
-        if (dom.govCandidatesContainer) {
-            dom.govCandidatesContainer.innerHTML = '';
-            sortedGov.forEach((cand, idx) => {
-                const div = document.createElement('div');
-                div.className = `cand-item ${idx === 0 ? 'leading' : ''}`;
-                div.id = `cand-row-gov-${cand.id}`;
-                div.dataset.candId = cand.id;
-                div.innerHTML = `
-                    <div class="cand-rank">${idx + 1}º</div>
-                    <div class="cand-avatar">${renderAvatar(cand.photo, cand.name, '🌴')}</div>
-                    <div class="cand-info">
-                        <div class="cand-name-row">
-                            <span class="cand-name">${cand.name}</span>
-                            ${idx === 0 ? '<span class="cand-badge">LÍDER EM AL</span>' : ''}
-                        </div>
-                        <div class="cand-meta">
-                            <span class="cand-party">${cand.party}</span> &bull; 
-                            <span class="cand-num">Nº ${cand.number}</span>
-                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'gov')" title="Comparar no Confronto Direto (X1)">⚔️ X1</button>
-                        </div>
-                    </div>
-                    <div class="cand-stats">
-                        <span class="cand-pct numeric" id="pct-gov-${cand.id}">0.0000%</span>
-                        <span class="cand-votes-raw numeric" id="votes-gov-${cand.id}">0 votos</span>
-                    </div>
-                    <div class="cand-microbar" id="bar-gov-${cand.id}" style="width: 0%;"></div>
+        if (elDiffSub) {
+            if (bolsoWins > lulaWins) {
+                elDiffSub.textContent = `PL lidera por vantagem de ${bolsoWins - lulaWins} estados`;
+            } else if (lulaWins > bolsoWins) {
+                elDiffSub.textContent = `PT lidera por vantagem de ${lulaWins - bolsoWins} estados`;
+            } else {
+                elDiffSub.textContent = `Empate em estados: ${bolsoWins} a ${lulaWins}`;
+            }
+        }
+    }
+
+    // --- COLÉGIOS ELEITORAIS PRINCIPAIS (ACESSO RÁPIDO) ---
+    const KEY_ELECTORAL_COLLEGES = ['TODOS', 'SP', 'MG', 'RJ', 'BA', 'RS', 'PR', 'PE', 'CE', 'SC', 'GO', 'DF', 'AL', 'PA', 'MA'];
+
+    function renderQuickCollegePills() {
+        const container = document.getElementById('quick-colleges-scroll');
+        if (!container) return;
+
+        const currentUf = state.selectedState;
+
+        container.innerHTML = KEY_ELECTORAL_COLLEGES.map(uf => {
+            if (uf === 'TODOS') {
+                const isActive = !currentUf;
+                return `
+                    <button class="college-pill ${isActive ? 'active' : ''}" data-uf="TODOS" onclick="window.selectQuickCollege('TODOS')">
+                        <span>🇧🇷</span> <span>Todos (27)</span>
+                    </button>
                 `;
-                dom.govCandidatesContainer.appendChild(div);
-            });
+            }
+
+            const ufData = state.uf_matrix[uf];
+            const isActive = currentUf === uf;
+            if (!ufData) {
+                return `
+                    <button class="college-pill ${isActive ? 'active' : ''}" data-uf="${uf}" onclick="window.selectQuickCollege('${uf}')">
+                        <span>${uf}</span>
+                    </button>
+                `;
+            }
+
+            const isPl = ufData.lider === '22' || (ufData.bolsonaro_votos >= ufData.lula_votos);
+            const leadPct = isPl ? ufData.bolsonaro_pct : ufData.lula_pct;
+            const badgeClass = isPl ? 'pl' : 'pt';
+            const icon = isPl ? '🔵' : '🔴';
+
+            return `
+                <button class="college-pill ${isActive ? 'active' : ''}" data-uf="${uf}" onclick="window.selectQuickCollege('${uf}')" title="${ufData.nome} (${uf}) - Liderança: ${leadPct}">
+                    <strong>${uf}</strong>
+                    <span class="pill-lead-badge ${badgeClass}">${icon} ${leadPct || ''}</span>
+                </button>
+            `;
+        }).join('');
+    }
+
+    window.selectQuickCollege = function(uf) {
+        if (uf === 'TODOS') {
+            window.setMapFilter('all');
+            window.resetMapZoom();
+            return;
         }
 
-        // 3. President Detailed Grid
-        if (dom.presDetailedGrid) {
-            dom.presDetailedGrid.innerHTML = '';
-            sortedPres.forEach((cand, idx) => {
-                const card = document.createElement('div');
-                card.className = `detailed-card ${idx === 0 ? 'leader' : ''}`;
-                card.innerHTML = `
-                    <div class="detailed-top">
-                        <div class="detailed-avatar-box">${renderAvatar(cand.photo, cand.name, '🇧🇷')}</div>
-                        <div class="detailed-name-meta">
-                            <div class="detailed-candidate-name">${cand.name}</div>
-                            <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
-                            <div style="margin-top: 5px;">
-                                <button class="btn-card-duel-pill" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'pres')">⚔️ Comparar no X1</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="detailed-numbers-row">
-                        <span class="detailed-pct-giant numeric" id="detail-pct-pres-${cand.id}">0.0000%</span>
-                        <span class="detailed-votes-total numeric" id="detail-votes-pres-${cand.id}">0 VOTOS</span>
-                    </div>
-                    <div class="progress-bar-wrap">
-                        <div class="progress-bar-fill bg-cyan" id="detail-bar-pres-${cand.id}" style="width: 0%;"></div>
-                    </div>
-                `;
-                dom.presDetailedGrid.appendChild(card);
-            });
+        window.selectState(uf, true);
+
+        // Se estiver em telas menores, rola suavemente até o cartão do estado e cidades
+        if (window.innerWidth <= 900) {
+            setTimeout(() => {
+                const target = document.getElementById('selected-state-card');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+    };
+
+    function showMapTooltip(e, ufCode) {
+        const tooltip = document.getElementById('map-tooltip');
+        const ufData = state.uf_matrix[ufCode];
+        if (!tooltip || !ufData) return;
+
+        const liderNome = ufData.lider_nome || (ufData.lider === '22' ? 'Flávio Bolsonaro' : 'Lula');
+        const liderCor = ufData.lider === '22' ? 'var(--pl-blue)' : 'var(--pt-red)';
+
+        tooltip.innerHTML = `
+            <div class="map-tooltip-title">${ufData.nome || ufCode} (${ufCode})</div>
+            <div class="map-tooltip-row">
+                <span class="pl-color">PL 22 (Bolsonaro):</span>
+                <strong>${ufData.bolsonaro_pct || '0%'}</strong>
+            </div>
+            <div class="map-tooltip-row">
+                <span class="pt-color">PT 13 (Lula):</span>
+                <strong>${ufData.lula_pct || '0%'}</strong>
+            </div>
+            <div class="map-tooltip-row" style="margin-top: 5px; color: ${liderCor}; font-weight: 800; font-size: 11px;">
+                🏆 Vencedor: ${liderNome}
+            </div>
+            <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+                Diferença: ${formatNumber(ufData.delta_votos || 0)} votos
+            </div>
+        `;
+        tooltip.classList.remove('hidden');
+        moveMapTooltip(e);
+    }
+
+    function moveMapTooltip(e) {
+        const tooltip = document.getElementById('map-tooltip');
+        const container = document.getElementById('map-svg-container');
+        if (!tooltip || !container) return;
+
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const clampedX = Math.max(90, Math.min(rect.width - 90, x));
+        const clampedY = Math.max(40, y);
+
+        tooltip.style.left = `${clampedX}px`;
+        tooltip.style.top = `${clampedY}px`;
+    }
+
+    function hideMapTooltip() {
+        const tooltip = document.getElementById('map-tooltip');
+        if (tooltip) tooltip.classList.add('hidden');
+    }
+
+    // Seleção de estado e atualização da interface
+    window.selectState = async function (ufCode, isUserClick = true) {
+        state.selectedState = ufCode;
+
+        if (isUserClick) {
+            pauseAutoTourUserAction();
         }
 
-        // 4. Governor Detailed Grid
-        if (dom.govDetailedGrid) {
-            dom.govDetailedGrid.innerHTML = '';
-            sortedGov.forEach((cand, idx) => {
-                const card = document.createElement('div');
-                card.className = `detailed-card ${idx === 0 ? 'leader' : ''}`;
-                card.innerHTML = `
-                    <div class="detailed-top">
-                        <div class="detailed-avatar-box">${renderAvatar(cand.photo, cand.name, '🌴')}</div>
-                        <div class="detailed-name-meta">
-                            <div class="detailed-candidate-name">${cand.name}</div>
-                            <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
-                            <div style="margin-top: 5px;">
-                                <button class="btn-card-duel-pill" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'gov')">⚔️ Comparar no X1</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="detailed-numbers-row">
-                        <span class="detailed-pct-giant numeric text-teal" id="detail-pct-gov-${cand.id}">0.0000%</span>
-                        <span class="detailed-votes-total numeric" id="detail-votes-gov-${cand.id}">0 VOTOS</span>
-                    </div>
-                    <div class="progress-bar-wrap">
-                        <div class="progress-bar-fill bg-teal" id="detail-bar-gov-${cand.id}" style="width: 0%;"></div>
-                    </div>
-                `;
-                dom.govDetailedGrid.appendChild(card);
-            });
+        // Dropdown
+        const select = document.getElementById('select-map-uf');
+        if (select) select.value = ufCode;
+
+        // Atualiza destaque no SVG e traz para a frente para evitar bordas cortadas
+        document.querySelectorAll('.state-path').forEach(p => {
+            const isTarget = p.getAttribute('data-uf') === ufCode;
+            p.classList.toggle('active', isTarget);
+            if (isTarget && p.parentElement) {
+                p.parentElement.appendChild(p);
+            }
+        });
+
+        document.querySelectorAll('.map-state-label').forEach(lbl => {
+            const isTarget = lbl.getAttribute('data-uf') === ufCode;
+            lbl.classList.toggle('active', isTarget);
+            if (isTarget && lbl.parentElement) {
+                lbl.parentElement.appendChild(lbl);
+            }
+        });
+
+        // Atualiza Card de Destaque
+        updateSelectedStateCard(ufCode);
+
+        // Atualiza pílula ativa nos colégios eleitorais
+        document.querySelectorAll('.college-pill').forEach(btn => {
+            const isMatch = btn.getAttribute('data-uf') === ufCode;
+            btn.classList.toggle('active', isMatch);
+        });
+
+        // Atualiza label do dock flutuante mobile
+        const dockCitiesLbl = document.getElementById('mobile-dock-cities-lbl');
+        if (dockCitiesLbl) {
+            dockCitiesLbl.textContent = `Ver Cidades (${ufCode})`;
         }
 
-        // 5. Senator Cards
-        if (dom.senCandidatesContainer) {
-            dom.senCandidatesContainer.innerHTML = '';
-            sortedSen.forEach((cand, idx) => {
-                const div = document.createElement('div');
-                div.className = `cand-item ${idx < 2 ? 'leading' : ''}`;
-                div.innerHTML = `
-                    <div class="cand-rank">${idx + 1}º</div>
-                    <div class="cand-avatar">${renderAvatar(cand.photo, cand.name, '🏛️')}</div>
-                    <div class="cand-info">
-                        <span class="cand-name">${cand.name}</span>
-                        <span class="cand-meta">
-                            ${cand.party} &bull; Nº ${cand.number} ${idx < 2 ? '<strong class="text-gold">(ZONA ELEITO)</strong>' : ''}
-                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'sen')" title="Comparar no Confronto Direto (X1)">⚔️ X1</button>
+        // Renderiza contorno do estado no Canvas SeuImposto
+        requestCanvasRender();
+
+        // Se mudou de estado, carrega municípios
+        if (state.loadedStateUf !== ufCode) {
+            state.loadedStateUf = ufCode;
+            await loadStateCities(ufCode);
+        }
+    };
+
+    function updateSelectedStateCard(ufCode) {
+        const stateCard = document.getElementById('selected-state-card');
+        if (!stateCard) return;
+
+        const ufData = state.uf_matrix[ufCode] || { nome: ufCode, uf: ufCode, pct_secoes: '100%' };
+        const lider = ufData.lider || (ufData.bolsonaro_votos >= ufData.lula_votos ? '22' : '13');
+        const isPl = lider === '22';
+        const liderNome = ufData.lider_nome || (isPl ? 'Flávio Bolsonaro' : 'Lula');
+
+        stateCard.className = `selected-state-card ${isPl ? 'pl-win-card' : 'pt-win-card'}`;
+
+        const totalPair = (ufData.bolsonaro_votos || 0) + (ufData.lula_votos || 0);
+        const pctPl = totalPair > 0 ? (ufData.bolsonaro_votos / totalPair * 100).toFixed(1) : '50.0';
+        const pctPt = totalPair > 0 ? (ufData.lula_votos / totalPair * 100).toFixed(1) : '50.0';
+        const delta = Math.abs((ufData.bolsonaro_votos || 0) - (ufData.lula_votos || 0));
+
+        stateCard.innerHTML = `
+            <div class="state-card-top-row">
+                <div class="state-card-title-group">
+                    <span class="state-card-uf-pill">${ufCode}</span>
+                    <div>
+                        <h3>${ufData.nome || ufCode}</h3>
+                        <span style="font-size: 11px; color: var(--accent-green); font-family: var(--font-mono); font-weight: 700;">
+                            ${ufData.pct_secoes || '100,00%'} APURADO OFICIAL
                         </span>
                     </div>
-                    <div class="cand-stats">
-                        <span class="cand-pct numeric" id="pct-sen-${cand.id}">0.0000%</span>
-                        <span class="cand-votes-raw numeric" id="votes-sen-${cand.id}">0 votos</span>
-                    </div>
-                `;
-                dom.senCandidatesContainer.appendChild(div);
-            });
-        }
+                </div>
+                <span class="state-card-winner-tag ${isPl ? 'pl' : 'pt'}">
+                    🏆 ${liderNome.toUpperCase()} VENCEU
+                </span>
+            </div>
 
-        // 6. Deputies Cards
-        if (dom.depCandidatesContainer) {
-            dom.depCandidatesContainer.innerHTML = '';
-            state.deputies.forEach((dep, idx) => {
-                const div = document.createElement('div');
-                div.className = 'cand-item';
-                div.innerHTML = `
-                    <div class="cand-rank">${idx + 1}º</div>
-                    <div class="cand-avatar">📋</div>
-                    <div class="cand-info">
-                        <span class="cand-name">${dep.name}</span>
-                        <span class="cand-meta">${dep.party} &bull; Nº ${dep.number} &bull; ELEITO QP</span>
-                    </div>
-                    <div class="cand-stats">
-                        <span class="cand-pct numeric" id="pct-dep-${idx}">0.0000%</span>
-                        <span class="cand-votes-raw numeric" id="votes-dep-${idx}">0 votos</span>
-                    </div>
-                `;
-                dom.depCandidatesContainer.appendChild(div);
-            });
-        }
-
-        // 7. DEPUTADOS FEDERAIS POR ALAGOAS (9 VAGAS NA CÂMARA)
-        renderFedCandidates();
-
-        // 8. DEPUTADOS ESTADUAIS POR ALAGOAS (27 VAGAS NA ALEAL)
-        renderEstCandidates();
-
-        // 9. UF Row
-        if (dom.ufTelemetryRow) {
-            dom.ufTelemetryRow.innerHTML = '';
-            state.ufs.forEach(uf => {
-                const card = document.createElement('div');
-                card.className = 'uf-card';
-                card.innerHTML = `
-                    <div class="uf-card-head">
-                        <span>${uf.name} (${uf.uf})</span>
-                        <span class="text-cyan numeric" id="uf-pct-${uf.uf}">0.00%</span>
-                    </div>
-                    <div class="progress-bar-wrap" style="height: 6px;">
-                        <div class="progress-bar-fill bg-cyan" id="uf-bar-${uf.uf}" style="width: 0%;"></div>
-                    </div>
-                    <div class="uf-card-leader">LÍDER: <strong>${uf.leader}</strong> (${uf.leadShare})</div>
-                `;
-                dom.ufTelemetryRow.appendChild(card);
-            });
-        }
-
-        // 8. Alagoas Cities
-        if (dom.alagoasCitiesGrid) {
-            dom.alagoasCitiesGrid.innerHTML = '';
-            state.citiesAL.forEach((city, idx) => {
-                const card = document.createElement('div');
-                card.className = 'city-card';
-                card.innerHTML = `
-                    <div class="city-card-head">
-                        <span>${city.name}</span>
-                        <span class="text-teal numeric" id="city-pct-${idx}">0.00%</span>
-                    </div>
-                    <div class="progress-bar-wrap" style="height: 6px;">
-                        <div class="progress-bar-fill bg-teal" id="city-bar-${idx}" style="width: 0%;"></div>
-                    </div>
-                    <div class="city-card-leader">LÍDER: <strong>${city.leader}</strong> (${city.leadShare})</div>
-                `;
-                dom.alagoasCitiesGrid.appendChild(card);
-            });
-        }
-    }
-
-    // --- MOTOR MILISSEGUNDO (1000Hz LERP & REFRESH) ---
-    let tickerAccumulator = 0;
-
-    function lerp(current, target, factor) {
-        return current + (target - current) * factor;
-    }
-
-    function tickEngine() {
-        const now = performance.now();
-        const deltaMs = now - state.lastTickTime;
-        state.lastTickTime = now;
-
-        updateClock();
-
-        if (state.isRunning) {
-            // Fator de suavização lerp responsivo
-            const factor = Math.min(1.0, 0.08 * (deltaMs / 16.66) * state.speedMultiplier);
-
-            // Suaviza seções e votos para animação milissegundo fluida
-            state.pres.secoesApuradasCurrent = lerp(state.pres.secoesApuradasCurrent, state.pres.secoesApuradasTarget, factor);
-            state.pres.totalVotosCurrent = lerp(state.pres.totalVotosCurrent, state.pres.totalVotosTarget, factor);
-            state.pres.validosCurrent = lerp(state.pres.validosCurrent, state.pres.validosTarget, factor);
-            state.pres.brancosCurrent = lerp(state.pres.brancosCurrent, state.pres.brancosTarget, factor);
-            state.pres.nulosCurrent = lerp(state.pres.nulosCurrent, state.pres.nulosTarget, factor);
-
-            state.gov.secoesApuradasCurrent = lerp(state.gov.secoesApuradasCurrent, state.gov.secoesApuradasTarget, factor);
-            state.gov.totalVotosCurrent = lerp(state.gov.totalVotosCurrent, state.gov.totalVotosTarget, factor);
-            state.gov.validosCurrent = lerp(state.gov.validosCurrent, state.gov.validosTarget, factor);
-            state.gov.brancosCurrent = lerp(state.gov.brancosCurrent, state.gov.brancosTarget, factor);
-            state.gov.nulosCurrent = lerp(state.gov.nulosCurrent, state.gov.nulosTarget, factor);
-
-            // Suaviza candidatos presidenciais
-            state.pres.candidates.forEach(c => {
-                c.currentVotes = lerp(c.currentVotes, c.targetVotes, factor);
-                c.currentShare = lerp(c.currentShare, c.targetShare, factor);
-            });
-
-            // Suaviza candidatos governo AL
-            state.gov.candidates.forEach(c => {
-                c.currentVotes = lerp(c.currentVotes, c.targetVotes, factor);
-                c.currentShare = lerp(c.currentShare, c.targetShare, factor);
-            });
-
-            // Suaviza senadores AL
-            state.sen.candidates.forEach(c => {
-                c.currentVotes = lerp(c.currentVotes, c.targetVotes, factor);
-                c.currentShare = lerp(c.currentShare, c.targetShare, factor);
-            });
-
-            // Suaviza deputados AL (legado)
-            state.deputies.forEach(dep => {
-                dep.currentVotes = lerp(dep.currentVotes, dep.targetVotes, factor);
-            });
-
-            // Suaviza deputados federais e estaduais AL
-            state.depFed.secoesApuradasCurrent = lerp(state.depFed.secoesApuradasCurrent, state.depFed.secoesApuradasTarget, factor);
-            state.depFed.totalVotosCurrent = lerp(state.depFed.totalVotosCurrent, state.depFed.totalVotosTarget, factor);
-            state.depFed.validosCurrent = lerp(state.depFed.validosCurrent, state.depFed.validosTarget, factor);
-
-            state.depEst.secoesApuradasCurrent = lerp(state.depEst.secoesApuradasCurrent, state.depEst.secoesApuradasTarget, factor);
-            state.depEst.totalVotosCurrent = lerp(state.depEst.totalVotosCurrent, state.depEst.totalVotosTarget, factor);
-            state.depEst.validosCurrent = lerp(state.depEst.validosCurrent, state.depEst.validosTarget, factor);
-
-            // Ticker & Feed de Boletins de Urna
-            tickerAccumulator += deltaMs * state.speedMultiplier;
-            if (tickerAccumulator >= 120) {
-                tickerAccumulator = 0;
-                const citiesCatalog = [
-                    { uf: 'AL', city: 'Maceió', zona: 1 },
-                    { uf: 'AL', city: 'Arapiraca', zona: 22 },
-                    { uf: 'AL', city: 'Palmeira dos Índios', zona: 10 },
-                    { uf: 'AL', city: 'Rio Largo', zona: 15 },
-                    { uf: 'SP', city: 'São Paulo', zona: 258 },
-                    { uf: 'MG', city: 'Belo Horizonte', zona: 33 },
-                    { uf: 'RJ', city: 'Rio de Janeiro', zona: 119 },
-                    { uf: 'BA', city: 'Salvador', zona: 2 }
-                ];
-                const pick = citiesCatalog[Math.floor(Math.random() * citiesCatalog.length)];
-                const secNum = Math.floor(Math.random() * 800) + 1;
-                const votesInBu = Math.floor(Math.random() * 260) + 120;
-                addTickerItem(pick.uf, pick.city, secNum, votesInBu);
-                addTerminalLog(pick.uf, pick.city, pick.zona, secNum, votesInBu);
-            }
-
-            // Taxa de vazão de votos
-            if (now - state.lastSecTick >= 1000) {
-                const diffVotes = Math.abs(state.pres.totalVotosTarget - state.pres.totalVotosCurrent);
-                const ratePerMs = (diffVotes / 1000 + 1.85).toFixed(3);
-                if (dom.rate) dom.rate.textContent = `${ratePerMs} votos/ms`;
-                drawTelemetryWave(parseFloat(ratePerMs));
-                state.lastSecTick = now;
-            }
-
-            // Atualiza tela
-            updateUI();
-        }
-
-        requestAnimationFrame(tickEngine);
-    }
-
-    // --- REORDENAÇÃO DINÂMICA DE CARDS NO DOM ---
-    function syncCandidateDomOrder(container, candidates, prefix) {
-        if (!container) return;
-        const sorted = [...candidates].sort((a, b) => b.currentVotes - a.currentVotes);
-        sorted.forEach((cand, idx) => {
-            const row = container.querySelector(`[data-cand-id="${cand.id}"]`) || document.getElementById(`cand-row-${prefix}-${cand.id}`);
-            if (row) {
-                const rankEl = row.querySelector('.cand-rank');
-                if (rankEl) rankEl.textContent = `${idx + 1}º`;
-                
-                const badgeEl = row.querySelector('.cand-badge');
-                if (idx === 0) {
-                    row.classList.add('leading');
-                    if (!badgeEl) {
-                        const nameRow = row.querySelector('.cand-name-row');
-                        if (nameRow) {
-                            const newBadge = document.createElement('span');
-                            newBadge.className = 'cand-badge';
-                            newBadge.textContent = prefix === 'pres' ? 'LÍDER NACIONAL' : 'LÍDER EM AL';
-                            nameRow.appendChild(newBadge);
-                        }
-                    }
-                } else {
-                    row.classList.remove('leading');
-                    if (badgeEl) badgeEl.remove();
-                }
-
-                // Garante que o elemento fique na posição exata da hierarquia do ranking
-                container.appendChild(row);
-            }
-        });
-    }
-
-    // --- RENDERIZAÇÃO DEPUTADOS FEDERAIS (AL - 9 VAGAS) ---
-    function renderFedCandidates(filterQuery = '') {
-        if (!dom.fedCandidatesContainer) return;
-        const query = (filterQuery !== '' ? filterQuery : (dom.filterFed ? dom.filterFed.value : '')).trim().toLowerCase();
-        const sorted = [...state.depFed.candidates].sort((a, b) => b.targetVotes - a.targetVotes);
-        
-        const filtered = query ? sorted.filter(c => 
-            (c.name && c.name.toLowerCase().includes(query)) ||
-            (c.party && c.party.toLowerCase().includes(query)) ||
-            (c.number && c.number.includes(query))
-        ) : sorted;
-
-        if (dom.fedCountPill) {
-            dom.fedCountPill.textContent = `Exibindo ${filtered.length} de ${sorted.length} candidatos`;
-        }
-
-        dom.fedCandidatesContainer.innerHTML = '';
-        if (filtered.length === 0) {
-            dom.fedCandidatesContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 40px;">Nenhum candidato a deputado federal encontrado com esse termo.</div>';
-            return;
-        }
-
-        filtered.forEach(cand => {
-            const originalRank = sorted.indexOf(cand) + 1;
-            const isElected = originalRank <= 9;
-            const card = document.createElement('div');
-            card.className = `detailed-card ${isElected ? 'leader' : ''}`;
-            const photoSrc = resolveCandidatePhoto('dep', cand.number, cand.sqcand, cand.photo);
-            card.innerHTML = `
-                <div class="detailed-top">
-                    <div class="detailed-avatar-box">${renderAvatar(photoSrc, cand.name, '📋')}</div>
-                    <div class="detailed-name-meta">
-                        <div class="detailed-candidate-name">${originalRank}º ${cand.name}</div>
-                        <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
-                        <div style="margin-top: 5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            ${isElected ? '<span class="cand-badge eleito">⭐ ELEITO (TOP 9)</span>' : '<span class="cand-badge">SUPLENTE</span>'}
-                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'dep')" title="Comparar este candidato no X1">⚔️ X1</button>
-                        </div>
+            <!-- DUELO VOTO A VOTO -->
+            <div class="state-score-duel">
+                <div class="state-score-box pl ${isPl ? 'leading' : ''}">
+                    <img src="fotos/pres_22.jpeg" alt="Bolsonaro" class="state-score-avatar pl-border">
+                    <div class="state-score-info">
+                        <span class="state-score-cand pl-color">FLÁVIO BOLSONARO (22)</span>
+                        <strong class="state-score-pct pl-color">${ufData.bolsonaro_pct || '0%'}</strong>
+                        <span class="state-score-votes">${formatNumber(ufData.bolsonaro_votos || 0)} votos</span>
                     </div>
                 </div>
-                <div class="detailed-numbers-row">
-                    <span class="detailed-pct-giant numeric text-purple" id="detail-pct-fed-${cand.id}">${cand.pct_str || formatPercent(cand.targetShare, 2)}</span>
-                    <span class="detailed-votes-total numeric" id="detail-votes-fed-${cand.id}">${formatInt(cand.targetVotes)} VOTOS</span>
-                </div>
-                <div class="progress-bar-wrap">
-                    <div class="progress-bar-fill bg-purple" id="detail-bar-fed-${cand.id}" style="width: ${Math.min(100, (cand.targetShare || 0) * 100 * 2.5)}%;"></div>
-                </div>
-            `;
-            dom.fedCandidatesContainer.appendChild(card);
-        });
-    }
-
-    // --- RENDERIZAÇÃO DEPUTADOS ESTADUAIS (AL - 27 VAGAS) ---
-    function renderEstCandidates(filterQuery = '') {
-        if (!dom.estCandidatesContainer) return;
-        const query = (filterQuery !== '' ? filterQuery : (dom.filterEst ? dom.filterEst.value : '')).trim().toLowerCase();
-        const sorted = [...state.depEst.candidates].sort((a, b) => b.targetVotes - a.targetVotes);
-
-        const filtered = query ? sorted.filter(c => 
-            (c.name && c.name.toLowerCase().includes(query)) ||
-            (c.party && c.party.toLowerCase().includes(query)) ||
-            (c.number && c.number.includes(query))
-        ) : sorted;
-
-        if (dom.estCountPill) {
-            dom.estCountPill.textContent = `Exibindo ${filtered.length} de ${sorted.length} candidatos`;
-        }
-
-        dom.estCandidatesContainer.innerHTML = '';
-        if (filtered.length === 0) {
-            dom.estCandidatesContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 40px;">Nenhum candidato a deputado estadual encontrado com esse termo.</div>';
-            return;
-        }
-
-        filtered.forEach(cand => {
-            const originalRank = sorted.indexOf(cand) + 1;
-            const isElected = originalRank <= 27;
-            const card = document.createElement('div');
-            card.className = `detailed-card ${isElected ? 'leader' : ''}`;
-            const photoSrc = resolveCandidatePhoto('est', cand.number, cand.sqcand, cand.photo);
-            card.innerHTML = `
-                <div class="detailed-top">
-                    <div class="detailed-avatar-box">${renderAvatar(photoSrc, cand.name, '🏛️')}</div>
-                    <div class="detailed-name-meta">
-                        <div class="detailed-candidate-name">${originalRank}º ${cand.name}</div>
-                        <div class="detailed-candidate-sub">${cand.party} &bull; Nº ${cand.number} &bull; ${cand.fullName || cand.name}</div>
-                        <div style="margin-top: 5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            ${isElected ? '<span class="cand-badge eleito">⭐ ELEITO (TOP 27)</span>' : '<span class="cand-badge">SUPLENTE</span>'}
-                            <button class="btn-card-duel" onclick="event.stopPropagation(); window.startDuelWith('${cand.id}', 'est')" title="Comparar este candidato no X1">⚔️ X1</button>
-                        </div>
+                <div class="state-score-box pt ${!isPl ? 'leading' : ''}">
+                    <img src="fotos/pres_13.jpeg" alt="Lula" class="state-score-avatar pt-border">
+                    <div class="state-score-info">
+                        <span class="state-score-cand pt-color">LULA (13)</span>
+                        <strong class="state-score-pct pt-color">${ufData.lula_pct || '0%'}</strong>
+                        <span class="state-score-votes">${formatNumber(ufData.lula_votos || 0)} votos</span>
                     </div>
                 </div>
-                <div class="detailed-numbers-row">
-                    <span class="detailed-pct-giant numeric text-teal" id="detail-pct-est-${cand.id}">${cand.pct_str || formatPercent(cand.targetShare, 2)}</span>
-                    <span class="detailed-votes-total numeric" id="detail-votes-est-${cand.id}">${formatInt(cand.targetVotes)} VOTOS</span>
+            </div>
+
+            <!-- BARRA PROPORCIONAL DO ESTADO -->
+            <div class="state-progress-bar-wrap">
+                <div class="state-progress-track">
+                    <div class="state-progress-pl" style="width: ${pctPl}%;"></div>
+                    <div class="state-progress-pt" style="width: ${pctPt}%;"></div>
                 </div>
-                <div class="progress-bar-wrap">
-                    <div class="progress-bar-fill bg-teal" id="detail-bar-est-${cand.id}" style="width: ${Math.min(100, (cand.targetShare || 0) * 100 * 3.5)}%;"></div>
+                <div class="state-delta-banner">
+                    <span>Vantagem: <strong style="color: ${isPl ? 'var(--pl-blue)' : 'var(--pt-red)'};">+${formatNumber(delta)} votos</strong></span>
+                    <span>Total apurado no estado: <strong>${formatNumber(ufData.votos_validos || totalPair)} válidos</strong></span>
                 </div>
-            `;
-            dom.estCandidatesContainer.appendChild(card);
-        });
+            </div>
+        `;
     }
 
-    // --- ATUALIZAÇÃO DO DISPLAY ---
-    function updateUI() {
-        const pRatio = state.pres.secoesTotal > 0 ? (state.pres.secoesApuradasCurrent / state.pres.secoesTotal) : 0;
-        const gRatio = state.gov.secoesTotal > 0 ? (state.gov.secoesApuradasCurrent / state.gov.secoesTotal) : 0;
+    let currentCityLimit = 8;
+    let currentFilterTerm = '';
+    let activeCityRequestId = 0;
 
-        // 1. PRESIDENTE
-        if (dom.presProgressBar) dom.presProgressBar.style.width = `${Math.min(100, pRatio * 100)}%`;
-        if (dom.presSecPercent) dom.presSecPercent.textContent = formatPercent(pRatio, 4);
-        if (dom.presSecCount) dom.presSecCount.textContent = `${formatInt(state.pres.secoesApuradasCurrent)} / ${formatInt(state.pres.secoesTotal)}`;
-        if (dom.presTotalVotos) dom.presTotalVotos.textContent = formatInt(state.pres.totalVotosCurrent);
+    // Carrega municípios do estado e busca os votos das principais cidades
+    async function loadStateCities(ufCode) {
+        const thisRequestId = ++activeCityRequestId;
+        const loadingTag = document.getElementById('cities-loading-tag');
+        const countLabel = document.getElementById('cities-count-label');
+        currentCityLimit = 8;
+        currentFilterTerm = '';
+        const searchInput = document.getElementById('cities-filter-input');
+        if (searchInput) searchInput.value = '';
 
-        const valPctP = state.pres.totalVotosCurrent > 0 ? (state.pres.validosCurrent / state.pres.totalVotosCurrent) : 0;
-        const bnPctP = state.pres.totalVotosCurrent > 0 ? ((state.pres.brancosCurrent + state.pres.nulosCurrent) / state.pres.totalVotosCurrent) : 0;
-        if (dom.presVotosValidos) dom.presVotosValidos.textContent = `${formatInt(state.pres.validosCurrent)} (${formatPercent(valPctP, 2)})`;
-        if (dom.presBrancosNulos) dom.presBrancosNulos.textContent = `${formatInt(state.pres.brancosCurrent + state.pres.nulosCurrent)} (${formatPercent(bnPctP, 2)})`;
+        if (loadingTag) loadingTag.classList.remove('hidden');
 
-        // Sincroniza e atualiza candidatos presidenciais
-        syncCandidateDomOrder(dom.presCandidatesContainer, state.pres.candidates, 'pres');
-
-        state.pres.candidates.forEach(cand => {
-            const pctEl = document.getElementById(`pct-pres-${cand.id}`);
-            const votesEl = document.getElementById(`votes-pres-${cand.id}`);
-            const barEl = document.getElementById(`bar-pres-${cand.id}`);
-
-            if (pctEl) pctEl.textContent = formatPercent(cand.currentShare, 4);
-            if (votesEl) votesEl.textContent = `${formatInt(cand.currentVotes)} votos`;
-            if (barEl) barEl.style.width = `${Math.min(100, cand.currentShare * 100)}%`;
-
-            const detPct = document.getElementById(`detail-pct-pres-${cand.id}`);
-            const detVotes = document.getElementById(`detail-votes-pres-${cand.id}`);
-            const detBar = document.getElementById(`detail-bar-pres-${cand.id}`);
-            if (detPct) detPct.textContent = formatPercent(cand.currentShare, 4);
-            if (detVotes) detVotes.textContent = `${formatInt(cand.currentVotes)} VOTOS`;
-            if (detBar) detBar.style.width = `${Math.min(100, cand.currentShare * 100)}%`;
-        });
-
-        const sortedPres = [...state.pres.candidates].sort((a, b) => b.currentVotes - a.currentVotes);
-        if (sortedPres.length >= 2 && dom.presMarginDiff) {
-            const diffP = Math.abs(sortedPres[0].currentVotes - sortedPres[1].currentVotes);
-            dom.presMarginDiff.textContent = `${formatInt(diffP)} votos`;
-            if (dom.presMarginRate) dom.presMarginRate.textContent = `+${formatInt(1850)} votos/s`;
-            if (dom.presProjection) dom.presProjection.textContent = sortedPres[0].currentShare > 0.50 ? 'LIDERANÇA COM MAIORIA ABSOLUTA' : 'PROJEÇÃO DE 2º TURNO';
-        }
-
-        // 2. GOVERNADOR ALAGOAS
-        if (dom.govProgressBar) dom.govProgressBar.style.width = `${Math.min(100, gRatio * 100)}%`;
-        if (dom.govSecPercent) dom.govSecPercent.textContent = formatPercent(gRatio, 4);
-        if (dom.govSecCount) dom.govSecCount.textContent = `${formatInt(state.gov.secoesApuradasCurrent)} / ${formatInt(state.gov.secoesTotal)}`;
-        if (dom.govTotalVotos) dom.govTotalVotos.textContent = formatInt(state.gov.totalVotosCurrent);
-
-        const valPctG = state.gov.totalVotosCurrent > 0 ? (state.gov.validosCurrent / state.gov.totalVotosCurrent) : 0;
-        if (dom.govVotosValidos) dom.govVotosValidos.textContent = `${formatInt(state.gov.validosCurrent)} (${formatPercent(valPctG, 2)})`;
-        if (dom.govMaceioPercent) dom.govMaceioPercent.textContent = formatPercent(Math.min(1, gRatio * 1.05), 2);
-
-        // Sincroniza e atualiza candidatos de Alagoas
-        syncCandidateDomOrder(dom.govCandidatesContainer, state.gov.candidates, 'gov');
-
-        state.gov.candidates.forEach(cand => {
-            const pctEl = document.getElementById(`pct-gov-${cand.id}`);
-            const votesEl = document.getElementById(`votes-gov-${cand.id}`);
-            const barEl = document.getElementById(`bar-gov-${cand.id}`);
-
-            if (pctEl) pctEl.textContent = formatPercent(cand.currentShare, 4);
-            if (votesEl) votesEl.textContent = `${formatInt(cand.currentVotes)} votos`;
-            if (barEl) barEl.style.width = `${Math.min(100, cand.currentShare * 100)}%`;
-
-            const detPct = document.getElementById(`detail-pct-gov-${cand.id}`);
-            const detVotes = document.getElementById(`detail-votes-gov-${cand.id}`);
-            const detBar = document.getElementById(`detail-bar-gov-${cand.id}`);
-            if (detPct) detPct.textContent = formatPercent(cand.currentShare, 4);
-            if (detVotes) detVotes.textContent = `${formatInt(cand.currentVotes)} VOTOS`;
-            if (detBar) detBar.style.width = `${Math.min(100, cand.currentShare * 100)}%`;
-        });
-
-        const sortedGov = [...state.gov.candidates].sort((a, b) => b.currentVotes - a.currentVotes);
-        if (sortedGov.length >= 2 && dom.govMarginDiff) {
-            const diffG = Math.abs(sortedGov[0].currentVotes - sortedGov[1].currentVotes);
-            dom.govMarginDiff.textContent = `${formatInt(diffG)} votos`;
-            if (dom.govProjection) dom.govProjection.textContent = sortedGov[0].currentShare > 0.50 ? 'LIDERANÇA EM 1º TURNO' : 'SEGUNDO TURNO EM AL';
-        }
-
-        // 3. HEROS
-        if (dom.heroPresSecoes) {
-            dom.heroPresSecoes.textContent = formatPercent(pRatio, 4);
-            dom.heroPresUrnasRatio.textContent = `${formatInt(state.pres.secoesApuradasCurrent)} de ${formatInt(state.pres.secoesTotal)}`;
-            dom.heroPresEleitores.textContent = formatInt(state.pres.totalVotosCurrent);
-        }
-
-        if (dom.heroGovSecoes) {
-            dom.heroGovSecoes.textContent = formatPercent(gRatio, 4);
-            dom.heroGovUrnasRatio.textContent = `${formatInt(state.gov.secoesApuradasCurrent)} de ${formatInt(state.gov.secoesTotal)}`;
-            dom.heroGovEleitores.textContent = formatInt(state.gov.totalVotosCurrent);
-        }
-
-        // 4. SENADO & DEPUTADOS
-        if (dom.senSecPercent) {
-            dom.senSecPercent.textContent = formatPercent(gRatio, 4);
-            dom.senSecCount.textContent = `${formatInt(state.gov.secoesApuradasCurrent)} / ${formatInt(state.gov.secoesTotal)}`;
-            dom.senProgressBar.style.width = `${Math.min(100, gRatio * 100)}%`;
-
-            state.sen.candidates.forEach(cand => {
-                const pEl = document.getElementById(`pct-sen-${cand.id}`);
-                const vEl = document.getElementById(`votes-sen-${cand.id}`);
-                if (pEl) pEl.textContent = formatPercent(cand.currentShare, 4);
-                if (vEl) vEl.textContent = `${formatInt(cand.currentVotes)} votos`;
-            });
-        }
-
-        if (dom.depSecPercent) {
-            dom.depSecPercent.textContent = formatPercent(gRatio, 4);
-            dom.depTotalVotos.textContent = formatInt(state.gov.validosCurrent);
-            dom.depProgressBar.style.width = `${Math.min(100, gRatio * 100)}%`;
-
-            state.deputies.forEach((dep, idx) => {
-                const pEl = document.getElementById(`pct-dep-${idx}`);
-                const vEl = document.getElementById(`votes-dep-${idx}`);
-                if (pEl) pEl.textContent = formatPercent(dep.targetShare, 4);
-                if (vEl) vEl.textContent = `${formatInt(dep.currentVotes)} votos`;
-            });
-        }
-
-        // 5. DEPUTADO FEDERAL POR ALAGOAS (DEDICADO)
-        const fedRatio = state.depFed.secoesTotal > 0 ? (state.depFed.secoesApuradasCurrent / state.depFed.secoesTotal) : 0;
-        if (dom.fedSecPercent) {
-            dom.fedSecPercent.textContent = formatPercent(fedRatio, 2);
-            if (dom.fedSecCount) dom.fedSecCount.textContent = `${formatInt(state.depFed.secoesApuradasCurrent)} / ${formatInt(state.depFed.secoesTotal)} urnas`;
-            if (dom.fedVotosValidos) dom.fedVotosValidos.textContent = formatInt(state.depFed.validosCurrent);
-            if (dom.fedTotalVotos) dom.fedTotalVotos.textContent = `TOTAL: ${formatInt(state.depFed.totalVotosCurrent)} votos`;
-            if (dom.fedProgressLabel) dom.fedProgressLabel.textContent = formatPercent(fedRatio, 4);
-            if (dom.fedProgressBar) dom.fedProgressBar.style.width = `${Math.min(100, fedRatio * 100)}%`;
-
-            state.depFed.candidates.forEach(cand => {
-                const pEl = document.getElementById(`detail-pct-fed-${cand.id}`);
-                const vEl = document.getElementById(`detail-votes-fed-${cand.id}`);
-                const bEl = document.getElementById(`detail-bar-fed-${cand.id}`);
-                if (pEl) pEl.textContent = cand.pct_str || formatPercent(cand.targetShare, 2);
-                if (vEl) vEl.textContent = `${formatInt(cand.targetVotes)} VOTOS`;
-                if (bEl) bEl.style.width = `${Math.min(100, (cand.targetShare || 0) * 100 * 2.5)}%`;
-            });
-        }
-
-        // 6. DEPUTADO ESTADUAL POR ALAGOAS (DEDICADO)
-        const estRatio = state.depEst.secoesTotal > 0 ? (state.depEst.secoesApuradasCurrent / state.depEst.secoesTotal) : 0;
-        if (dom.estSecPercent) {
-            dom.estSecPercent.textContent = formatPercent(estRatio, 2);
-            if (dom.estSecCount) dom.estSecCount.textContent = `${formatInt(state.depEst.secoesApuradasCurrent)} / ${formatInt(state.depEst.secoesTotal)} urnas`;
-            if (dom.estVotosValidos) dom.estVotosValidos.textContent = formatInt(state.depEst.validosCurrent);
-            if (dom.estTotalVotos) dom.estTotalVotos.textContent = `TOTAL: ${formatInt(state.depEst.totalVotosCurrent)} votos`;
-            if (dom.estProgressLabel) dom.estProgressLabel.textContent = formatPercent(estRatio, 4);
-            if (dom.estProgressBar) dom.estProgressBar.style.width = `${Math.min(100, estRatio * 100)}%`;
-
-            state.depEst.candidates.forEach(cand => {
-                const pEl = document.getElementById(`detail-pct-est-${cand.id}`);
-                const vEl = document.getElementById(`detail-votes-est-${cand.id}`);
-                const bEl = document.getElementById(`detail-bar-est-${cand.id}`);
-                if (pEl) pEl.textContent = cand.pct_str || formatPercent(cand.targetShare, 2);
-                if (vEl) vEl.textContent = `${formatInt(cand.targetVotes)} VOTOS`;
-                if (bEl) bEl.style.width = `${Math.min(100, (cand.targetShare || 0) * 100 * 3.5)}%`;
-            });
-        }
-
-        // 7. REGIONAL
-        state.ufs.forEach(uf => {
-            const pEl = document.getElementById(`uf-pct-${uf.uf}`);
-            const bEl = document.getElementById(`uf-bar-${uf.uf}`);
-            if (pEl && bEl) {
-                const ufRatio = uf.uf === 'AL' ? gRatio : Math.min(1, pRatio * (0.95 + (uf.secoes % 5) * 0.02));
-                pEl.textContent = formatPercent(ufRatio, 2);
-                bEl.style.width = `${ufRatio * 100}%`;
-            }
-        });
-
-        state.citiesAL.forEach((city, idx) => {
-            const pEl = document.getElementById(`city-pct-${idx}`);
-            const bEl = document.getElementById(`city-bar-${idx}`);
-            if (pEl && bEl) {
-                const cRatio = Math.min(1, gRatio * (0.98 + (idx % 3) * 0.02));
-                pEl.textContent = formatPercent(cRatio, 2);
-                bEl.style.width = `${cRatio * 100}%`;
-            }
-        });
-
-        if (dom.specAlagoasCount) {
-            dom.specAlagoasCount.textContent = `${formatInt(state.gov.secoesApuradasCurrent)} / ${formatInt(state.gov.secoesTotal)}`;
-            const zonasDone = Math.floor(gRatio * 42);
-            if (dom.specAlZonas) dom.specAlZonas.textContent = `${zonasDone} de 42 Zonas`;
-        }
-
-        // 8. CONFRONTO DIRETO // HEAD-TO-HEAD (X1)
-        updateDuelDisplay();
-    }
-
-    // --- EVENT LISTENERS ---
-    function setupInteractions() {
-        // 1. Navegação de Abas Unificada (Desktop Pills & Mobile Dropdown)
-        dom.tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                switchTab(tab.dataset.target);
-            });
-        });
-
-        if (dom.mobileNavSelect) {
-            dom.mobileNavSelect.addEventListener('change', (e) => {
-                switchTab(e.target.value);
-            });
-        }
-
-        // 2. Omni-Search Engine Listeners
-        if (dom.omniSearchInput) {
-            dom.omniSearchInput.addEventListener('input', (e) => {
-                state.omni.query = e.target.value;
-                renderOmniSearchResults(state.omni.query, state.omni.filterRace);
-            });
-
-            dom.omniSearchInput.addEventListener('focus', () => {
-                if (dom.omniSearchInput.value.trim()) {
-                    renderOmniSearchResults(dom.omniSearchInput.value, state.omni.filterRace);
-                }
-            });
-        }
-
-        if (dom.omniSearchClear) {
-            dom.omniSearchClear.addEventListener('click', () => {
-                if (dom.omniSearchInput) dom.omniSearchInput.value = '';
-                state.omni.query = '';
-                renderOmniSearchResults('', state.omni.filterRace);
-            });
-        }
-
-        if (dom.omniFilterChips) {
-            dom.omniFilterChips.forEach(chip => {
-                chip.addEventListener('click', () => {
-                    sound.click();
-                    dom.omniFilterChips.forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    state.omni.filterRace = chip.dataset.race || 'all';
-                    renderOmniSearchResults(dom.omniSearchInput ? dom.omniSearchInput.value : '', state.omni.filterRace);
+        try {
+            const res = await fetch(`/api/tse/municipios?uf=${ufCode}`);
+            if (thisRequestId !== activeCityRequestId) return;
+            if (res.ok) {
+                const data = await res.json();
+                if (thisRequestId !== activeCityRequestId) return;
+                state.stateCitiesList = data.municipios || [];
+                // Garante capital no topo, depois alfabético
+                state.stateCitiesList.sort((a, b) => {
+                    if (a.c === 's' && b.c !== 's') return -1;
+                    if (b.c === 's' && a.c !== 's') return 1;
+                    return a.nm.localeCompare(b.nm);
                 });
+
+                if (countLabel) countLabel.textContent = `Municípios (${state.stateCitiesList.length}):`;
+
+                const priorityCities = state.stateCitiesList.slice(0, currentCityLimit);
+                await fetchAndRenderCities(ufCode, priorityCities, state.stateCitiesList.length > currentCityLimit, thisRequestId);
+            }
+        } catch (e) {
+            console.warn('Erro ao carregar municípios:', e);
+        } finally {
+            if (thisRequestId === activeCityRequestId && loadingTag) {
+                loadingTag.classList.add('hidden');
+            }
+        }
+    }
+
+    async function fetchAndRenderCities(ufCode, cities, hasMore = false, requestId = null) {
+        if (requestId && requestId !== activeCityRequestId) return;
+        const citiesList = document.getElementById('cities-list');
+        if (!citiesList) return;
+
+        // Dispara requisições em paralelo para máxima velocidade
+        await Promise.all(cities.map(async (city) => {
+            const cacheKey = `${ufCode}_${city.cd}`;
+            if (!state.cityVotesMap[cacheKey]) {
+                try {
+                    const res = await fetch(`/api/tse/municipio-votos?uf=${ufCode}&cd=${city.cd}&nm=${encodeURIComponent(city.nm)}`);
+                    if (res.ok) {
+                        state.cityVotesMap[cacheKey] = await res.json();
+                    }
+                } catch (e) {}
+            }
+        }));
+
+        if (requestId && requestId !== activeCityRequestId) return;
+
+        citiesList.innerHTML = '';
+
+        for (const city of cities) {
+            const cacheKey = `${ufCode}_${city.cd}`;
+            const voteData = state.cityVotesMap[cacheKey];
+
+            if (voteData && voteData.ok) {
+                renderCityCard(voteData, city.c === 's');
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'city-card';
+                placeholder.innerHTML = `
+                    <div class="city-card-top">
+                        <strong class="city-card-name">${city.nm}</strong>
+                        <button class="action-btn" style="height: 26px; font-size: 11px;" onclick="window.fetchSingleCity('${ufCode}', '${city.cd}', '${city.nm}', this)">Carregar Votos</button>
+                    </div>
+                `;
+                citiesList.appendChild(placeholder);
+            }
+        }
+
+        if (hasMore) {
+            const moreWrap = document.createElement('div');
+            moreWrap.style.cssText = 'text-align: center; margin-top: 10px; margin-bottom: 8px;';
+            moreWrap.innerHTML = `
+                <button class="action-btn" style="width: 100%; padding: 8px; font-size: 12px; font-weight: 700;" onclick="window.loadMoreCities()">
+                    ➕ Carregar mais cidades de ${ufCode}...
+                </button>
+            `;
+            citiesList.appendChild(moreWrap);
+        }
+    }
+
+    window.loadMoreCities = async function () {
+        currentCityLimit += 10;
+        let list = state.stateCitiesList || [];
+        if (currentFilterTerm) {
+            list = list.filter(c => c.nm.toLowerCase().includes(currentFilterTerm));
+        }
+        const subset = list.slice(0, currentCityLimit);
+        await fetchAndRenderCities(state.selectedState, subset, list.length > currentCityLimit);
+    };
+
+    window.filterCities = async function (query) {
+        currentFilterTerm = (query || '').trim().toLowerCase();
+        if (!state.stateCitiesList || state.stateCitiesList.length === 0) return;
+
+        let filtered = state.stateCitiesList;
+        if (currentFilterTerm.length > 0) {
+            filtered = state.stateCitiesList.filter(c => c.nm.toLowerCase().includes(currentFilterTerm));
+        }
+
+        currentCityLimit = 8;
+        const subset = filtered.slice(0, currentCityLimit);
+        await fetchAndRenderCities(state.selectedState, subset, filtered.length > currentCityLimit);
+    };
+
+    function renderCityCard(data, isCapital) {
+        const citiesList = document.getElementById('cities-list');
+        if (!citiesList) return;
+
+        const isFocused = state.focusedCityCd && String(data.cd || data.codigo_tse) === String(state.focusedCityCd);
+        const card = document.createElement('div');
+        card.className = `city-card ${isFocused ? 'searched-highlight' : ''}`;
+
+        const lider = data.lider;
+        const winnerBadge = lider === '22'
+            ? '<span class="city-winner-badge pl">BOLSONARO VENCEU</span>'
+            : '<span class="city-winner-badge pt">LULA VENCEU</span>';
+
+        const totalPair = (data.bolsonaro_votos || 0) + (data.lula_votos || 0);
+        const pctPl = totalPair > 0 ? (data.bolsonaro_votos / totalPair * 100).toFixed(0) : '50';
+        const pctPt = totalPair > 0 ? (data.lula_votos / totalPair * 100).toFixed(0) : '50';
+
+        card.innerHTML = `
+            <div class="city-card-top">
+                <div class="city-card-name-wrap">
+                    <strong class="city-card-name">${data.nome}</strong>
+                    ${isCapital ? '<span class="city-capital-badge">CAPITAL</span>' : ''}
+                    ${isFocused ? '<span class="city-searched-badge">🎯 CIDADE BUSCADA</span>' : ''}
+                </div>
+                ${winnerBadge}
+            </div>
+            <div class="city-bar-track">
+                <div class="city-bar-pl" style="width: ${pctPl}%;"></div>
+                <div class="city-bar-pt" style="width: ${pctPt}%;"></div>
+            </div>
+            <div class="city-card-bottom">
+                <span class="pl-color">PL 22: ${data.bolsonaro_pct} (${formatNumber(data.bolsonaro_votos)})</span>
+                <span class="pt-color">PT 13: ${data.lula_pct} (${formatNumber(data.lula_votos)})</span>
+            </div>
+        `;
+
+        citiesList.appendChild(card);
+    }
+
+    window.fetchSingleCity = async function (uf, cd, nm, btn) {
+        if (btn) btn.textContent = 'Carregando...';
+        try {
+            const res = await fetch(`/api/tse/municipio-votos?uf=${uf}&cd=${cd}&nm=${encodeURIComponent(nm)}`);
+            if (res.ok) {
+                const data = await res.json();
+                state.cityVotesMap[`${uf}_${cd}`] = data;
+                if (btn && btn.parentElement && btn.parentElement.parentElement) {
+                    btn.parentElement.parentElement.remove();
+                }
+                renderCityCard(data, false);
+                audio.beep(850, 0.04);
+            }
+        } catch (e) {}
+    };
+
+    window.filterCities = async function (query) {
+        const q = (query || '').trim().toLowerCase();
+        if (!state.stateCitiesList || state.stateCitiesList.length === 0) return;
+
+        let filtered = state.stateCitiesList;
+        if (q.length > 0) {
+            filtered = state.stateCitiesList.filter(c => c.nm.toLowerCase().includes(q));
+        }
+
+        const subset = filtered.slice(0, 10);
+        await fetchAndRenderCities(state.selectedState, subset);
+    };
+
+    function renderBottomUfCards() {
+        const grid = document.getElementById('uf-cards-grid');
+        if (!grid || !state.uf_matrix) return;
+
+        grid.innerHTML = '';
+        const ufs = Object.values(state.uf_matrix);
+
+        ufs.forEach(uf => {
+            const card = document.createElement('div');
+            card.className = 'uf-card';
+            card.onclick = () => {
+                window.selectState(uf.uf);
+                window.scrollTo({ top: 380, behavior: 'smooth' });
+            };
+
+            const totalBolsoLula = (uf.bolsonaro_votos || 0) + (uf.lula_votos || 0);
+            const pctPl = totalBolsoLula > 0 ? (uf.bolsonaro_votos / totalBolsoLula * 100).toFixed(0) : '50';
+            const pctPt = totalBolsoLula > 0 ? (uf.lula_votos / totalBolsoLula * 100).toFixed(0) : '50';
+
+            card.innerHTML = `
+                <div class="uf-card-top">
+                    <span class="uf-card-sigla">${uf.uf} &bull; ${uf.nome || uf.uf}</span>
+                    <span class="uf-card-pct-secoes">${uf.pct_secoes || '100%'}</span>
+                </div>
+                <div class="uf-card-leader">
+                    Líder: <strong>${uf.lider_nome || (uf.lider === '22' ? 'Bolsonaro' : 'Lula')}</strong>
+                </div>
+                <div class="uf-bar-pl" style="width: ${pctPl}%;"></div>
+                <div class="uf-bar-pt" style="width: ${pctPt}%;"></div>
+                <div class="uf-card-bottom">
+                    <span class="pl-color">PL: ${uf.bolsonaro_pct || '0%'}</span>
+                    <span class="pt-color">PT: ${uf.lula_pct || '0%'}</span>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // Modal de detalhes da UF
+    window.openUfModal = function (ufCode) {
+        const uf = state.uf_matrix[ufCode];
+        if (!uf) return;
+
+        const modal = document.getElementById('uf-modal');
+        const title = document.getElementById('uf-modal-title');
+        const sub = document.getElementById('uf-modal-sub');
+        const body = document.getElementById('uf-modal-body');
+
+        if (title) title.textContent = `${uf.nome || uf.uf} (${uf.uf})`;
+        if (sub) sub.textContent = `Apuração das urnas &bull; ${uf.pct_secoes || '100%'} das seções`;
+
+        let top3Html = '';
+        if (Array.isArray(uf.top3)) {
+            top3Html = uf.top3.map((c, i) => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-weight: 800; font-family: var(--font-mono); color: var(--text-muted);">${i + 1}º</span>
+                        <strong style="color: #ffffff; font-size: 13px;">${c.nome}</strong>
+                        <span style="font-size: 11px; color: var(--text-secondary);">${c.partido}</span>
+                    </div>
+                    <div style="text-align: right; font-family: var(--font-mono);">
+                        <strong style="color: var(--accent-cyan); font-size: 13px;">${c.pct_str}</strong>
+                        <div style="font-size: 11px; color: var(--text-muted);">${formatNumber(c.votos)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        if (body) {
+            body.innerHTML = `
+                <div style="margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); text-align: center;">
+                        <span style="font-size: 10px; color: var(--text-muted);">SEÇÕES APURADAS</span>
+                        <div style="font-size: 15px; font-weight: 800; color: #ffffff; font-family: var(--font-mono);">${formatNumber(uf.secoes_apuradas)} de ${formatNumber(uf.secoes_total)}</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: var(--radius-sm); text-align: center;">
+                        <span style="font-size: 10px; color: var(--text-muted);">VOTOS VÁLIDOS</span>
+                        <div style="font-size: 15px; font-weight: 800; color: #ffffff; font-family: var(--font-mono);">${formatNumber(uf.votos_validos)}</div>
+                    </div>
+                </div>
+
+                <h4 style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">Mais Votados no Estado:</h4>
+                ${top3Html}
+            `;
+        }
+
+        if (modal) modal.classList.remove('hidden');
+        audio.beep(800, 0.05);
+    };
+
+    window.closeUfModal = function (e) {
+        if (!e || e.target.id === 'uf-modal' || e.target.classList.contains('modal-close')) {
+            const modal = document.getElementById('uf-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+    };
+
+    // --- BARRA DE PESQUISA INTELIGENTE (OMNI SEARCH) ---
+    let searchDebounceTimer = null;
+
+    function setupSearch() {
+        const inp = document.getElementById('omni-search');
+        const clearBtn = document.getElementById('search-clear');
+        const dropdown = document.getElementById('search-results-dropdown');
+        if (!inp || !dropdown) return;
+
+        inp.addEventListener('input', () => {
+            const rawQ = inp.value;
+            const q = rawQ.trim().toLowerCase();
+            if (clearBtn) clearBtn.classList.toggle('hidden', q.length === 0);
+
+            if (q.length < 2) {
+                dropdown.classList.add('hidden');
+                dropdown.innerHTML = '';
+                return;
+            }
+
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(async () => {
+                await executeOmniSearch(q, dropdown);
+            }, 180);
+        });
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!inp.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    async function executeOmniSearch(q, dropdown) {
+        const candidateResults = [];
+        const stateResults = [];
+        let cityResults = [];
+
+        // 1. Busca nos presidenciáveis
+        if (state.pres && state.pres.candidatos) {
+            state.pres.candidatos.forEach(c => {
+                const nameMatch = c.nome.toLowerCase().includes(q) || (c.nome_completo && c.nome_completo.toLowerCase().includes(q));
+                const numMatch = c.numero.includes(q);
+                const partyMatch = (c.partido || '').toLowerCase().includes(q);
+                if (nameMatch || numMatch || partyMatch) {
+                    candidateResults.push({ ...c, cargo: 'Presidente', view: 'view-presidente' });
+                }
             });
         }
 
-        // Fechar dropdown de busca ao clicar fora
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.omni-search-bar-wrap')) {
-                if (dom.omniDropdownResults) dom.omniDropdownResults.classList.add('hidden');
+        // 2. Busca nos 27 Estados (UF)
+        if (state.uf_matrix) {
+            Object.values(state.uf_matrix).forEach(u => {
+                const ufMatch = u.uf.toLowerCase() === q || u.uf.toLowerCase().startsWith(q);
+                const nameMatch = (u.nome || '').toLowerCase().includes(q);
+                if (ufMatch || nameMatch) {
+                    stateResults.push(u);
+                }
+            });
+        }
+
+        // 3. Busca nas Cidades via API instantânea do TSE
+        try {
+            const res = await fetch(`/api/tse/busca-cidades?q=${encodeURIComponent(q)}`);
+            if (res.ok) {
+                const data = await res.json();
+                cityResults = data.resultados || [];
+            }
+        } catch (e) {
+            console.warn('Erro ao buscar cidades:', e);
+        }
+
+        if (candidateResults.length === 0 && stateResults.length === 0 && cityResults.length === 0) {
+            dropdown.innerHTML = `
+                <div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">
+                    Nenhum candidato, estado ou cidade encontrado para "<strong>${q}</strong>"
+                </div>
+            `;
+            dropdown.classList.remove('hidden');
+            return;
+        }
+
+        let html = '';
+
+        // Seção: Candidatos
+        if (candidateResults.length > 0) {
+            html += `<div class="search-group-header">🗳️ CANDIDATOS A PRESIDENTE</div>`;
+            html += candidateResults.slice(0, 4).map(c => `
+                <div class="search-result-item" onclick="window.selectSearchResult('${c.view}')">
+                    <div class="search-cand-left">
+                        <img src="${c.foto || 'fotos/pres_22.jpeg'}" alt="${c.nome}" class="search-avatar" onerror="this.src='fotos/pres_22.jpeg'">
+                        <div>
+                            <div class="search-cand-name">
+                                ${c.nome}
+                                <span class="search-type-badge candidato">CANDIDATO</span>
+                            </div>
+                            <div class="search-cand-meta">${c.partido} &bull; Nº ${c.numero} &bull; Presidência da República</div>
+                        </div>
+                    </div>
+                    <div class="search-cand-score">
+                        <div class="search-cand-pct">${c.pct_str || formatPct(c.pct)}</div>
+                        <div class="search-cand-votes">${formatNumber(c.votos)} votos</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Seção: Estados
+        if (stateResults.length > 0) {
+            html += `<div class="search-group-header">🗺️ ESTADOS BRASILEIROS</div>`;
+            html += stateResults.slice(0, 4).map(u => {
+                const isPl = u.lider === '22' || (u.bolsonaro_votos >= u.lula_votos);
+                const leadName = isPl ? 'Flávio Bolsonaro' : 'Lula';
+                const leadPct = isPl ? u.bolsonaro_pct : u.lula_pct;
+                const partyColor = isPl ? 'var(--pl-blue)' : 'var(--pt-red)';
+                return `
+                    <div class="search-result-item" onclick="window.selectStateResult('${u.uf}')">
+                        <div class="search-cand-left">
+                            <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-title); font-size: 14px; border: 1px solid var(--border-color); color: #fbbf24;">
+                                ${u.uf}
+                            </div>
+                            <div>
+                                <div class="search-cand-name">
+                                    ${u.nome || u.uf} (${u.uf})
+                                    <span class="search-type-badge estado">ESTADO</span>
+                                </div>
+                                <div class="search-cand-meta">Liderança: <strong style="color: ${partyColor}">${leadName} (${leadPct})</strong></div>
+                            </div>
+                        </div>
+                        <div class="search-cand-score">
+                            <span class="action-btn" style="height: 24px; font-size: 11px; padding: 2px 8px;">Ver Mapa ➔</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Seção: Cidades
+        if (cityResults.length > 0) {
+            html += `<div class="search-group-header">🏙️ CIDADES & MUNICÍPIOS (EXPLORADOR DIRETO)</div>`;
+            html += cityResults.slice(0, 8).map(c => `
+                <div class="search-result-item" onclick="window.selectCityResult('${c.uf}', '${c.cd}', '${c.nm.replace(/'/g, "\\'")}')">
+                    <div class="search-cand-left">
+                        <div style="font-size: 20px;">📍</div>
+                        <div>
+                            <div class="search-cand-name">
+                                ${c.nm}
+                                <span class="search-type-badge cidade">${c.uf}</span>
+                                ${c.is_capital ? '<span class="city-capital-badge" style="font-size: 8px; padding: 1px 4px;">CAPITAL</span>' : ''}
+                            </div>
+                            <div class="search-cand-meta">Toque para ver a apuração voto a voto de ${c.nm} (${c.uf})</div>
+                        </div>
+                    </div>
+                    <div class="search-cand-score">
+                        <span class="action-btn" style="height: 24px; font-size: 11px; padding: 2px 8px;">Ver Votos ➔</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        dropdown.innerHTML = html;
+        dropdown.classList.remove('hidden');
+    }
+
+    window.clearSearch = function () {
+        const inp = document.getElementById('omni-search');
+        const clearBtn = document.getElementById('search-clear');
+        const dropdown = document.getElementById('search-results-dropdown');
+        if (inp) inp.value = '';
+        if (clearBtn) clearBtn.classList.add('hidden');
+        if (dropdown) dropdown.classList.add('hidden');
+    };
+
+    window.selectSearchResult = function (viewId) {
+        window.clearSearch();
+        window.switchTab(viewId);
+    };
+
+    window.selectStateResult = function (uf) {
+        window.clearSearch();
+        window.switchTab('view-estados');
+        window.selectState(uf, true);
+        if (window.innerWidth <= 900) {
+            setTimeout(() => {
+                const target = document.getElementById('selected-state-card');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+    };
+
+    window.selectCityResult = async function (uf, cd, nm) {
+        window.clearSearch();
+        window.switchTab('view-estados');
+        state.focusedCityCd = cd;
+        await window.selectState(uf, true);
+
+        // Previne sobrescrita caso a cidade não esteja carregada
+        const cacheKey = `${uf}_${cd}`;
+        if (!state.cityVotesMap[cacheKey]) {
+            try {
+                const res = await fetch(`/api/tse/municipio-votos?uf=${uf}&cd=${cd}&nm=${encodeURIComponent(nm)}`);
+                if (res.ok) {
+                    state.cityVotesMap[cacheKey] = await res.json();
+                }
+            } catch (e) {}
+        }
+
+        // Move a cidade para o topo da lista se ela existir
+        if (state.stateCitiesList && state.stateCitiesList.length > 0) {
+            const foundIdx = state.stateCitiesList.findIndex(c => String(c.cd) === String(cd));
+            if (foundIdx > 0) {
+                const [target] = state.stateCitiesList.splice(foundIdx, 1);
+                state.stateCitiesList.unshift(target);
+            } else if (foundIdx === -1) {
+                state.stateCitiesList.unshift({ cd, nm, c: 'n' });
+            }
+        }
+
+        const priorityCities = (state.stateCitiesList || []).slice(0, Math.max(8, currentCityLimit));
+        await fetchAndRenderCities(uf, priorityCities, (state.stateCitiesList || []).length > currentCityLimit);
+
+        setTimeout(() => {
+            const highlighted = document.querySelector('.city-card.searched-highlight') || document.getElementById('selected-state-card');
+            if (highlighted) {
+                highlighted.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 150);
+    };
+
+    // --- SISTEMA DE PRESENÇA E CHAT AO VIVO ---
+    function setupChat() {
+        // Gera ou recupera Client ID
+        state.clientId = localStorage.getItem('tse_chat_client_id');
+        if (!state.clientId) {
+            state.clientId = 'user_' + Math.random().toString(36).slice(2, 9);
+            localStorage.setItem('tse_chat_client_id', state.clientId);
+        }
+
+        // Recupera apelido e crachá
+        const savedName = localStorage.getItem('tse_chat_user_name');
+        state.userName = savedName || `Eleitor_${Math.floor(1000 + Math.random() * 9000)}`;
+
+        const savedBadge = localStorage.getItem('tse_chat_badge');
+        if (savedBadge) state.userBadge = savedBadge;
+
+        const nameInput = document.getElementById('chat-username-input');
+        const badgeSelect = document.getElementById('chat-badge-select');
+
+        if (nameInput) {
+            nameInput.value = state.userName;
+            nameInput.addEventListener('change', () => {
+                const val = nameInput.value.trim().slice(0, 18);
+                if (val) {
+                    state.userName = val;
+                    localStorage.setItem('tse_chat_user_name', val);
+                    sendHeartbeat();
+                }
+            });
+        }
+
+        if (badgeSelect) {
+            badgeSelect.value = state.userBadge;
+            badgeSelect.addEventListener('change', () => {
+                state.userBadge = badgeSelect.value;
+                localStorage.setItem('tse_chat_badge', state.userBadge);
+                sendHeartbeat();
+            });
+        }
+
+        // Heartbeat inicial e periódico (a cada 4s)
+        sendHeartbeat();
+        setInterval(sendHeartbeat, 4000);
+
+        // Polling de mensagens a cada 1.5s
+        fetchChatMessages();
+        setInterval(fetchChatMessages, 1500);
+    }
+
+    async function sendHeartbeat() {
+        try {
+            const res = await fetch('/api/presence/heartbeat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clientId: state.clientId,
+                    userName: state.userName,
+                    team: state.userBadge
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                updatePresenceUI(data.online);
+            }
+        } catch (e) {}
+    }
+
+    function updatePresenceUI(count) {
+        const safeCount = Math.max(1, parseInt(count) || 1);
+        const elHeader = document.getElementById('presence-online-val');
+        if (elHeader) elHeader.textContent = `${safeCount} online`;
+
+        const elChatSub = document.getElementById('chat-online-count');
+        if (elChatSub) elChatSub.textContent = `${safeCount} ${safeCount === 1 ? 'eleitor online' : 'eleitores online'}`;
+    }
+
+    async function fetchChatMessages() {
+        try {
+            const res = await fetch(`/api/chat/messages?since=${state.lastChatTime}&clientId=${encodeURIComponent(state.clientId)}`);
+            if (!res.ok) return;
+
+            const data = await res.json();
+            if (data.online) updatePresenceUI(data.online);
+
+            if (Array.isArray(data.messages) && data.messages.length > 0) {
+                let hasNewForeign = false;
+                data.messages.forEach(msg => {
+                    if (!state.seenChatIds.has(msg.id)) {
+                        state.seenChatIds.add(msg.id);
+                        state.lastChatTime = Math.max(state.lastChatTime, msg.time_ms || msg.time || 0);
+
+                        const isMe = msg.clientId === state.clientId || msg.is_user === true;
+                        renderChatMessage(msg, isMe);
+
+                        if (!isMe) hasNewForeign = true;
+                    }
+                });
+
+                if (hasNewForeign) {
+                    if (!state.isChatOpen) {
+                        state.unreadChatCount++;
+                        updateUnreadBadge();
+                    }
+                    audio.chatPing();
+                }
+            }
+        } catch (e) {}
+    }
+
+    function renderChatMessage(msg, isMe) {
+        const feed = document.getElementById('chat-feed');
+        if (!feed) return;
+
+        const row = document.createElement('div');
+        row.className = `chat-msg ${isMe ? 'is-me' : ''}`;
+
+        const d = new Date(msg.time_ms || msg.time || Date.now());
+        const timeStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        const safeName = (msg.userName || msg.name || 'Eleitor').replace(/</g, '&lt;');
+        const safeBadge = (msg.team || msg.badge || '⚖️ Neutro').replace(/</g, '&lt;');
+        const safeText = (msg.text || '').replace(/</g, '&lt;');
+
+        row.innerHTML = `
+            <div class="chat-msg-header">
+                <div class="chat-msg-author">
+                    <span class="chat-badge">${safeBadge}</span>
+                    ${isMe ? '<span class="badge-me">VOCÊ</span>' : ''}
+                    <span>${safeName}</span>
+                </div>
+                <span class="chat-msg-time">${timeStr}</span>
+            </div>
+            <div class="chat-msg-body">${safeText}</div>
+        `;
+
+        feed.appendChild(row);
+        while (feed.children.length > 80) {
+            feed.removeChild(feed.firstChild);
+        }
+        feed.scrollTop = feed.scrollHeight;
+    }
+
+    function updateUnreadBadge() {
+        const bHeader = document.getElementById('chat-header-badge');
+        const bFloat = document.getElementById('floating-chat-badge');
+        [bHeader, bFloat].forEach(badge => {
+            if (!badge) return;
+            if (state.unreadChatCount > 0) {
+                badge.textContent = state.unreadChatCount > 99 ? '99+' : state.unreadChatCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
             }
         });
+    }
 
-        // Atalhos de teclado (Ctrl+K ou '/' foca a busca; ESC fecha)
+    window.toggleChat = function () {
+        state.isChatOpen = !state.isChatOpen;
+        const drawer = document.getElementById('chat-drawer');
+        if (drawer) {
+            drawer.classList.toggle('hidden', !state.isChatOpen);
+        }
+        if (state.isChatOpen) {
+            state.unreadChatCount = 0;
+            updateUnreadBadge();
+            const feed = document.getElementById('chat-feed');
+            if (feed) feed.scrollTop = feed.scrollHeight;
+            setTimeout(() => {
+                const inp = document.getElementById('chat-message-input');
+                if (inp) inp.focus();
+            }, 100);
+        }
+        audio.beep(state.isChatOpen ? 900 : 600, 0.04);
+    };
+
+    window.handleChatOverlay = function (e) {
+        if (e.target.id === 'chat-drawer') {
+            window.toggleChat();
+        }
+    };
+
+    window.submitChatMessage = async function (e) {
+        if (e) e.preventDefault();
+        const input = document.getElementById('chat-message-input');
+        if (!input) return;
+
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        input.focus();
+
+        const payload = {
+            clientId: state.clientId,
+            userName: state.userName,
+            team: state.userBadge,
+            text: text
+        };
+
+        audio.beep(850, 0.04);
+
+        try {
+            const res = await fetch('/api/chat/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.message && !state.seenChatIds.has(data.message.id)) {
+                    state.seenChatIds.add(data.message.id);
+                    state.lastChatTime = Math.max(state.lastChatTime, data.message.time_ms || 0);
+                    renderChatMessage(data.message, true);
+                }
+            }
+        } catch (err) {
+            // Modo desconectado / fallback local
+            const mock = {
+                id: 'local_' + Date.now(),
+                clientId: state.clientId,
+                userName: state.userName,
+                team: state.userBadge,
+                text: text,
+                time: Date.now()
+            };
+            renderChatMessage(mock, true);
+        }
+    };
+
+    window.sendEmoji = function (emoji) {
+        const inp = document.getElementById('chat-message-input');
+        if (inp) {
+            inp.value = emoji;
+            window.submitChatMessage(null);
+        }
+    };
+
+    // --- NAVEGAÇÃO RÁPIDA, ACESSIBILIDADE E MOBILE DOCK ---
+    function setupAccessibilityAndNav() {
+        // Atalho de teclado: '/' foca a busca, 'Esc' fecha busca/modais
         document.addEventListener('keydown', (e) => {
-            if (((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') || (e.key === '/' && document.activeElement.tagName !== 'INPUT')) {
+            if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
                 e.preventDefault();
-                if (dom.omniSearchInput) {
-                    dom.omniSearchInput.focus();
-                    dom.omniSearchInput.select();
+                const searchInput = document.getElementById('omni-search');
+                if (searchInput) {
+                    searchInput.focus();
+                    searchInput.select();
                 }
             } else if (e.key === 'Escape') {
-                if (dom.omniDropdownResults) dom.omniDropdownResults.classList.add('hidden');
+                window.clearSearch();
+                const ufModal = document.getElementById('uf-modal');
+                if (ufModal && !ufModal.classList.contains('hidden')) {
+                    window.closeUfModal();
+                }
+                if (state.isChatOpen) {
+                    window.toggleChat();
+                }
             }
         });
 
-        // 3. Confronto Direto // Duelo Listeners
-        if (dom.duelSelectCargo) {
-            dom.duelSelectCargo.addEventListener('change', (e) => {
-                sound.click();
-                state.duel.cargo = e.target.value;
-                populateDuelCandidateSelects();
-                updateDuelDisplay();
-            });
-        }
-
-        if (dom.duelSelectCandA) {
-            dom.duelSelectCandA.addEventListener('change', (e) => {
-                sound.click();
-                const [race, id] = e.target.value.split(':');
-                state.duel.candACargo = race;
-                state.duel.candAId = id;
-                updateDuelDisplay();
-            });
-        }
-
-        if (dom.duelSelectCandB) {
-            dom.duelSelectCandB.addEventListener('change', (e) => {
-                sound.click();
-                const [race, id] = e.target.value.split(':');
-                state.duel.candBCargo = race;
-                state.duel.candBId = id;
-                updateDuelDisplay();
-            });
-        }
-
-        if (dom.duelBtnSwap) {
-            dom.duelBtnSwap.addEventListener('click', () => {
-                sound.click();
-                const tmpId = state.duel.candAId;
-                const tmpCargo = state.duel.candACargo;
-                state.duel.candAId = state.duel.candBId;
-                state.duel.candACargo = state.duel.candBCargo;
-                state.duel.candBId = tmpId;
-                state.duel.candBCargo = tmpCargo;
-
-                populateDuelCandidateSelects();
-                updateDuelDisplay();
-                showToast('⇄ CANDIDATOS INVERTIDOS NO CONFRONTO');
-            });
-        }
-
-        if (dom.duelPresetButtons) {
-            dom.duelPresetButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    sound.click();
-                    setDuelPreset(btn.dataset.preset);
-                });
-            });
-        }
-
-        // Filtros de busca instantânea para Deputados Federais e Estaduais de Alagoas
-        if (dom.filterFed) {
-            dom.filterFed.addEventListener('input', (e) => {
-                renderFedCandidates(e.target.value);
-            });
-        }
-        if (dom.filterEst) {
-            dom.filterEst.addEventListener('input', (e) => {
-                renderEstCandidates(e.target.value);
-            });
-        }
-
-        if (dom.btnAudio) {
-            dom.btnAudio.addEventListener('click', () => {
-                sound.init();
-                sound.enabled = !sound.enabled;
-                dom.audioStatus.textContent = sound.enabled ? 'SOM: ON' : 'SOM: OFF';
-                dom.btnAudio.style.borderColor = sound.enabled ? 'var(--neon-cyan)' : 'var(--text-dim)';
-            });
-        }
-
-        const btnAudioMobile = document.getElementById('btn-audio-mobile');
-        if (btnAudioMobile) {
-            btnAudioMobile.addEventListener('click', () => {
-                sound.init();
-                sound.enabled = !sound.enabled;
-                if (dom.audioStatus) dom.audioStatus.textContent = sound.enabled ? 'SOM: ON' : 'SOM: OFF';
-                if (dom.btnAudio) dom.btnAudio.style.borderColor = sound.enabled ? 'var(--neon-cyan)' : 'var(--text-dim)';
-                btnAudioMobile.textContent = sound.enabled ? '🔊 Áudio: Ativado' : '🔇 Áudio: Desativado';
-                showToast(sound.enabled ? '🔊 EFEITOS SONOROS ATIVADOS' : '🔇 EFEITOS SONOROS MUTADOS');
-            });
-        }
-
-        if (dom.btnFullscreen) {
-            dom.btnFullscreen.addEventListener('click', () => {
-                sound.init();
-                sound.click();
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                } else {
-                    document.exitFullscreen().catch(() => {});
-                }
-            });
-        }
-
-        if (dom.btnControls) {
-            dom.btnControls.addEventListener('click', () => {
-                sound.init();
-                sound.click();
-                dom.controlDrawer.classList.toggle('hidden');
-            });
-        }
-
-        if (dom.btnCloseDrawer) {
-            dom.btnCloseDrawer.addEventListener('click', () => {
-                sound.click();
-                dom.controlDrawer.classList.add('hidden');
-            });
-        }
-
-        dom.speedButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                sound.click();
-                dom.speedButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                state.speedMultiplier = parseFloat(btn.dataset.speed);
-                showToast(`VELOCIDADE AJUSTADA PARA ${btn.dataset.speed}x`);
-            });
-        });
-
-        // BOTÃO DE ATUALIZAÇÃO FORÇADA DO TSE COM FEEDBACK IMEDIATO
-        if (dom.btnForceRefresh) {
-            dom.btnForceRefresh.addEventListener('click', async () => {
-                sound.init();
-                sound.beep(1100, 0.05, 'triangle', 0.04);
-                if (dom.spinRefreshIcon) dom.spinRefreshIcon.classList.add('spinning');
-                if (dom.lblRefresh) dom.lblRefresh.textContent = 'CONSULTANDO TSE...';
-
-                const ok = await fetchLiveTse(true, true);
-
-                setTimeout(() => {
-                    if (dom.spinRefreshIcon) dom.spinRefreshIcon.classList.remove('spinning');
-                    if (dom.lblRefresh) dom.lblRefresh.textContent = 'ATUALIZAR TSE';
-                }, 400);
-
-                const pctApurado = (state.pres.secoesApuradasCurrent / state.pres.secoesTotal) * 100;
-                if (ok) {
-                    showToast(`✅ DADOS OFICIAIS TSE SINCRONIZADOS: ${formatInt(state.pres.secoesApuradasCurrent)} URNAS BR (${pctApurado.toFixed(2)}%) &bull; BOLETIM ${state.tseLastTime}`);
-                } else {
-                    showToast(`⚠️ ERRO AO CONECTAR COM TSE. VERIFIQUE SE O SERVIDOR ESTÁ ATIVO.`);
-                }
-            });
-        }
-
-        // FUNÇÃO MEME: LULA 13 ("AI BOLSONARO COLOCA VAI")
-        function triggerLula13Meme() {
-            sound.init();
-            sound.beep(650, 0.08, 'sawtooth', 0.08);
-
-            if (dom.btnLula13) {
-                dom.btnLula13.classList.add('playing');
-                setTimeout(() => dom.btnLula13.classList.remove('playing'), 2000);
+        // Monitor de rolagem para botão "Topo" e dock flutuante mobile
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY || window.pageYOffset;
+            const backToTop = document.getElementById('btn-back-to-top');
+            if (backToTop) {
+                backToTop.classList.toggle('hidden', scrollY < 260);
             }
 
-            const frase = 'Ai Bolsonaro, coloca vai!';
-
-            if ('speechSynthesis' in window) {
-                try {
-                    window.speechSynthesis.resume();
-                    window.speechSynthesis.cancel();
-                    const utter = new SpeechSynthesisUtterance(frase);
-                    utter.lang = 'pt-BR';
-                    utter.rate = 1.05;
-                    utter.pitch = 1.35;
-                    utter.volume = 1.0;
-
-                    const voices = window.speechSynthesis.getVoices();
-                    if (voices && voices.length > 0) {
-                        const ptVoice = voices.find(v => v.lang && (v.lang.toLowerCase().includes('pt') || v.lang.toLowerCase().includes('br')));
-                        if (ptVoice) utter.voice = ptVoice;
-                    }
-
-                    window.speechSynthesis.speak(utter);
-                } catch (e) {
-                    console.warn('Speech synthesis error:', e);
-                }
+            const mobileDock = document.getElementById('mobile-map-dock');
+            if (mobileDock) {
+                const isEstados = state.activeTab === 'view-estados';
+                const isMobile = window.innerWidth <= 900;
+                mobileDock.classList.toggle('hidden', !(isEstados && isMobile && scrollY > 120));
             }
-
-            showToast('🗣️ "AI BOLSONARO COLOCA VAI!" — LULA 13');
-        }
-
-        // Listener do botão no cabeçalho
-        if (dom.btnLula13) {
-            dom.btnLula13.addEventListener('click', triggerLula13Meme);
-        }
-
-        // Delegação de clique: clicar no card do Lula (13) também ativa a fala
-        if (dom.presCandidatesContainer) {
-            dom.presCandidatesContainer.addEventListener('click', (e) => {
-                const item = e.target.closest('.cand-item');
-                if (item && item.dataset && item.dataset.candId === '13') {
-                    triggerLula13Meme();
-                }
-            });
-        }
-        if (dom.presDetailedGrid) {
-            dom.presDetailedGrid.addEventListener('click', (e) => {
-                const card = e.target.closest('.detailed-card');
-                if (card && card.innerHTML.includes('Nº 13')) {
-                    triggerLula13Meme();
-                }
-            });
-        }
-
-        if (dom.btnSyncNow) {
-            dom.btnSyncNow.addEventListener('click', async () => {
-                sound.click();
-                await fetchLiveTse(true, true);
-                showToast('📡 SINCRONIZADO COM CDN OFICIAL DO TSE');
-            });
-        }
-
-        if (dom.btnPause) {
-            dom.btnPause.addEventListener('click', () => {
-                sound.click();
-                state.isRunning = !state.isRunning;
-                dom.btnPause.textContent = state.isRunning ? '⏸️ Pausar Apuração' : '▶️ Retomar Apuração';
-                showToast(state.isRunning ? 'APURAÇÃO RETOMADA' : 'APURAÇÃO PAUSADA');
-            });
-        }
-
-        if (dom.btnVirada) {
-            dom.btnVirada.addEventListener('click', () => {
-                sound.click();
-                state.viradaMode = !state.viradaMode;
-                showToast(state.viradaMode ? '⚡ MODO VIRADA HISTÓRICA ATIVADO!' : 'MODO VIRADA DESATIVADO');
-            });
-        }
-
-        if (dom.btnReset) {
-            dom.btnReset.addEventListener('click', () => {
-                sound.click();
-                state.pres.secoesApuradasCurrent = 0;
-                state.gov.secoesApuradasCurrent = 0;
-                state.viradaMode = false;
-                showToast('🔄 REINICIANDO APURAÇÃO (0%)');
-            });
-        }
-
-        if (dom.btnFinish) {
-            dom.btnFinish.addEventListener('click', () => {
-                sound.click();
-                state.pres.secoesApuradasTarget = state.pres.secoesTotal;
-                state.gov.secoesApuradasTarget = state.gov.secoesTotal;
-                state.pres.secoesApuradasCurrent = state.pres.secoesTotal;
-                state.gov.secoesApuradasCurrent = state.gov.secoesTotal;
-                showToast('🏁 100% DAS URNAS TOTALIZADAS!');
-            });
-        }
-
-        if (dom.btnApplyNames) {
-            dom.btnApplyNames.addEventListener('click', () => {
-                sound.click();
-                if (state.pres.candidates[0] && dom.editP1Name) {
-                    state.pres.candidates[0].name = dom.editP1Name.value.trim().toUpperCase();
-                    state.pres.candidates[0].party = dom.editP1Party.value.trim().toUpperCase();
-                }
-                if (state.pres.candidates[1] && dom.editP2Name) {
-                    state.pres.candidates[1].name = dom.editP2Name.value.trim().toUpperCase();
-                    state.pres.candidates[1].party = dom.editP2Party.value.trim().toUpperCase();
-                }
-                renderCandidateItems();
-                showToast('✅ CANDIDATOS ATUALIZADOS');
-            });
-        }
+        }, { passive: true });
     }
 
-    // --- BOOTSTRAP ---
+    window.scrollToTop = function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.scrollToMap = function () {
+        const el = document.getElementById('brazil-svg') || document.getElementById('map-svg-container');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    window.scrollToCities = function () {
+        const el = document.getElementById('selected-state-card') || document.getElementById('cities-list');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
+    // --- INICIALIZAÇÃO DO APP ---
     async function init() {
-        renderCandidateItems();
-        populateDuelCandidateSelects();
-        updateDuelDisplay();
-        setupInteractions();
+        setupSearch();
+        setupAccessibilityAndNav();
+        setupChat();
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
 
-        // Carga inicial forçada sincronizando imediatamente
-        await fetchLiveTse(true, true);
-        populateDuelCandidateSelects();
-        updateDuelDisplay();
+        // Inicializa motor de 5.570 cidades SeuImposto & Reações ao vivo
+        initSeuImpostoCanvasMap();
+        loadMuniMapData();
+        syncReactions();
+        setInterval(syncReactions, 4000);
 
-        // Polling contínuo automático a cada 1.5s
-        setInterval(() => fetchLiveTse(false, true), 1500);
+        await fetchPollResults();
+        setInterval(fetchPollResults, 3000);
+        await loadData();
 
-        // Loop de renderização fluida a 1.000 Hz
-        requestAnimationFrame(tickEngine);
+        // Foco total: abre imediatamente no Mapa Interativo e Cidades
+        window.switchTab('view-estados');
+
+        // Polling contínuo oficial do TSE a cada 2.5s
+        setInterval(loadData, 2500);
     }
 
     if (document.readyState === 'loading') {
